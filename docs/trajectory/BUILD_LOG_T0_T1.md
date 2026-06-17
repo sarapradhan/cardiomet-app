@@ -68,3 +68,12 @@ independent persona review — as in a software engineering organization.
 T0–T1 complete. Clinical core for longitudinal tracking implemented, fully
 tested (36 new tests, 220 total green), and cleared by all three persona
 reviews with no Blockers. Ready for T2 (stateless API endpoint).
+
+---
+
+## Verification stamp (re-run)
+Full suite re-run after T2–T3: **243 passed**. The 36 T0–T1 tests
+(`test_series.py` + `test_trajectory_analytics.py`) remain green with no
+changes required. The additive clinical-core accessors
+(`medication_affects()`, `medication_labels()`) continue to pass the full
+pre-existing suite — no regressions.

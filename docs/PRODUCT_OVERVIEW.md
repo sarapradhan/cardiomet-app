@@ -26,6 +26,8 @@ This is a **preparation and education** tool, sitting *before* the clinical enco
 
 The honest framing: most of what this tool does, a motivated person could assemble themselves with enough time, several guideline PDFs, and a statistics background. The value is doing it accurately, instantly, and in plain language — and surfacing the South Asian context that generic tools omit.
 
+A single snapshot is also something a general-purpose AI assistant can now interpret on its own. The capability that a stateless chat session *cannot* easily replicate — and the one that is most clinically meaningful — is tracking values **over time**: rate of change, whether a value crossed a guideline line, and what moved after a medication started. That longitudinal view is the product's durable differentiator, and it matters more for South Asians, who tend to develop disease earlier and at lower BMI, where catching an adverse trend early is higher-value. See `docs/INCREMENTAL_VALUE_SPEC.md`.
+
 ---
 
 ## 2. The What
@@ -143,6 +145,22 @@ Written in standard form, grouped by persona, with acceptance criteria. These ma
 **C2.** *As the caregiver, I want a clear summary I can bring to a clinician, so that I can advocate for my parent.*
 - The results page is a coherent, printable summary: disclaimer, classifications, benchmark, context, questions, limitations.
 
+### Epic C2 — Track my numbers over time
+
+**C2.1.** *As Priya, I want to enter lab draws from different dates and see how each value is trending, so that I can tell whether things are getting better or worse — not just where they are today.*
+- Given two or more dated draws, when I view my timeline, then each biomarker shows a sparkline over time and a plain-language direction (improving / worsening / stable / not enough data).
+- "Improving" means moving toward the guideline-preferred range (correctly inverted for HDL).
+- The tool describes what has happened; it never predicts a future value or gives a risk score.
+
+**C2.2.** *As Rajesh, I want to see when a value crossed a clinical line and what changed after I started a medication, so that I have something concrete to discuss.*
+- Category transitions are shown (e.g. "Prediabetes → Normal").
+- When a medication was started between draws, the timeline marks it and describes the observed change in the affected values — without claiming the medication caused it.
+
+**C2.3.** *As a privacy-conscious user, I want to own my history, so that tracking over time doesn't mean a company stores my health data.*
+- I can export my history as a file I keep, and import it later to continue.
+- An optional cache lives only on my own device and I can clear it.
+- The server stores nothing; it computes on what I send and returns.
+
 ### Epic D — Trust, safety, and privacy
 
 **D1.** *As any user, I want to know this isn't a diagnosis, so that I don't act on it inappropriately.*
@@ -178,4 +196,4 @@ Adoption, engagement, and outcome measures belong to a later phase, only after c
 ---
 
 ## 7. What's next
-Phase 1 is complete and demo-ready. The gate to going further is **clinical review** — a licensed clinician confirming the thresholds are current, the South Asian framing is defensible, and the language is safe. Everything beyond that (deployment at scale, regulatory determination, accessibility, security hardening) follows that sign-off. See the companion clinician briefing document and `docs/PHASE2_ROADMAP.md`.
+Phase 1 is complete and demo-ready, and the longitudinal trajectory capability (the key differentiator) is now implemented end-to-end — stateless API plus a timeline UI with user-owned data. The gate to going further is **clinical review** — a licensed clinician confirming the thresholds are current, the South Asian framing is defensible, and the language is safe. Everything beyond that (deployment at scale, regulatory determination, accessibility, security hardening) follows that sign-off. See the companion clinician briefing document and `docs/PHASE2_ROADMAP.md`.

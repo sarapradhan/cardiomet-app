@@ -61,3 +61,15 @@ verifiable, user-owned tracking) is now end-to-end.
 ## Remaining (T4 closeout)
 Browser-tier manual walkthrough per docs/E2E_CHECKLIST.md (timeline section);
 update ARCHITECTURE.md with the new endpoint/route/components.
+
+---
+
+## Verification stamp (re-run)
+- Full suite: **243 passed** (verified, not trusted).
+- Trajectory suites: `test_series.py` + `test_trajectory_analytics.py` +
+  `test_trajectory_api.py` = **53 passed**.
+- End-to-end (`test_e2e.py`, real uvicorn over HTTP): **8 passed**, including
+  `test_e2e_trajectory_endpoint`.
+- Validation gate: all tiers + TypeScript type-check + descriptive-only scan PASS.
+- Frontend: `npm run type-check` clean; production build generates 7/7 routes
+  including `/timeline`.

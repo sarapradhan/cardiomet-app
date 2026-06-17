@@ -43,6 +43,11 @@ Walking through a result, in order:
 5. **A discussion guide** — plain-language questions for each non-normal value, each citing its guideline. This is fixed template text, not AI-generated prose.
 6. **A limitations panel**, always visible, that cannot be hidden.
 
+If the patient enters lab values from more than one date (or imports a file of their own history), they also see:
+
+7. **A timeline** — each value plotted over time against the guideline category bands, so they can see direction of travel rather than a single snapshot.
+8. **A trend summary** — plain language: e.g. "LDL 162 → 124, moving toward the typical range; crossed from High to Near Optimal; cholesterol medication was started before the latest draw." Strictly descriptive. No projection of future values, no risk score, no claim that the medication caused the change.
+
 ---
 
 ## 4. The specific things we need your judgment on
@@ -73,6 +78,11 @@ We've worked to keep every output educational. We scan the code to block diagnos
 ### 4d. Is anything clinically missing or misleading by omission?
 **Questions for you:** Should we say more about non-fasting glucose being uninterpretable? About medications confounding values (we flag this but don't adjust classifications)? Is showing standard and South Asian BMI side by side clarifying, or confusing for a layperson? Is there a value we include that shouldn't be patient-facing, or one we omit that should be there?
 
+### 4f. Is the trend view honest and appropriately bounded?
+The tool can track a patient's values across multiple dated draws and describe the trend. We have deliberately kept this **descriptive only**: it reports direction (toward or away from the typical range), the size of the change, when a value crossed a category line, and what was observed around a medication change. It does **not** forecast future values, estimate time-to-threshold, attribute causation to a medication, or produce any risk score — and we enforce that with tests that scan the output for predictive or causal language.
+
+**Questions for you:** Is a descriptive trend view (no prediction) a responsible thing to put in a patient's hands? Is "improving / worsening" — defined strictly as movement toward or away from the guideline-preferred range — acceptable wording, or does it risk over-reading normal lab variation? Is the "a few draws can be misleading" caveat we always show sufficient? Is there a minimum number of draws below which we should show no trend at all?
+
 ### 4e. The net effect on your encounter
 **The question that matters most:** On balance, would a patient arriving with this *help* your appointment (focused, prepared, better questions) or *hinder* it (anxious, misinformed, arguing with a printout)? If the latter, what would have to change for it to help?
 
@@ -89,6 +99,8 @@ We'd rather you hear these from us than find them yourself.
 - Medications affect values; we flag medication use but do not adjust classifications.
 - Missing values are never imputed — they're shown as missing.
 - The South Asian BMI action points are discussion context, not an empirical cohort.
+
+**On the trend view and data:** the longitudinal tracking stores nothing on our servers. The patient owns their history as a file they export and re-import; any cache lives only on their own device. We chose this specifically to keep the privacy and regulatory surface minimal while still offering trends over time.
 
 **What we don't yet have:** a clinical review (this conversation), a regulatory determination, or any outcome evidence. We're not pretending otherwise.
 

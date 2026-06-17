@@ -15,6 +15,7 @@ A user enters cardiometabolic lab values and vitals (lipids, glucose, HbA1c, blo
 2. **Population benchmark** — the value positioned against the NHANES Non-Hispanic Asian reference distribution (p10–p90), accurately labeled.
 3. **South Asian risk context** — guideline-backed, qualitative discussion points (e.g. ancestry as a risk-enhancing factor; lower BMI cut-points), shown only when the user reports South Asian ancestry.
 4. **Physician discussion guide** — template-generated prompts the user can raise with their clinician.
+5. **Longitudinal trajectory tracking** — across multiple dated draws, descriptive trends (direction, change, category transitions, response-to-intervention) over time, with the data owned by the user and nothing stored server-side.
 
 Everything is framed for discussion, never diagnosis. Two safety guarantees are enforced by the type system and tests: the cohort is always labeled exactly `"NHANES Non-Hispanic Asian"`, and a disclaimer is always present in every response.
 
@@ -91,6 +92,9 @@ This package is the heart of the system and the only place clinical decisions ar
 | `data/missingness.py` | Reports missing values; never imputes or drops | `missingness_report()` |
 | `data/demo_cohort.py` | Frozen real NH-Asian percentiles for the stateless demo | `get_demo_percentiles()` |
 | `benchmark/percentile.py` | Resolves the data source (live vs demo) and produces benchmark points | `get_benchmark_data()`, `get_cohort_percentiles()` |
+| `trajectory/series.py` | Dated-draw and series model; validation (no future dates), date-sorting, immutability | `make_series()`, `BiomarkerDraw`, `BiomarkerSeries` |
+| `trajectory/health_file.py` | Portable, user-owned health-file export/import (no server storage) | `to_health_file()`, `from_health_file()` |
+| `trajectory/analytics.py` | Descriptive longitudinal analytics — reuses the classifier; zero new thresholds | `analyze_series()` (direction, change, per-year rate, transitions, interventions) |
 
 **The classification algorithm.** Each threshold table is an ascending list of `(lower_bound_inclusive, category, range_description)`. A value is classified to the *last* entry whose lower bound it meets or exceeds, so upper bounds are implicit (the next entry's lower bound). Two non-obvious cases are handled explicitly and tested: HbA1c/FPG prediabetes upper bounds are exclusive (an HbA1c of 6.49 is Prediabetes, not Diabetes), and HDL branches on sex (different tables for male and female).
 
@@ -106,6 +110,9 @@ This package is the heart of the system and the only place clinical decisions ar
 | `api/routers/benchmark.py` | `POST /api/v1/benchmark` — orchestrates the clinical core into a `BenchmarkResponse` |
 | `api/routers/thresholds.py` | `GET /api/v1/thresholds` — returns the full reference table |
 | `api/routers/health.py` | `GET /health` — liveness plus demo/live mode indicator |
+| `api/models/series.py` | `BiomarkerDrawIn` / `BiomarkerSeriesIn` — dated-draw input (no future dates, ≥1 draw) |
+| `api/models/trajectory.py` | `TrajectoryResponse` and parts — mirrors the trajectory dataclasses; same safety fields |
+| `api/routers/trajectory.py` | `POST /api/v1/trajectory` — stateless; validates, calls `analyze_series`, maps to the response |
 
 Routers contain no clinical logic, no thresholds, and no NHANES variable names. They validate, delegate to `sahc_risklens/`, and assemble the response. The South Asian context is gated here (included only when `south_asian` is true), which is the one piece of orchestration the API owns.
 
@@ -127,6 +134,10 @@ Routers contain no clinical logic, no thresholds, and no NHANES variable names. 
 | `src/lib/types.ts` | TypeScript mirror of `api/models/results.py` — the contract's other half |
 | `src/lib/api.ts` | API client; reads `NEXT_PUBLIC_API_URL`, never hardcodes URLs |
 | `src/lib/categoryStyles.ts` | Maps a clinical category to a chip tone — presentation only, never alters the category |
+| `src/app/timeline/page.tsx` | Multi-draw entry, analyze, and export/import flow for longitudinal tracking |
+| `src/components/Timeline.tsx` | SVG small-multiples sparklines per biomarker, colored by category tone, with intervention markers |
+| `src/components/TrajectorySummary.tsx` | Plain-language trend summary; always-on disclaimer + few-draws limitation |
+| `src/lib/healthFile.ts` | User-owned health-file export/import + user-controlled local cache (no server storage) |
 
 The design system is Material Design 3, defined as CSS custom properties and a Tailwind token set in `globals.css` / `tailwind.config.js`: a clinical-blue primary, elevation shadows, a rounded shape scale, and four semantic chip tones (normal / elevated / high / missing). The aesthetic is intentionally restrained — in a medical context, credibility and legibility outrank flourish.
 
@@ -147,6 +158,8 @@ A single benchmark request flows through every tier:
    - `get_south_asian_context(bmi)` → only if `south_asian` is true
 4. **Assembly** — the router builds a `BenchmarkResponse`. `cohort_label` and `disclaimer` are supplied by model defaults and cannot be absent.
 5. **Render** — the frontend stores the response in `sessionStorage`, routes to `/results`, and renders disclaimer → badges → threshold cards → distribution → South Asian context → medication notes → physician guide → limitations. The disclaimer and limitations are unconditional.
+
+**The longitudinal flow** is parallel but stateful in the *user's* hands: the `/timeline` page collects several dated draws (or imports a user-owned health file), POSTs the whole series to the stateless `POST /api/v1/trajectory`, and renders the `Timeline` (per-biomarker sparklines with category bands and intervention markers) and `TrajectorySummary`. The server computes and returns; it stores nothing. Persistence is the user's: an exported JSON health file they keep, plus an optional local-browser cache they can clear.
 
 ---
 
@@ -178,14 +191,14 @@ The output shape is defined once in `api/models/results.py` (Pydantic) and mirro
 
 ## 8. Testing architecture
 
-The suite has **184 tests across four tiers**, run in order by `scripts/run_validation_gate.sh`:
+The suite has **243 tests across four tiers**, run in order by `scripts/run_validation_gate.sh`:
 
 | Tier | File(s) | Count | What it proves |
 |---|---|---|---|
-| **Smoke** | `test_smoke.py` | ~32 | Every module imports and every entry point runs on minimal input — catches wiring and signature breaks first |
-| **Unit** | `test_thresholds.py`, `test_cohort_filters.py`, `test_missingness.py`, `test_biomarker_mapping.py`, `test_percentile.py` | ~100 | Each function correct in isolation: every threshold boundary, filter behavior, percentile math, real-file sanity checks |
-| **Integration** | `test_api_endpoints.py`, `test_integration.py` | ~31 | Components agree through the API: value consistency across sections, guide ⊆ threshold results, context gating |
-| **End-to-end** | `test_e2e.py` | ~7 | A real uvicorn server over HTTP: boot, full contract, safety invariants, CORS, input validation |
+| **Smoke** | `test_smoke.py` | ~37 | Every module imports and every entry point runs on minimal input — catches wiring and signature breaks first |
+| **Unit** | `test_thresholds.py`, `test_cohort_filters.py`, `test_missingness.py`, `test_biomarker_mapping.py`, `test_percentile.py`, `test_series.py`, `test_trajectory_analytics.py` | ~136 | Each function correct in isolation: every threshold boundary, filter behavior, percentile math, real-file checks, plus series handling and trajectory analytics (incl. descriptive-only guardrails) |
+| **Integration** | `test_api_endpoints.py`, `test_integration.py`, `test_trajectory_api.py` | ~48 | Components agree through the API: value consistency across sections, guide ⊆ threshold results, context gating, and the stateless trajectory endpoint contract |
+| **End-to-end** | `test_e2e.py` | 8 | A real uvicorn server over HTTP: boot, full contract, safety invariants, CORS, input validation, and the trajectory endpoint |
 
 The unit tier includes boundary cases for every cut-point in the appendix (e.g. LDL at 99/100/129/130/159/160/189/190) and the deliberately tricky HbA1c 6.49 edge. Real-NHANES-file tests skip cleanly when the data is absent, so the suite is green in any environment. A browser-tier checklist for manual or Playwright execution lives in `docs/E2E_CHECKLIST.md`.
 
@@ -258,7 +271,7 @@ sahc-risklens/
 │       ├── components/        #   form + 6 result components
 │       └── lib/               #   types (contract mirror), api client, category styles
 │
-├── tests/                     # 184 tests across 4 tiers
+├── tests/                     # 243 tests across 4 tiers
 │   ├── conftest.py            #   9 synthetic patient fixtures
 │   ├── test_smoke.py          #   tier 1: imports + entry points
 │   ├── test_thresholds.py …   #   tier 2: unit (clinical, data, benchmark)
