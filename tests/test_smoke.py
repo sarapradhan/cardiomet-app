@@ -40,6 +40,9 @@ _MINIMAL_PATIENT = {
     "sahc_risklens.data.missingness",
     "sahc_risklens.data.demo_cohort",
     "sahc_risklens.benchmark.percentile",
+    "sahc_risklens.trajectory.series",
+    "sahc_risklens.trajectory.health_file",
+    "sahc_risklens.trajectory.analytics",
     "api.main",
     "api.models.patient",
     "api.models.results",
@@ -150,3 +153,23 @@ def test_smoke_openapi_schema():
     r = client.get("/openapi.json")
     assert r.status_code == 200
     assert "/api/v1/benchmark" in r.json()["paths"]
+
+
+def test_smoke_make_series_and_analyze():
+    import datetime as dt
+    from sahc_risklens.trajectory.series import BiomarkerDraw, make_series
+    from sahc_risklens.trajectory.analytics import analyze_series
+    series = make_series([
+        BiomarkerDraw(dt.date(2025, 12, 1), {"LDL_mgdl": 162}),
+        BiomarkerDraw(dt.date(2026, 5, 1), {"LDL_mgdl": 124}),
+    ])
+    a = analyze_series(series)
+    assert len(a.trajectories) == 9
+
+
+def test_smoke_health_file_round_trip():
+    import datetime as dt
+    from sahc_risklens.trajectory.series import BiomarkerDraw, make_series
+    from sahc_risklens.trajectory.health_file import to_health_file, from_health_file
+    s = make_series([BiomarkerDraw(dt.date(2026, 1, 1), {"LDL_mgdl": 100})])
+    assert from_health_file(to_health_file(s)).draws[0].values["LDL_mgdl"] == 100

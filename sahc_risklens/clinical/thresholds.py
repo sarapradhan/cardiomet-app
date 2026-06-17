@@ -251,7 +251,14 @@ def get_all_threshold_categories() -> dict:
     }
 
 
+def medication_affects() -> dict[str, set[str]]:
+    """Public accessor for the medication -> affected-biomarker map (single
+    source of truth; reused by sahc_risklens/trajectory/analytics.py)."""
+    return {flag: set(bms) for flag, bms in _MED_AFFECTS.items()}
+
+
 __all__ = [
+    "medication_affects",
     "classify_all_biomarkers",
     "classify_bmi_south_asian",
     "get_all_threshold_categories",

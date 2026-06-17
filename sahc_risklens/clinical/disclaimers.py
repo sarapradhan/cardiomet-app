@@ -88,4 +88,11 @@ def get_medication_notes(data) -> list[str]:
     return notes
 
 
-__all__ = ["build_physician_guide", "get_medication_notes"]
+def medication_labels() -> dict[str, str]:
+    """Public accessor for the medication-flag -> human-label map (single
+    source of truth; reused by sahc_risklens/trajectory/analytics.py)."""
+    return dict(_MEDICATION_LABELS)
+
+
+__all__ = [
+    "medication_labels","build_physician_guide", "get_medication_notes"]

@@ -49,3 +49,19 @@ Phase 1 is functionally complete and deployable in demo mode. Next actions:
 1. Deploy: frontend -> Vercel, backend -> Railway (set NEXT_PUBLIC_API_URL + ALLOWED_ORIGINS).
 2. Run docs/E2E_CHECKLIST.md Tier 2 (browser) against the deployed URLs.
 3. Begin Phase 2 gate: physician review (docs/PHASE2_ROADMAP.md P2.0).
+
+
+## Trajectory Tracking — T0/T1 (Clinical Core) — COMPLETE
+_Added: longitudinal trajectory tracking, the differentiation capability (see docs/INCREMENTAL_VALUE_SPEC.md)._
+
+| Phase | Status | Notes |
+|---|---|---|
+| T0: Data model | Complete | sahc_risklens/trajectory/{series,health_file}.py. Dated draws, immutable date-sorted series, user-owned portable health file (no server storage). 12 tests. |
+| T1: Analytics engine | Complete | sahc_risklens/trajectory/analytics.py. Direction, change, per-year rate, category transitions, intervention detection. Reuses clinical core (classify_all_biomarkers, medication_affects()); zero new thresholds. 24 tests incl. descriptive-only guardrails. |
+| T2: API endpoint | Not started | POST /api/v1/trajectory (stateless) |
+| T3: Frontend timeline | Not started | |
+| T4: Gate/review/docs | Partial | smoke + gate updated for trajectory; full T4 after T2/T3 |
+
+Methodology: design-first (PRD + technical design), TDD (tests written first, red->green), three persona reviews (Staff Engineer, Data & QA Auditor, Clinical & Safety Reviewer) — all PASS, no Blockers. See docs/trajectory/BUILD_LOG_T0_T1.md.
+
+Test count: 220 total (184 base + 36 trajectory), all green. Additive public accessors added to clinical core (thresholds.medication_affects, disclaimers.medication_labels) to keep the medication map single-source; no regressions.

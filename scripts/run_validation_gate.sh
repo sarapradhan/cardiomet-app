@@ -12,7 +12,8 @@ echo "   1a. Smoke..."
 pytest tests/test_smoke.py -q --tb=short || { echo -e "${R}  x Smoke FAILED${E}"; exit 1; }
 echo "   1b. Unit (clinical, data, benchmark)..."
 pytest tests/test_thresholds.py tests/test_cohort_filters.py tests/test_missingness.py \
-       tests/test_biomarker_mapping.py tests/test_percentile.py -q --tb=short \
+       tests/test_biomarker_mapping.py tests/test_percentile.py \
+       tests/test_series.py tests/test_trajectory_analytics.py -q --tb=short \
   || { echo -e "${R}  x Unit FAILED${E}"; exit 1; }
 echo "   1c. API + integration..."
 pytest tests/test_api_endpoints.py tests/test_integration.py -q --tb=short \
@@ -66,6 +67,13 @@ grep -rq "PHAFSTHR" sahc_risklens/ --include="*.py" 2>/dev/null && \
   echo -e "${G}  ok PHAFSTHR fasting filter present${E}" || echo -e "${Y}  ! PHAFSTHR not found${E}"
 echo ""
 
+
+echo "9. Trajectory descriptive-only scan..."
+if grep -inE "will (reach|develop)|predict|forecast|expected to|is working|lowered your|caused by" sahc_risklens/trajectory/*.py | grep -vE "emits no predictive|no predictive/causal|descriptive"; then
+  echo -e "${R}  x Predictive/causal language in trajectory source${E}"; exit 1
+fi
+echo -e "${G}  ok Trajectory output is descriptive-only${E}"
+echo ""
 echo -e "${D}==================================================${E}"
 echo -e "${G} Validation gate PASSED${E}"
 echo -e "${D}==================================================${E}\n"
