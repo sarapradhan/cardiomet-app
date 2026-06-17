@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --md-primary:             #1565C0;
+  --md-on-primary:          #FFFFFF;
+  --md-primary-container:   #D3E4FF;
+  --md-on-primary-container:#001D36;
+  --md-secondary:           #0277BD;
+  --md-surface:             #FFFFFF;
+  --md-surface-variant:     #E3F2FD;
+  --md-surface-dim:         #E8EAF6;
+  --md-background:          #F5F5F5;
+  --md-on-surface:          #1C1B1F;
+  --md-on-surface-variant:  #49454F;
+  --md-outline:             #79747E;
+  --md-outline-variant:     #CAC4D0;
+  --md-error:               #B3261E;
+  --md-error-container:     #F9DEDC;
+  --md-elevation-1: 0px 1px 2px rgba(0,0,0,0.3), 0px 1px 3px 1px rgba(0,0,0,0.15);
+  --md-elevation-2: 0px 1px 2px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15);
+  --md-elevation-3: 0px 4px 8px 3px rgba(0,0,0,0.15), 0px 1px 3px rgba(0,0,0,0.3);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: var(--md-background);
+  color: var(--md-on-surface);
+  font-family: 'Inter', 'Roboto', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  /* Cards */
+  .md-card {
+    @apply bg-white rounded-md p-6;
+    box-shadow: var(--md-elevation-1);
+  }
+  .md-card-elevated {
+    @apply bg-white rounded-md p-6;
+    box-shadow: var(--md-elevation-2);
+  }
+  .md-surface-variant {
+    @apply rounded-sm p-4;
+    background-color: var(--md-surface-variant);
+  }
+
+  /* Buttons */
+  .md-btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-2.5 rounded-xl
+           font-medium text-sm tracking-wide transition-all duration-200 select-none;
+    background-color: var(--md-primary);
+    color: var(--md-on-primary);
+  }
+  .md-btn-primary:hover { box-shadow: var(--md-elevation-2); opacity: 0.92; }
+  .md-btn-primary:active { opacity: 0.84; }
+
+  .md-btn-outlined {
+    @apply inline-flex items-center justify-center px-6 py-2.5 rounded-xl
+           font-medium text-sm tracking-wide transition-all duration-200 border select-none;
+    color: var(--md-primary);
+    border-color: var(--md-outline);
+  }
+  .md-btn-outlined:hover { background-color: rgba(21,101,192,0.08); }
+
+  .md-btn-text {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
+           font-medium text-sm tracking-wide transition-all duration-200 select-none;
+    color: var(--md-primary);
+  }
+  .md-btn-text:hover { background-color: rgba(21,101,192,0.08); }
+
+  /* Chips */
+  .md-chip {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+  }
+  .chip-normal   { @apply md-chip; background-color:#DBEAFE; color:#1E40AF; }
+  .chip-elevated { @apply md-chip; background-color:#FEF3C7; color:#92400E; }
+  .chip-high     { @apply md-chip; background-color:#FEE2E2; color:#991B1B; }
+  .chip-missing  { @apply md-chip; background-color:#F3F4F6; color:#6B7280; }
+  .chip-primary  { @apply md-chip;
+    background-color: var(--md-primary-container);
+    color: var(--md-on-primary-container); }
+
+  /* Typography */
+  .md-label {
+    @apply text-xs font-medium tracking-wider uppercase;
+    color: var(--md-on-surface-variant);
+  }
+  .md-headline { @apply text-2xl font-light tracking-tight; color: var(--md-on-surface); }
+  .md-title    { @apply text-lg font-medium; color: var(--md-on-surface); }
+  .md-body     { @apply text-sm; color: var(--md-on-surface-variant); }
+
+  /* Divider */
+  .md-divider { @apply border-t; border-color: var(--md-outline-variant); }
+
+  /* Input field */
+  .md-input {
+    @apply w-full px-3 py-2.5 rounded-sm text-sm border bg-white
+           transition-colors duration-150 outline-none;
+    border-color: var(--md-outline);
+    color: var(--md-on-surface);
+  }
+  .md-input:focus { border-color: var(--md-primary); box-shadow: 0 0 0 2px rgba(21,101,192,0.15); }
+  .md-input::placeholder { color: var(--md-on-surface-variant); }
+
+  /* Top-bar nav link */
+  .md-nav-link {
+    @apply px-4 py-2 rounded-xl text-sm font-medium no-underline transition-colors duration-150;
+    color: var(--md-on-surface-variant);
+  }
+  .md-nav-link:hover { background-color: rgba(21,101,192,0.08); }
+
+}
