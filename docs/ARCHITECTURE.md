@@ -235,7 +235,7 @@ Python is pinned to `>=3.11`; key libraries are version-bounded in `requirements
 
 ```
 sahc-risklens/
-├── CLAUDE.md                  # AI-collaborator operating rules and authority hierarchy
+├── CONTRIBUTING.md             # Engineering guide, operating rules, authority hierarchy
 ├── README.md                  # Quick start
 ├── SESSION_START_PROMPT.md    # Per-session task template
 ├── pyproject.toml             # pytest config (pythonpath, markers), ruff, coverage
@@ -281,7 +281,7 @@ sahc-risklens/
 │   ├── run_validation_gate.sh #   the single pre-release gate
 │   └── setup_env.sh           #   venv + npm bootstrap
 │
-└── .claude/                   # AI reviewer subagents and skills
+└── .project/                  # Reviewer subagents and engineering skills
     ├── agents/                #   clinical_safety, data_qa, release_gate reviewers
     └── skills/                #   implement_feature, run_validation_gate, etc.
 ```
@@ -298,4 +298,4 @@ A few rules keep changes from breaking the invariants:
 - **Any clinical or UI copy change** → re-run the diagnostic-language scan; have the Clinical & Safety Reviewer subagent review before release.
 - **Before any release** → `bash scripts/run_validation_gate.sh` must exit clean.
 
-The `.claude/` directory encodes these as reviewer subagents and skills so the discipline survives across development sessions.
+The `.project/` directory encodes these as reviewer subagents and engineering skills so the discipline survives across development sessions.
