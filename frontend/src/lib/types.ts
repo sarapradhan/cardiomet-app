@@ -89,3 +89,57 @@ export interface ThresholdsResponse {
   BMI_standard: ThresholdCategory[];
   BMI_south_asian_context: ThresholdCategory[];
 }
+
+// --- Trajectory (longitudinal tracking) ---
+// Mirror of api/models/series.py and api/models/trajectory.py.
+// SYNC RULE: changing those Pydantic models requires updating these in the same change.
+
+export interface BiomarkerDraw {
+  draw_date: string;          // ISO date (YYYY-MM-DD)
+  values: BiomarkerInput;
+  label: string | null;
+}
+
+export interface BiomarkerSeries {
+  draws: BiomarkerDraw[];
+}
+
+export interface TrajectoryPoint {
+  draw_date: string;
+  value: number | null;
+  category: string | null;
+  category_tone: 'normal' | 'elevated' | 'high' | 'missing';
+}
+
+export interface CategoryTransition {
+  from_category: string;
+  to_category: string;
+  from_date: string;
+  to_date: string;
+}
+
+export interface BiomarkerTrajectory {
+  biomarker: string;
+  unit: string;
+  points: TrajectoryPoint[];
+  direction: 'improving' | 'worsening' | 'stable' | 'insufficient_data';
+  change_absolute: number | null;
+  change_per_year: number | null;
+  transitions: CategoryTransition[];
+  n_points: number;
+}
+
+export interface InterventionMarker {
+  draw_date: string;
+  change: string;
+  affected_biomarkers: string[];
+  observed_effects: string[];
+}
+
+export interface TrajectoryResponse {
+  trajectories: BiomarkerTrajectory[];
+  interventions: InterventionMarker[];
+  cohort_label: 'NHANES Non-Hispanic Asian';
+  disclaimer: string;
+  validation_status: string;
+}

@@ -16,7 +16,7 @@ pytest tests/test_thresholds.py tests/test_cohort_filters.py tests/test_missingn
        tests/test_series.py tests/test_trajectory_analytics.py -q --tb=short \
   || { echo -e "${R}  x Unit FAILED${E}"; exit 1; }
 echo "   1c. API + integration..."
-pytest tests/test_api_endpoints.py tests/test_integration.py -q --tb=short \
+pytest tests/test_api_endpoints.py tests/test_integration.py tests/test_trajectory_api.py -q --tb=short \
   || { echo -e "${R}  x Integration FAILED${E}"; exit 1; }
 echo "   1d. End-to-end (boots real server)..."
 pytest tests/test_e2e.py -q --tb=short || { echo -e "${R}  x E2E FAILED${E}"; exit 1; }

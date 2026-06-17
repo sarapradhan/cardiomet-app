@@ -160,3 +160,28 @@ def test_e2e_cors_header_present(live_server):
     with urllib.request.urlopen(req, timeout=10) as resp:
         allow_origin = resp.headers.get("access-control-allow-origin")
     assert allow_origin in ("http://localhost:3000", "*")
+
+
+def test_e2e_trajectory_endpoint(live_server):
+    """Real-server: post a 2-draw series, assert contract + safety over HTTP."""
+    payload = {"draws": [
+        {"draw_date": "2025-12-01", "label": "baseline",
+         "values": {"LDL_mgdl": 162, "HbA1c_pct": 6.0, "sex": "M",
+                    "south_asian": True, "chol_med": False, "bp_med": False,
+                    "insulin": False, "dm_pills": False}},
+        {"draw_date": "2026-05-01", "label": "after statin",
+         "values": {"LDL_mgdl": 124, "HbA1c_pct": 5.5, "sex": "M",
+                    "south_asian": True, "chol_med": True, "bp_med": False,
+                    "insulin": False, "dm_pills": False}},
+    ]}
+    status, body = _post_json(live_server, "/api/v1/trajectory", payload)
+    assert status == 200
+    assert body["cohort_label"] == "NHANES Non-Hispanic Asian"
+    assert len(body["disclaimer"]) >= 20
+    assert len(body["trajectories"]) == 9
+    ldl = next(t for t in body["trajectories"] if t["biomarker"] == "LDL")
+    assert ldl["direction"] == "improving"
+    # descriptive-only over the wire
+    text = json.dumps(body).lower()
+    for phrase in ["will reach", "predict", "is working", "% risk", "lowered your"]:
+        assert phrase not in text

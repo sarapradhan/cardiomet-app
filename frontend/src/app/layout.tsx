@@ -50,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </span>
           </div>
           <nav style={{ display: 'flex', gap: 4 }}>
-            {([['/', 'Home'], ['/benchmark', 'Benchmark']] as [string,string][]).map(([href, label]) => (
+            {([['/', 'Home'], ['/benchmark', 'Benchmark'], ['/timeline', 'Timeline']] as [string,string][]).map(([href, label]) => (
               <Link key={href} href={href} className="md-nav-link">
                 {label}
               </Link>

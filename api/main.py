@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routers import benchmark, thresholds, health
+from api.routers import benchmark, thresholds, health, trajectory
 
 app = FastAPI(
     title="SAHC RiskLens API",
@@ -23,3 +23,4 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(benchmark.router, prefix="/api/v1", tags=["benchmark"])
 app.include_router(thresholds.router, prefix="/api/v1", tags=["thresholds"])
+app.include_router(trajectory.router, prefix="/api/v1", tags=["trajectory"])

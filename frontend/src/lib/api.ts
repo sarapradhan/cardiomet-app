@@ -30,3 +30,17 @@ export async function healthCheck(): Promise<{ status: string; nhanes_loaded: bo
   if (!res.ok) throw new Error('Health check failed');
   return res.json();
 }
+
+export async function submitSeries(series: import('./types').BiomarkerSeries):
+    Promise<import('./types').TrajectoryResponse> {
+  const res = await fetch(`${API_BASE}/api/v1/trajectory`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(series),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? `API error: ${res.status}`);
+  }
+  return res.json() as Promise<import('./types').TrajectoryResponse>;
+}

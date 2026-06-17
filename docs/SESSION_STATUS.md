@@ -58,10 +58,10 @@ _Added: longitudinal trajectory tracking, the differentiation capability (see do
 |---|---|---|
 | T0: Data model | Complete | sahc_risklens/trajectory/{series,health_file}.py. Dated draws, immutable date-sorted series, user-owned portable health file (no server storage). 12 tests. |
 | T1: Analytics engine | Complete | sahc_risklens/trajectory/analytics.py. Direction, change, per-year rate, category transitions, intervention detection. Reuses clinical core (classify_all_biomarkers, medication_affects()); zero new thresholds. 24 tests incl. descriptive-only guardrails. |
-| T2: API endpoint | Not started | POST /api/v1/trajectory (stateless) |
-| T3: Frontend timeline | Not started | |
-| T4: Gate/review/docs | Partial | smoke + gate updated for trajectory; full T4 after T2/T3 |
+| T2: API endpoint | Complete | POST /api/v1/trajectory (stateless). api/models/{series,trajectory}.py + router. 17 tests; contract mirrored to types.ts. |
+| T3: Frontend timeline | Complete | /timeline page, Timeline (SVG small-multiples) + TrajectorySummary components, healthFile export/import (user-owned, no server storage). Type-check + build pass (7/7 pages). |
+| T4: Gate/review/docs | Partial | gate+smoke+e2e cover trajectory; ARCHITECTURE.md update + browser walkthrough remain |
 
 Methodology: design-first (PRD + technical design), TDD (tests written first, red->green), three persona reviews (Staff Engineer, Data & QA Auditor, Clinical & Safety Reviewer) — all PASS, no Blockers. See docs/trajectory/BUILD_LOG_T0_T1.md.
 
-Test count: 220 total (184 base + 36 trajectory), all green. Additive public accessors added to clinical core (thresholds.medication_affects, disclaimers.medication_labels) to keep the medication map single-source; no regressions.
+Test count: 243 total (184 base + 36 trajectory), all green. Additive public accessors added to clinical core (thresholds.medication_affects, disclaimers.medication_labels) to keep the medication map single-source; no regressions.
