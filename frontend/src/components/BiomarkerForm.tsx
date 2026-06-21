@@ -43,9 +43,10 @@ const MEDS: { key: keyof BiomarkerInput; label: string }[] = [
 interface Props {
   onSubmit: (input: BiomarkerInput) => void;
   isLoading?: boolean;
+  submitLabel?: string;
 }
 
-export function BiomarkerForm({ onSubmit, isLoading = false }: Props) {
+export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See My Results' }: Props) {
   const [values, setValues] = useState<Record<string, string>>({});
   const [age, setAge] = useState<string>('');
   const [sex, setSex] = useState<'M' | 'F' | ''>('');
@@ -158,7 +159,7 @@ export function BiomarkerForm({ onSubmit, isLoading = false }: Props) {
         <button className="btn btn-primary" disabled={isLoading}
           onClick={() => onSubmit(buildInput())}
           style={isLoading ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}>
-          {isLoading ? 'Analyzing…' : 'See My Results'}
+          {isLoading ? 'Analyzing…' : submitLabel}
         </button>
       </div>
     </div>

@@ -75,6 +75,21 @@ fi
 echo -e "${G}  ok Trajectory output is descriptive-only${E}"
 echo ""
 echo -e "${D}==================================================${E}"
+
+# --- Tier 5: Browser UI (Playwright) — optional, skips if unavailable ---
+echo -e "${D}5. Browser UI tests (Playwright)${E}"
+if python3 -c "import playwright" 2>/dev/null; then
+  if [[ -f frontend/out/index.html ]] || [[ -d frontend/node_modules ]]; then
+    python3 -m pytest tests/browser/ -q --tb=short -p no:cacheprovider \
+      || { echo -e "${R}  x Browser tests FAILED${E}"; exit 1; }
+    echo -e "${G}  ok Browser UI passed${E}\n"
+  else
+    echo -e "${Y}  - Skipped (build the static export first: cd frontend && npm run build)${E}\n"
+  fi
+else
+  echo -e "${Y}  - Skipped (playwright not installed: pip install playwright && playwright install chromium)${E}\n"
+fi
+
 echo -e "${G} Validation gate PASSED${E}"
 echo -e "${D}==================================================${E}\n"
 exit 0

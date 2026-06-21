@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { NavBar } from '@/components/NavBar';
 import './globals.css';
 
+export const viewport = { width: 'device-width', initialScale: 1 };
+
 export const metadata: Metadata = {
   title: 'SAHC RiskLens — Cardiometabolic lab context',
   description: 'Understand your cardiometabolic labs against clinical guidelines and a population benchmark. Educational use only — not a diagnosis.',
@@ -11,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <a href="#main" className="skip-link">Skip to content</a>
         {/* Structural disclaimer — always present */}
         <div style={{
           background: 'var(--surface)', borderBottom: '1px solid var(--hairline)',
@@ -21,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* App bar */}
-        <header style={{
+        <header role="banner" style={{
           background: 'rgba(255,255,255,0.82)', backdropFilter: 'saturate(180%) blur(12px)',
           borderBottom: '1px solid var(--hairline)', padding: '12px 20px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -40,9 +43,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <NavBar />
         </header>
 
-        <main style={{ minHeight: 'calc(100vh - 140px)' }}>{children}</main>
+        <main id="main" role="main" style={{ minHeight: 'calc(100vh - 140px)' }}>{children}</main>
 
-        <footer style={{ borderTop: '1px solid var(--hairline)', padding: '24px 20px', textAlign: 'center', background: 'var(--surface)' }}>
+        <footer role="contentinfo" style={{ borderTop: '1px solid var(--hairline)', padding: '24px 20px', textAlign: 'center', background: 'var(--surface)' }}>
           <p className="caption" style={{ margin: 0 }}>
             Reference: NHANES Non-Hispanic Asian (2017–2018) · Thresholds: ACC/AHA · ADA · NCEP · WHO
           </p>

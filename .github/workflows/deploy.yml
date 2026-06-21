@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  image:
+    name: Build & publish container image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+  deploy:
+    name: Trigger host deploy
+    runs-on: ubuntu-latest
+    needs: [image]
+    env:
+      RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+    steps:
+      - name: Trigger deploy or explain how
+        run: |
+          if [ -n "${RENDER_DEPLOY_HOOK}" ]; then
+            echo "Triggering host deploy via deploy hook..."
+            curl -fsS -X POST "${RENDER_DEPLOY_HOOK}"
+            echo "Deploy triggered."
+          else
+            echo "No RENDER_DEPLOY_HOOK secret set — image published, no host hook called."
+            echo "Image: ghcr.io/${{ github.repository }}:latest"
+            echo "To enable auto-deploy: add a deploy-hook secret (Render/Railway/etc.),"
+            echo "or point your host at the published image above."
+          fi

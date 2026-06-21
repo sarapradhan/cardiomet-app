@@ -20,6 +20,7 @@ addopts = "-v --tb=short"
 pythonpath = ["."]
 markers = [
     "e2e: end-to-end tests that boot a real uvicorn server (deselect with '-m \"not e2e\"')",
+    "browser: Playwright UI tests that build the static export and drive the app (deselect with '-m \"not browser\"')",
 ]
 
 [tool.coverage.run]

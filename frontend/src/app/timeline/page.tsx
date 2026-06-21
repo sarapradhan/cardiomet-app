@@ -87,7 +87,7 @@ export default function TimelinePage() {
               value={label} onChange={(e) => setLabel(e.target.value)} />
           </label>
         </div>
-        <BiomarkerForm onSubmit={addDraw} />
+        <BiomarkerForm onSubmit={addDraw} submitLabel="Add this draw" />
       </div>
 
       {/* Draws added */}

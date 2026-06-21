@@ -11,10 +11,11 @@ const LINKS: [string, string][] = [
 export function NavBar() {
   const path = usePathname();
   return (
-    <nav style={{ display: 'flex', gap: 2 }}>
+    <nav aria-label="Primary" style={{ display: 'flex', gap: 2 }}>
       {LINKS.map(([href, label]) => (
         <Link key={href} href={href} className="nav-link"
-          data-active={href === '/' ? path === '/' : path.startsWith(href)}>
+          data-active={href === '/' ? path === '/' : path.startsWith(href)}
+          aria-current={(href === '/' ? path === '/' : path.startsWith(href)) ? 'page' : undefined}>
           {label}
         </Link>
       ))}
