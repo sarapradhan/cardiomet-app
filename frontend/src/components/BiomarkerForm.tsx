@@ -82,16 +82,16 @@ export function BiomarkerForm({ onSubmit, isLoading = false }: Props) {
   function renderGroup(title: string, fields: NumField[]) {
     return (
       <fieldset style={{ border: 'none', margin: 0, padding: 0 }}>
-        <legend className="md-label" style={{ marginBottom: 12 }}>{title}</legend>
+        <legend className="eyebrow" style={{ marginBottom: 12 }}>{title}</legend>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
           {fields.map((f) => (
             <label key={String(f.key)} style={{ display: 'block' }}>
-              <span style={{ display: 'block', fontSize: 13, marginBottom: 6, color: 'var(--md-on-surface)' }}>
-                {f.label} <span style={{ color: 'var(--md-on-surface-variant)' }}>({f.unit})</span>
+              <span style={{ display: 'block', fontSize: 13, marginBottom: 6, color: 'var(--ink)' }}>
+                {f.label} <span style={{ color: 'var(--ink-soft)' }}>({f.unit})</span>
               </span>
               <input
                 type="number" inputMode="decimal" step="any"
-                className="md-input" placeholder={f.placeholder}
+                className="input" placeholder={f.placeholder}
                 value={values[String(f.key)] ?? ''}
                 onChange={(e) => setNum(String(f.key), e.target.value)}
               />
@@ -104,26 +104,26 @@ export function BiomarkerForm({ onSubmit, isLoading = false }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-      <div className="md-card" style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
         {renderGroup('Lipids', LIPID_FIELDS)}
-        <div className="md-divider" />
+        <hr className="hairline" />
         {renderGroup('Glucose', METABOLIC_FIELDS)}
-        <div className="md-divider" />
+        <hr className="hairline" />
         {renderGroup('Vitals & Body', VITALS_FIELDS)}
       </div>
 
-      <div className="md-card" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <fieldset style={{ border: 'none', margin: 0, padding: 0 }}>
-          <legend className="md-label" style={{ marginBottom: 12 }}>About You</legend>
+          <legend className="eyebrow" style={{ marginBottom: 12 }}>About You</legend>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
             <label style={{ display: 'block' }}>
               <span style={{ display: 'block', fontSize: 13, marginBottom: 6 }}>Age (years)</span>
-              <input type="number" inputMode="numeric" className="md-input" placeholder="e.g. 45"
+              <input type="number" inputMode="numeric" className="input" placeholder="e.g. 45"
                 value={age} onChange={(e) => setAge(e.target.value)} />
             </label>
             <label style={{ display: 'block' }}>
               <span style={{ display: 'block', fontSize: 13, marginBottom: 6 }}>Sex</span>
-              <select className="md-input" value={sex}
+              <select className="input" value={sex}
                 onChange={(e) => setSex(e.target.value as 'M' | 'F' | '')}>
                 <option value="">Select…</option>
                 <option value="M">Male</option>
@@ -138,10 +138,10 @@ export function BiomarkerForm({ onSubmit, isLoading = false }: Props) {
           </label>
         </fieldset>
 
-        <div className="md-divider" />
+        <hr className="hairline" />
 
         <fieldset style={{ border: 'none', margin: 0, padding: 0 }}>
-          <legend className="md-label" style={{ marginBottom: 12 }}>Current Medications</legend>
+          <legend className="eyebrow" style={{ marginBottom: 12 }}>Current Medications</legend>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
             {MEDS.map((m) => (
               <label key={String(m.key)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
@@ -155,7 +155,7 @@ export function BiomarkerForm({ onSubmit, isLoading = false }: Props) {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button className="md-btn-primary" disabled={isLoading}
+        <button className="btn btn-primary" disabled={isLoading}
           onClick={() => onSubmit(buildInput())}
           style={isLoading ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}>
           {isLoading ? 'Analyzing…' : 'See My Results'}

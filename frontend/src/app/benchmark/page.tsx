@@ -28,9 +28,9 @@ export default function BenchmarkPage() {
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: '32px 24px' }}>
       <div style={{ marginBottom: 32 }}>
-        <p className="md-label" style={{ marginBottom: 4 }}>Biomarker Input</p>
-        <h1 className="md-headline">Enter Your Lab Values</h1>
-        <p className="md-body" style={{ marginTop: 8 }}>
+        <p className="eyebrow" style={{ marginBottom: 4 }}>Biomarker Input</p>
+        <h1 className="display">Enter Your Lab Values</h1>
+        <p className="body" style={{ marginTop: 8 }}>
           Every field is optional — anything you leave blank is simply flagged as
           not provided. No data is stored beyond this browser session.
         </p>
@@ -41,7 +41,7 @@ export default function BenchmarkPage() {
       {error && (
         <div role="alert" style={{
           marginTop: 16, padding: '12px 16px', borderRadius: 8,
-          backgroundColor: 'var(--md-error-container)', color: '#410E0B', fontSize: 13,
+          backgroundColor: 'var(--high-tint)', color: '#410E0B', fontSize: 13,
         }}>
           {error}
         </div>

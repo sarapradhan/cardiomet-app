@@ -25,9 +25,9 @@ export default function ResultsPage() {
   if (loaded && !result) {
     return (
       <div style={{ maxWidth: 480, margin: '64px auto', padding: '0 24px', textAlign: 'center' }}>
-        <div className="md-card">
-          <p className="md-body" style={{ marginBottom: 20 }}>No results to show yet.</p>
-          <Link href="/benchmark" className="md-btn-outlined">Enter Biomarkers</Link>
+        <div className="card">
+          <p className="body" style={{ marginBottom: 20 }}>No results to show yet.</p>
+          <Link href="/benchmark" className="btn btn-outline">Enter Biomarkers</Link>
         </div>
       </div>
     );
@@ -49,10 +49,10 @@ export default function ResultsPage() {
 
       {/* Cohort + validation badges */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <span className="chip-primary">{result.cohort_label}</span>
+        <span className="chip chip-primary">{result.cohort_label}</span>
         <span style={{
           padding: '4px 10px', borderRadius: 20, fontSize: 11,
-          backgroundColor: 'var(--md-surface-variant)', color: 'var(--md-on-surface-variant)',
+          backgroundColor: 'var(--panel-sunken)', color: 'var(--ink-soft)',
         }}>
           {result.validation_status}
         </span>
@@ -66,7 +66,7 @@ export default function ResultsPage() {
       <LimitationsPanel />
 
       <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
-        <Link href="/benchmark" className="md-btn-text">Start Over</Link>
+        <Link href="/benchmark" className="btn btn-text">Start Over</Link>
       </div>
     </div>
   );

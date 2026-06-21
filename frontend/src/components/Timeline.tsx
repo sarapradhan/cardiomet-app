@@ -14,10 +14,10 @@ interface Props {
 }
 
 const TONE_COLOR: Record<string, string> = {
-  normal: 'var(--md-primary)',
+  normal: 'var(--primary)',
   elevated: '#E65100',
   high: '#B71C1C',
-  missing: 'var(--md-outline)',
+  missing: 'var(--ink-faint)',
 };
 
 const W = 260;
@@ -39,7 +39,7 @@ function Sparkline({ t, interventionDates }: { t: BiomarkerTrajectory; intervent
   const x = (ts: number) => PAD + ((ts - minT) / tSpan) * (W - 2 * PAD);
   const y = (v: number) => H - PAD - ((v - vMin) / vSpan) * (H - 2 * PAD);
 
-  const lineColor = TONE_COLOR[present.at(-1)?.category_tone ?? 'missing'] ?? 'var(--md-outline)';
+  const lineColor = TONE_COLOR[present.at(-1)?.category_tone ?? 'missing'] ?? 'var(--ink-faint)';
   const path = present
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(new Date(p.draw_date).getTime()).toFixed(1)} ${y(p.value).toFixed(1)}`)
     .join(' ');
@@ -50,7 +50,7 @@ function Sparkline({ t, interventionDates }: { t: BiomarkerTrajectory; intervent
       {/* intervention markers (vertical guides) */}
       {interventionDates.map((ts, i) => (
         <line key={i} x1={x(ts)} x2={x(ts)} y1={PAD / 2} y2={H - PAD / 2}
-          stroke="var(--md-secondary)" strokeWidth={1} strokeDasharray="2 2" opacity={0.6} />
+          stroke="var(--primary)" strokeWidth={1} strokeDasharray="2 2" opacity={0.6} />
       ))}
       {/* trend line */}
       {present.length >= 2 && <path d={path} fill="none" stroke={lineColor} strokeWidth={2} />}
@@ -60,7 +60,7 @@ function Sparkline({ t, interventionDates }: { t: BiomarkerTrajectory; intervent
           fill={TONE_COLOR[p.category_tone] ?? lineColor} stroke="#fff" strokeWidth={1} />
       ))}
       {present.length === 0 && (
-        <text x={W / 2} y={H / 2} textAnchor="middle" fontSize="11" fill="var(--md-on-surface-variant)">
+        <text x={W / 2} y={H / 2} textAnchor="middle" fontSize="11" fill="var(--ink-soft)">
           no data
         </text>
       )}
@@ -72,10 +72,10 @@ export function Timeline({ trajectories, interventions }: Props) {
   const interventionTs = interventions.map((iv) => new Date(iv.draw_date).getTime());
 
   return (
-    <section className="md-card" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <p className="md-label" style={{ marginBottom: 4 }}>Timeline</p>
-      <h2 className="md-title" style={{ marginBottom: 4 }}>Your Values Over Time</h2>
-      <p className="md-body" style={{ marginBottom: 16 }}>
+    <section className="card" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <p className="eyebrow" style={{ marginBottom: 4 }}>Timeline</p>
+      <h2 className="title" style={{ marginBottom: 4 }}>Your Values Over Time</h2>
+      <p className="body" style={{ marginBottom: 16 }}>
         Each line shows one biomarker across your draws. Dashed guides mark when a
         medication was started. Point color reflects the guideline category.
       </p>
@@ -84,16 +84,16 @@ export function Timeline({ trajectories, interventions }: Props) {
         {trajectories.map((t) => {
           const latest = t.points.filter((p) => p.value !== null).at(-1);
           return (
-            <div key={t.biomarker} className="md-surface-variant"
+            <div key={t.biomarker} className="panel-sunken"
               style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontSize: 13, fontWeight: 600 }}>{t.biomarker}</span>
-                <span style={{ fontSize: 11, color: 'var(--md-on-surface-variant)' }}>
+                <span style={{ fontSize: 11, color: 'var(--ink-soft)' }}>
                   {latest ? `${latest.value} ${t.unit}` : '—'}
                 </span>
               </div>
               <Sparkline t={t} interventionDates={interventionTs} />
-              <span style={{ fontSize: 11, color: 'var(--md-on-surface-variant)' }}>
+              <span style={{ fontSize: 11, color: 'var(--ink-soft)' }}>
                 {t.direction === 'insufficient_data'
                   ? 'Need ≥2 dated values'
                   : `${t.direction}${t.change_absolute !== null ? ` · Δ ${t.change_absolute} ${t.unit}` : ''}`}

@@ -11,10 +11,10 @@ interface Props {
 export function MedicationNotes({ notes }: Props) {
   if (notes.length === 0) return null;
   return (
-    <section className="md-surface-variant" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <span className="md-label">Medication Notes</span>
+    <section className="panel-sunken" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <span className="eyebrow">Medication Notes</span>
       {notes.map((note, i) => (
-        <p key={i} style={{ fontSize: 13, lineHeight: 1.5, margin: 0, color: 'var(--md-on-surface-variant)' }}>
+        <p key={i} style={{ fontSize: 13, lineHeight: 1.5, margin: 0, color: 'var(--ink-soft)' }}>
           {note}
         </p>
       ))}

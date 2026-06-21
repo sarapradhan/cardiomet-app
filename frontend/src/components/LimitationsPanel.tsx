@@ -16,13 +16,13 @@ const LIMITATIONS: string[] = [
 export function LimitationsPanel() {
   return (
     <section style={{
-      background: 'var(--md-surface)', border: '1px solid var(--md-outline-variant)',
+      background: 'var(--surface)', border: '1px solid var(--hairline)',
       borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', gap: 12,
     }}>
-      <span className="md-label">Important Limitations</span>
+      <span className="eyebrow">Important Limitations</span>
       <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {LIMITATIONS.map((text, i) => (
-          <li key={i} style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--md-on-surface-variant)' }}>
+          <li key={i} style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--ink-soft)' }}>
             {text}
           </li>
         ))}

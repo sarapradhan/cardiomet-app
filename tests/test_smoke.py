@@ -173,3 +173,11 @@ def test_smoke_health_file_round_trip():
     from sahc_risklens.trajectory.health_file import to_health_file, from_health_file
     s = make_series([BiomarkerDraw(dt.date(2026, 1, 1), {"LDL_mgdl": 100})])
     assert from_health_file(to_health_file(s)).draws[0].values["LDL_mgdl"] == 100
+
+
+def test_smoke_static_mount_does_not_shadow_api():
+    """The frontend static mount must not shadow /health or /api routes."""
+    paths = {getattr(r, "path", "") for r in app.routes}
+    assert "/health" in paths
+    assert "/api/v1/benchmark" in paths
+    assert "/api/v1/trajectory" in paths

@@ -48,5 +48,5 @@ export function categoryTone(category: string | null): ChipTone {
 }
 
 export function chipClass(category: string | null): string {
-  return `chip-${categoryTone(category)}`;
+  return `chip chip-${categoryTone(category)}`;
 }

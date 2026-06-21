@@ -1,0 +1,12 @@
+**/node_modules
+**/.next
+**/out
+**/__pycache__
+**/.pytest_cache
+.git
+.venv
+data/raw/*.XPT
+*.md
+docs/
+tests/
+frontend/.env.local
