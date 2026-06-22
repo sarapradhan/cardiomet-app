@@ -16,7 +16,7 @@ def mobile_page(browser, base_url):
     ctx = browser.new_context(viewport=MOBILE)
     pg = ctx.new_page()
     pg.goto(f"{base_url}/", wait_until="domcontentloaded")
-    pg.evaluate("() => { try { localStorage.clear(); sessionStorage.clear(); } catch (e) {} }")
+    pg.evaluate("() => { try { localStorage.clear(); sessionStorage.clear(); localStorage.setItem('sahc_tour_seen_v1:home', '1'); } catch (e) {} }")
     yield pg
     ctx.close()
 

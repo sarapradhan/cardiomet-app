@@ -116,3 +116,30 @@ def test_keyboard_focus_visible_on_primary_action(page, base_url):
     # something receives focus (no assertion on which — just that focus works)
     focused = page.evaluate("() => document.activeElement && document.activeElement.tagName")
     assert focused is not None
+
+
+def test_guided_tour_runs_and_dismisses(page, base_url):
+    """The guided tour can be started and stepped through to completion."""
+    # The fixture marks the tour seen; start it explicitly via the button.
+    page.goto(f"{base_url}/", wait_until="networkidle")
+    page.get_by_role("button", name="Take a tour").click()
+    expect(page.get_by_role("dialog", name="Guided tour")).to_be_visible()
+    expect(page.get_by_text("Welcome to SAHC RiskLens")).to_be_visible()
+    # Step forward through the tour
+    page.get_by_role("button", name="Next").click()
+    expect(page.get_by_text("The color legend")).to_be_visible()
+    # Skip closes it
+    page.get_by_role("button", name="Skip").click()
+    expect(page.get_by_role("dialog", name="Guided tour")).not_to_be_visible()
+
+
+def test_example_data_loads_and_submits(page, base_url):
+    """The 'Elevated-risk example' button populates the form and produces results."""
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_role("button", name="Elevated-risk example").click()
+    # Field should now hold the example LDL
+    expect(page.get_by_placeholder("e.g. 100")).to_have_value("168")
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    expect(page.get_by_text("Each number, in clinical context")).to_be_visible()

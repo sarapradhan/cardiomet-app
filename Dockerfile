@@ -25,4 +25,4 @@ COPY --from=frontend /app/frontend/out ./frontend/out
 # COPY data/raw/ ./data/raw/
 EXPOSE 8000
 # Hosts set $PORT; default to 8000 locally.
-CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-7860}"]

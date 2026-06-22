@@ -1,9 +1,23 @@
+'use client';
 import Link from 'next/link';
 import { Legend } from '@/components/Legend';
+import { GuidedTour, TourButton, type TourStep } from '@/components/GuidedTour';
+
+const TOUR: TourStep[] = [
+  { anchor: '', title: 'Welcome to SAHC RiskLens',
+    body: 'A quick 4-step tour. This tool puts your cardiometabolic labs in clinical and population context — educational only, never a diagnosis.' },
+  { anchor: 'legend', title: 'The color legend',
+    body: 'Every value is coded by status (in range / elevated / high) and grouped by panel (lipids, glucose, blood pressure, body). You will see this language throughout.' },
+  { anchor: 'cta', title: 'Two ways in',
+    body: 'Check a single set of labs, or track values over time to see trends. Try the example data on the next page if you do not have your own numbers handy.' },
+  { anchor: 'cta', title: 'Honest by design',
+    body: 'The benchmark is NHANES Non-Hispanic Asian (labeled honestly), South Asian ancestry is shown as risk context, and nothing is stored on a server.' },
+];
 
 export default function Home() {
   return (
     <div style={{ maxWidth: 880, margin: '0 auto', padding: '56px 24px 40px' }}>
+      <GuidedTour steps={TOUR} tourId="home" autoStart />
       {/* Hero */}
       <p className="eyebrow" style={{ marginBottom: 14 }}>South Asian cardiometabolic health</p>
       <h1 className="display" style={{ fontSize: 'clamp(32px, 5vw, 46px)', maxWidth: 640, marginBottom: 18 }}>
@@ -14,12 +28,14 @@ export default function Home() {
         and a population benchmark — with the South Asian risk context generic tools
         leave out. Nothing is stored; this is context for a conversation, not a diagnosis.
       </p>
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 44 }}>
+      <div data-tour="cta" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16, alignItems: 'center' }}>
         <Link href="/benchmark" className="btn btn-primary">Check my labs</Link>
         <Link href="/timeline" className="btn btn-outline">Track over time</Link>
+        <TourButton />
       </div>
+      <div style={{ marginBottom: 28 }} />
 
-      <Legend />
+      <div data-tour="legend"><Legend /></div>
 
       {/* What you get */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginTop: 32 }}>

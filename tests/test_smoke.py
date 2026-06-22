@@ -176,8 +176,24 @@ def test_smoke_health_file_round_trip():
 
 
 def test_smoke_static_mount_does_not_shadow_api():
-    """The frontend static mount must not shadow /health or /api routes."""
-    paths = {getattr(r, "path", "") for r in app.routes}
-    assert "/health" in paths
-    assert "/api/v1/benchmark" in paths
-    assert "/api/v1/trajectory" in paths
+    """The frontend static mount must not shadow /health or /api routes.
+
+    Checked by reachability (robust across FastAPI/Starlette versions) rather
+    than by introspecting route internals.
+    """
+    from fastapi.testclient import TestClient
+    client = TestClient(app)
+    # /health responds (not swallowed by the static mount)
+    assert client.get("/health").status_code == 200
+    # API endpoints respond to a minimal valid request
+    r = client.post("/api/v1/benchmark", json={
+        "sex": "M", "south_asian": False, "chol_med": False, "bp_med": False,
+        "insulin": False, "dm_pills": False,
+    })
+    assert r.status_code == 200
+    r2 = client.post("/api/v1/trajectory", json={"draws": [
+        {"draw_date": "2026-01-01", "label": None, "values": {
+            "sex": "M", "south_asian": False, "chol_med": False, "bp_med": False,
+            "insulin": False, "dm_pills": False}},
+    ]})
+    assert r2.status_code == 200

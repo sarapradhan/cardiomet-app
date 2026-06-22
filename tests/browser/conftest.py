@@ -83,8 +83,12 @@ def browser():
 def page(browser, base_url):
     ctx = browser.new_context(viewport={"width": 1100, "height": 1400})
     pg = ctx.new_page()
-    # Start each test with clean storage so state never leaks between tests.
+    # Start each test with clean storage so state never leaks between tests,
+    # but mark the guided tour as already seen so its auto-start overlay does
+    # not intercept clicks (the tour itself is covered by a dedicated test).
     pg.goto(f"{base_url}/", wait_until="domcontentloaded")
-    pg.evaluate("() => { try { localStorage.clear(); sessionStorage.clear(); } catch (e) {} }")
+    pg.evaluate("() => { try { localStorage.clear(); sessionStorage.clear();"
+                " localStorage.setItem('sahc_tour_seen_v1:home', '1'); } catch (e) {} }")
+    pg.reload(wait_until="networkidle")
     yield pg
     ctx.close()

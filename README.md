@@ -1,3 +1,14 @@
+---
+title: SAHC RiskLens
+emoji: 🩺
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+short_description: Educational South Asian cardiometabolic lab context — not a diagnosis
+---
+
 # SAHC RiskLens
 
 **Responsible cardiometabolic benchmarking for South Asian heart health.**

@@ -44,15 +44,22 @@ interface Props {
   onSubmit: (input: BiomarkerInput) => void;
   isLoading?: boolean;
   submitLabel?: string;
+  initialValues?: Partial<BiomarkerInput>;
 }
 
-export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See My Results' }: Props) {
-  const [values, setValues] = useState<Record<string, string>>({});
-  const [age, setAge] = useState<string>('');
-  const [sex, setSex] = useState<'M' | 'F' | ''>('');
-  const [southAsian, setSouthAsian] = useState<boolean>(false);
+export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See My Results', initialValues }: Props) {
+  const seed = initialValues ?? {};
+  const seedNums: Record<string, string> = {};
+  for (const [k, v] of Object.entries(seed)) {
+    if (typeof v === 'number') seedNums[k] = String(v);
+  }
+  const [values, setValues] = useState<Record<string, string>>(seedNums);
+  const [age, setAge] = useState<string>(typeof seed.age_yr === 'number' ? String(seed.age_yr) : '');
+  const [sex, setSex] = useState<'M' | 'F' | ''>((seed.sex as 'M' | 'F') ?? '');
+  const [southAsian, setSouthAsian] = useState<boolean>(seed.south_asian === true);
   const [meds, setMeds] = useState<Record<string, boolean>>({
-    chol_med: false, bp_med: false, insulin: false, dm_pills: false,
+    chol_med: seed.chol_med === true, bp_med: seed.bp_med === true,
+    insulin: seed.insulin === true, dm_pills: seed.dm_pills === true,
   });
 
   function setNum(key: string, raw: string) {
