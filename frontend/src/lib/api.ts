@@ -9,9 +9,11 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 export async function submitBiomarkers(
   input: BiomarkerInput,
   cohort: CohortId = 'nhanes_asian',
+  match = false,
 ): Promise<BenchmarkResponse> {
-  const qs = cohort ? `?cohort=${encodeURIComponent(cohort)}` : '';
-  const res = await fetch(`${API_BASE}/api/v1/benchmark${qs}`, {
+  const params = new URLSearchParams({ cohort });
+  if (match) params.set('match', 'true');
+  const res = await fetch(`${API_BASE}/api/v1/benchmark?${params.toString()}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),

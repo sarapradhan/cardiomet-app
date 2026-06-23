@@ -57,6 +57,9 @@ export interface BenchmarkPoint {
   cohort_p90: number;
   cohort_label: CohortLabel;
   cohort_n: number;
+  matched: boolean;                  // true if cohort_* describe a matched peer subgroup
+  match_n: number | null;            // peer-group size when matched
+  match_description: string | null;  // e.g. "Women, 49–64, on cholesterol medication"
 }
 
 export interface SouthAsianContextItem {
@@ -87,6 +90,8 @@ export interface BenchmarkResponse {
   medication_notes: string[];
   cohort: CohortId;                            // selected cohort id
   cohort_label: CohortLabel;                   // always render exactly as received
+  matched: boolean;                            // true if peer matching applied to >=1 biomarker
+  match_description: string | null;            // peer group used, e.g. "Women, 49–64"
   disclaimer: string;                          // always present — always render
   validation_status: string;
 }

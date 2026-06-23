@@ -47,9 +47,14 @@ export default function ResultsPage() {
         {result.disclaimer}
       </div>
 
-      {/* Cohort + validation badges */}
+      {/* Cohort + matching + validation badges */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         <span className="chip chip-primary">{result.cohort_label}</span>
+        {result.matched && result.match_description && (
+          <span className="chip chip-primary" title="Compared against a matched peer subgroup">
+            Matched peers: {result.match_description}
+          </span>
+        )}
         <span style={{
           padding: '4px 10px', borderRadius: 20, fontSize: 11,
           backgroundColor: 'var(--panel-sunken)', color: 'var(--ink-soft)',

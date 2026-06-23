@@ -43,6 +43,14 @@ class BenchmarkPoint(BaseModel):
     cohort_p90: float
     cohort_label: CohortLabel = NHANES_COHORT_LABEL
     cohort_n: int
+    # Peer matching (SCORE-style). When matched is True, the cohort_* fields
+    # above describe the patient's matched subgroup (sex + age band + medication),
+    # not the whole cohort; match_n is that subgroup's size and match_description
+    # names it (e.g. "Women, 49–64"). When False, the whole-cohort distribution is
+    # shown (matching was not requested, unavailable, or the cell was too small).
+    matched: bool = False
+    match_n: int | None = None
+    match_description: str | None = None
 
 
 class SouthAsianContextItem(BaseModel):
@@ -67,6 +75,8 @@ class BenchmarkResponse(BaseModel):
     medication_notes: list[str]
     cohort: str = DEFAULT_COHORT  # selected cohort id (config.COHORT_*)
     cohort_label: CohortLabel = NHANES_COHORT_LABEL
+    matched: bool = False               # True if peer matching was applied to >=1 biomarker
+    match_description: str | None = None  # peer group used, e.g. "Women, 49–64, on cholesterol medication"
     disclaimer: str = Field(default=PRODUCT_DISCLAIMER, min_length=20)
     validation_status: str = "Phase 1 — Demo"
 

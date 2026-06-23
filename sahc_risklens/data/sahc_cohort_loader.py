@@ -86,10 +86,35 @@ def load_biomarker_frame(data_file: Path | None = None) -> pd.DataFrame:
     return rename_to_biomarker_keys(load_cohort(data_file))
 
 
+def load_matching_frame(data_file: Path | None = None) -> pd.DataFrame:
+    """
+    Biomarker frame PLUS the normalized matching columns used for peer
+    stratification (see sahc_risklens/benchmark/matching.py):
+        sex      : "M" / "F" / None      (from RIAGENDR 1/2)
+        age_band : int band code / None  (from RIDAGEYR)
+        chol_med : bool                  (cholMeds == 1)
+        bp_med   : bool                  (bpMeds == 1)
+        dm_med   : bool                  (diabMeds == 1)
+    """
+    from sahc_risklens.benchmark.matching import age_to_band
+
+    cohort = load_cohort(data_file)
+    frame = rename_to_biomarker_keys(cohort)
+    sex = pd.to_numeric(cohort.get("RIAGENDR"), errors="coerce")
+    frame["sex"] = sex.map({1: "M", 2: "F"})
+    age = pd.to_numeric(cohort.get("RIDAGEYR"), errors="coerce")
+    frame["age_band"] = age.map(age_to_band)
+    frame["chol_med"] = pd.to_numeric(cohort.get("cholMeds"), errors="coerce") == 1
+    frame["bp_med"] = pd.to_numeric(cohort.get("bpMeds"), errors="coerce") == 1
+    frame["dm_med"] = pd.to_numeric(cohort.get("diabMeds"), errors="coerce") == 1
+    return frame
+
+
 __all__ = [
     "BIOMARKER_KEYS",
     "sahc_file_available",
     "load_cohort",
     "rename_to_biomarker_keys",
     "load_biomarker_frame",
+    "load_matching_frame",
 ]

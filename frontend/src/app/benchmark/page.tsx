@@ -50,6 +50,7 @@ export default function BenchmarkPage() {
   const [seed, setSeed] = useState<Partial<BiomarkerInput> | undefined>(undefined);
   const [formKey, setFormKey] = useState(0);
   const [cohort, setCohort] = useState<CohortId>('nhanes_asian');
+  const [match, setMatch] = useState(false);
 
   function loadExample(key: keyof typeof EXAMPLES) {
     setSeed(EXAMPLES[key].values);
@@ -60,7 +61,7 @@ export default function BenchmarkPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const result: BenchmarkResponse = await submitBiomarkers(input, cohort);
+      const result: BenchmarkResponse = await submitBiomarkers(input, cohort, match);
       sessionStorage.setItem('benchmarkResult', JSON.stringify(result));
       router.push('/results');
     } catch (err) {
@@ -115,6 +116,20 @@ export default function BenchmarkPage() {
             );
           })}
         </div>
+
+        {/* Peer matching — SCORE-style: match the comparison group to the patient */}
+        <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 14, cursor: 'pointer' }}>
+          <input type="checkbox" checked={match} onChange={(e) => setMatch(e.target.checked)}
+            style={{ marginTop: 3 }} />
+          <span>
+            <span style={{ fontWeight: 600, fontSize: 13 }}>Match to people like me</span>
+            <span style={{ display: 'block', fontSize: 11, color: 'var(--ink-soft)', marginTop: 2 }}>
+              Compare against peers of the same sex, age range, and medication use (requires age and
+              sex below). Available for the South Asian Heart Center cohort; if a peer group is too
+              small it falls back to the full cohort and says so.
+            </span>
+          </span>
+        </label>
       </div>
 
       <div data-tour="form">

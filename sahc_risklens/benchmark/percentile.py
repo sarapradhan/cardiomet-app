@@ -44,10 +44,17 @@ from sahc_risklens.data.nhanes_loader import (
 )
 from sahc_risklens.data.sahc_cohort_loader import (
     load_biomarker_frame as load_sahc_biomarker_frame,
+    load_matching_frame as load_sahc_matching_frame,
     sahc_file_available,
 )
 from sahc_risklens.data.sahc_demo_cohort import (
     get_demo_percentiles as get_sahc_demo_percentiles,
+)
+from sahc_risklens.data.strata_tables import get_strata_table
+from sahc_risklens.benchmark.matching import (
+    resolve_patient_strata,
+    stratified_from_frame,
+    stratified_from_table,
 )
 
 # Minimum non-missing cohort values for a biomarker to be benchmarked.
@@ -111,31 +118,67 @@ def get_cohort_percentiles(cohort: str = DEFAULT_COHORT) -> dict[str, dict[str, 
     return get_demo_percentiles()
 
 
-def get_benchmark_data(data, cohort: str = DEFAULT_COHORT) -> list[dict]:
+def get_matched_percentiles(data, cohort: str = DEFAULT_COHORT) -> dict | None:
+    """
+    Peer-matched percentiles for `data` within `cohort`, or None when matching
+    can't be applied (missing sex/age, no peer group reaches MIN_COHORT_N, or the
+    cohort has no stratified source). Result shape (see matching.py):
+        {"level", "description", "n", "per_biomarker": {key: {p10..p90, n}}}
+
+    Source resolution mirrors get_cohort_percentiles: live matching frame when
+    the raw cohort file is present, otherwise the frozen strata table.
+    """
+    _validate_cohort(cohort)
+    strata = resolve_patient_strata(data)
+    if not strata.can_match:
+        return None
+
+    if cohort == COHORT_SAHC:
+        if sahc_file_available():
+            return stratified_from_frame(load_sahc_matching_frame(), strata, BIOMARKER_KEYS)
+        return stratified_from_table(get_strata_table(COHORT_SAHC), strata, BIOMARKER_KEYS)
+
+    # NHANES: peer matching is not offered. The Non-Hispanic Asian cohort
+    # (n ~= 382-1055 per biomarker) is too small to stratify by sex x age x
+    # medication and stay above MIN_COHORT_N, and the raw files needed to do it
+    # live are not shipped. match=True therefore falls back to the whole-cohort
+    # distribution, disclosed at the call site (matched=False everywhere).
+    return None
+
+
+def get_benchmark_data(data, cohort: str = DEFAULT_COHORT, match: bool = False) -> list[dict]:
     """
     data: a BiomarkerInput instance or equivalent dict.
     cohort: which reference cohort to benchmark against (default NHANES).
+    match: when True, benchmark each biomarker against the patient's matched peer
+        subgroup (sex + age band + medication use), like the original SCORE tool —
+        but with small-cell suppression and transparent fallback. A biomarker whose
+        matched cell is too small falls back to the whole-cohort distribution and is
+        flagged matched=False.
 
     Returns a list of BenchmarkPoint-shaped dicts, one per biomarker that has a
-    cohort benchmark, in canonical biomarker order. patient_value is the
-    patient's input for that biomarker (may be None); the cohort fields always
-    carry the reference distribution so the frontend can plot the distribution
-    even when the patient left a field blank.
+    cohort benchmark, in canonical biomarker order. Each point carries the
+    reference distribution (so the frontend can always plot it) plus matching
+    metadata: matched (bool), match_n (peer-group size or None), match_description
+    (plain-language peer group, or None).
     """
     _validate_cohort(cohort)
-    percentiles = get_cohort_percentiles(cohort)
+    whole = get_cohort_percentiles(cohort)
     label = _cohort_label(cohort)
-    points: list[dict] = []
+    matched = get_matched_percentiles(data, cohort) if match else None
+    matched_per = matched["per_biomarker"] if matched else {}
+    matched_desc = matched["description"] if matched else None
 
+    points: list[dict] = []
     for key in BIOMARKER_KEYS:
-        stats = percentiles.get(key)
+        use_matched = key in matched_per
+        stats = matched_per[key] if use_matched else whole.get(key)
         if stats is None:
             continue
         spec = get_biomarker_spec(key)
-        patient_value = get_field(data, spec.input_field)
         points.append({
             "biomarker": key,
-            "patient_value": patient_value,
+            "patient_value": get_field(data, spec.input_field),
             "cohort_p10": stats["p10"],
             "cohort_p25": stats["p25"],
             "cohort_median": stats["median"],
@@ -143,6 +186,9 @@ def get_benchmark_data(data, cohort: str = DEFAULT_COHORT) -> list[dict]:
             "cohort_p90": stats["p90"],
             "cohort_label": label,
             "cohort_n": int(stats["n"]),
+            "matched": use_matched,
+            "match_n": int(stats["n"]) if use_matched else None,
+            "match_description": matched_desc if use_matched else None,
         })
     return points
 
@@ -179,6 +225,7 @@ __all__ = [
     "MIN_COHORT_N",
     "SUPPORTED_COHORTS",
     "get_cohort_percentiles",
+    "get_matched_percentiles",
     "get_benchmark_data",
     "percentile_rank",
 ]

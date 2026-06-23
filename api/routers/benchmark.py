@@ -34,6 +34,15 @@ def benchmark_biomarkers(
             f"One of: {', '.join(SUPPORTED_COHORTS)}. Defaults to NHANES."
         ),
     ),
+    match: bool = Query(
+        False,
+        description=(
+            "If true, benchmark each value against the patient's matched peer "
+            "subgroup (sex + age band + medication use), like the original SCORE "
+            "tool, with small-cell suppression and transparent fallback. Requires "
+            "sex and age_yr in the body; unavailable for the NHANES cohort."
+        ),
+    ),
 ) -> BenchmarkResponse:
     """
     Return threshold classifications, the selected reference benchmark, South
@@ -52,7 +61,8 @@ def benchmark_biomarkers(
         )
 
     threshold_results = classify_all_biomarkers(data)
-    benchmark_data = get_benchmark_data(data, cohort=cohort)
+    benchmark_data = get_benchmark_data(data, cohort=cohort, match=match)
+    any_matched = next((p for p in benchmark_data if p["matched"]), None)
     missing_biomarkers = find_missing_biomarkers(data)
     medication_notes = get_medication_notes(data)
     physician_guide = build_physician_guide(threshold_results)
@@ -71,4 +81,6 @@ def benchmark_biomarkers(
         medication_notes=medication_notes,
         cohort=cohort,
         cohort_label=cohort_label(cohort),
+        matched=any_matched is not None,
+        match_description=any_matched["match_description"] if any_matched else None,
     )
