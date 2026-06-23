@@ -34,6 +34,19 @@ export interface ThresholdResult {
   note: string | null;
 }
 
+// Selectable benchmark cohorts. Mirror of sahc_risklens/config.py COHORT_* ids
+// and COHORT_LABELS. Each label is honest to its cohort; the NHANES label is
+// never applied to the SAHC cohort or vice versa.
+export type CohortId = 'nhanes_asian' | 'sahc';
+export type CohortLabel =
+  | 'NHANES Non-Hispanic Asian'
+  | 'South Asian Heart Center clinical cohort';
+
+export const COHORT_LABELS: Record<CohortId, CohortLabel> = {
+  nhanes_asian: 'NHANES Non-Hispanic Asian',
+  sahc: 'South Asian Heart Center clinical cohort',
+};
+
 export interface BenchmarkPoint {
   biomarker: string;
   patient_value: number | null;
@@ -42,7 +55,7 @@ export interface BenchmarkPoint {
   cohort_median: number;
   cohort_p75: number;
   cohort_p90: number;
-  cohort_label: 'NHANES Non-Hispanic Asian';
+  cohort_label: CohortLabel;
   cohort_n: number;
 }
 
@@ -72,7 +85,8 @@ export interface BenchmarkResponse {
   physician_guide: PhysicianGuideItem[];
   missing_biomarkers: string[];
   medication_notes: string[];
-  cohort_label: 'NHANES Non-Hispanic Asian';  // literal — always render exactly as received
+  cohort: CohortId;                            // selected cohort id
+  cohort_label: CohortLabel;                   // always render exactly as received
   disclaimer: string;                          // always present — always render
   validation_status: string;
 }

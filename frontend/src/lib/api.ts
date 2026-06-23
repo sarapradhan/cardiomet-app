@@ -2,12 +2,16 @@
  * frontend/src/lib/api.ts — API client.
  * Never hardcode API URL — use NEXT_PUBLIC_API_URL only.
  */
-import type { BiomarkerInput, BenchmarkResponse, ThresholdsResponse } from './types';
+import type { BiomarkerInput, BenchmarkResponse, ThresholdsResponse, CohortId } from './types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
-export async function submitBiomarkers(input: BiomarkerInput): Promise<BenchmarkResponse> {
-  const res = await fetch(`${API_BASE}/api/v1/benchmark`, {
+export async function submitBiomarkers(
+  input: BiomarkerInput,
+  cohort: CohortId = 'nhanes_asian',
+): Promise<BenchmarkResponse> {
+  const qs = cohort ? `?cohort=${encodeURIComponent(cohort)}` : '';
+  const res = await fetch(`${API_BASE}/api/v1/benchmark${qs}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),

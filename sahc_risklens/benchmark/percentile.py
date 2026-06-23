@@ -1,21 +1,27 @@
 """
 sahc_risklens/benchmark/percentile.py
 
-Builds the NHANES Non-Hispanic Asian benchmark: for each biomarker, the cohort
+Builds a benchmark distribution: for each biomarker, the cohort
 p10 / p25 / median / p75 / p90 and the cohort sample size, plus the patient's
 own value placed against that distribution.
 
-Data source resolution:
-  - If the real NHANES XPT files are present (nhanes_loader.nhanes_files_available),
-    percentiles are computed from the live Non-Hispanic Asian cohort.
-  - Otherwise the frozen demo percentiles (sahc_risklens/data/demo_cohort.py,
-    which are the same real numbers) are used.
+Selectable cohorts (config.COHORT_LABELS):
+  - config.COHORT_NHANES ("nhanes_asian"): NHANES 2017-2018 Non-Hispanic Asian.
+  - config.COHORT_SAHC   ("sahc"): South Asian Heart Center clinical cohort.
+The default is config.DEFAULT_COHORT (NHANES), which preserves the original
+single-cohort contract.
+
+Data source resolution, per cohort:
+  - If the cohort's real source files are present, percentiles are computed live.
+  - Otherwise the cohort's frozen demo percentiles are used (the same real
+    numbers). See demo_cohort.py / sahc_demo_cohort.py.
 
 Output dicts are shaped exactly like api/models/results.py BenchmarkPoint:
     biomarker, patient_value, cohort_p10, cohort_p25, cohort_median,
     cohort_p75, cohort_p90, cohort_label, cohort_n
 
-cohort_label is always config.NHANES_COHORT_LABEL.
+cohort_label always comes from config.cohort_label(cohort) — an honest,
+cohort-specific label. The NHANES cohort is never labeled "South Asian".
 """
 from __future__ import annotations
 
@@ -24,12 +30,24 @@ from functools import lru_cache
 import numpy as np
 
 from sahc_risklens.clinical.biomarkers import get_biomarker_spec, get_field
-from sahc_risklens.config import NHANES_COHORT_LABEL
+from sahc_risklens.config import (
+    COHORT_NHANES,
+    COHORT_SAHC,
+    DEFAULT_COHORT,
+    cohort_label as _cohort_label,
+)
 from sahc_risklens.data.demo_cohort import get_demo_percentiles
 from sahc_risklens.data.nhanes_loader import (
     BIOMARKER_KEYS,
     load_biomarker_frame,
     nhanes_files_available,
+)
+from sahc_risklens.data.sahc_cohort_loader import (
+    load_biomarker_frame as load_sahc_biomarker_frame,
+    sahc_file_available,
+)
+from sahc_risklens.data.sahc_demo_cohort import (
+    get_demo_percentiles as get_sahc_demo_percentiles,
 )
 
 # Minimum non-missing cohort values for a biomarker to be benchmarked.
@@ -37,10 +55,12 @@ MIN_COHORT_N = 30
 
 _PERCENTILE_POINTS = (10, 25, 50, 75, 90)
 
+# Cohorts the benchmark layer knows how to build.
+SUPPORTED_COHORTS = (COHORT_NHANES, COHORT_SAHC)
 
-def _percentiles_from_frame() -> dict[str, dict[str, float]]:
-    """Compute p10/p25/median/p75/p90 + n per biomarker from the live cohort."""
-    frame = load_biomarker_frame()
+
+def _percentiles_from_frame(frame) -> dict[str, dict[str, float]]:
+    """Compute p10/p25/median/p75/p90 + n per biomarker from a biomarker frame."""
     table: dict[str, dict[str, float]] = {}
     for key in BIOMARKER_KEYS:
         if key not in frame.columns:
@@ -60,23 +80,41 @@ def _percentiles_from_frame() -> dict[str, dict[str, float]]:
     return table
 
 
-@lru_cache(maxsize=1)
-def get_cohort_percentiles() -> dict[str, dict[str, float]]:
+def _validate_cohort(cohort: str) -> str:
+    if cohort not in SUPPORTED_COHORTS:
+        raise ValueError(
+            f"Unknown cohort id: {cohort!r}. Supported: {SUPPORTED_COHORTS}"
+        )
+    return cohort
+
+
+@lru_cache(maxsize=len(SUPPORTED_COHORTS))
+def get_cohort_percentiles(cohort: str = DEFAULT_COHORT) -> dict[str, dict[str, float]]:
     """
-    Return the cohort percentile table, computed from real NHANES files when
-    available, otherwise the frozen demo table. Cached for the process lifetime
-    (the underlying data does not change at runtime).
+    Return the percentile table for `cohort`, computed from real source files
+    when available, otherwise the cohort's frozen demo table. Cached per cohort
+    for the process lifetime (the underlying data does not change at runtime).
     """
+    _validate_cohort(cohort)
+    if cohort == COHORT_SAHC:
+        if sahc_file_available():
+            table = _percentiles_from_frame(load_sahc_biomarker_frame())
+            if table:
+                return table
+        return get_sahc_demo_percentiles()
+
+    # NHANES (default)
     if nhanes_files_available():
-        table = _percentiles_from_frame()
+        table = _percentiles_from_frame(load_biomarker_frame())
         if table:
             return table
     return get_demo_percentiles()
 
 
-def get_benchmark_data(data) -> list[dict]:
+def get_benchmark_data(data, cohort: str = DEFAULT_COHORT) -> list[dict]:
     """
     data: a BiomarkerInput instance or equivalent dict.
+    cohort: which reference cohort to benchmark against (default NHANES).
 
     Returns a list of BenchmarkPoint-shaped dicts, one per biomarker that has a
     cohort benchmark, in canonical biomarker order. patient_value is the
@@ -84,7 +122,9 @@ def get_benchmark_data(data) -> list[dict]:
     carry the reference distribution so the frontend can plot the distribution
     even when the patient left a field blank.
     """
-    percentiles = get_cohort_percentiles()
+    _validate_cohort(cohort)
+    percentiles = get_cohort_percentiles(cohort)
+    label = _cohort_label(cohort)
     points: list[dict] = []
 
     for key in BIOMARKER_KEYS:
@@ -101,20 +141,21 @@ def get_benchmark_data(data) -> list[dict]:
             "cohort_median": stats["median"],
             "cohort_p75": stats["p75"],
             "cohort_p90": stats["p90"],
-            "cohort_label": NHANES_COHORT_LABEL,
+            "cohort_label": label,
             "cohort_n": int(stats["n"]),
         })
     return points
 
 
-def percentile_rank(value: float, key: str) -> float | None:
+def percentile_rank(value: float, key: str, cohort: str = DEFAULT_COHORT) -> float | None:
     """
     Approximate percentile rank (0-100) of `value` within the cohort, by linear
     interpolation across the stored p10/p25/median/p75/p90 anchors. Returns None
     if the biomarker has no benchmark. Intended for descriptive context only, not
     clinical classification (that is thresholds.py).
     """
-    stats = get_cohort_percentiles().get(key)
+    _validate_cohort(cohort)
+    stats = get_cohort_percentiles(cohort).get(key)
     if stats is None:
         return None
     anchors = [
@@ -136,6 +177,7 @@ def percentile_rank(value: float, key: str) -> float | None:
 
 __all__ = [
     "MIN_COHORT_N",
+    "SUPPORTED_COHORTS",
     "get_cohort_percentiles",
     "get_benchmark_data",
     "percentile_rank",

@@ -9,6 +9,9 @@ build/
 data/raw/*.XPT
 data/raw/*.xpt
 data/processed/
+# SAHC clinic cohort: de-identified patient rows are NOT committed (see docs/SAHC_COHORT.md).
+# Only frozen aggregate percentiles in sahc_risklens/data/sahc_demo_cohort.py are tracked.
+data/sahc/*.csv
 node_modules/
 frontend/.next/
 frontend/out/

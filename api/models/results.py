@@ -7,7 +7,20 @@ When this file changes, update types.ts in the same session.
 from __future__ import annotations
 from typing import Literal
 from pydantic import BaseModel, Field
-from sahc_risklens.config import NHANES_COHORT_LABEL, PRODUCT_DISCLAIMER
+from sahc_risklens.config import (
+    DEFAULT_COHORT,
+    NHANES_COHORT_LABEL,
+    PRODUCT_DISCLAIMER,
+    SAHC_COHORT_LABEL,
+)
+
+# The set of honest cohort labels a benchmark response may carry. Each is tied to
+# a real, separately-documented cohort; the NHANES label is never applied to the
+# SAHC cohort or vice versa (see sahc_risklens/benchmark/percentile.py).
+CohortLabel = Literal[
+    "NHANES Non-Hispanic Asian",
+    "South Asian Heart Center clinical cohort",
+]
 
 
 class ThresholdResult(BaseModel):
@@ -28,7 +41,7 @@ class BenchmarkPoint(BaseModel):
     cohort_median: float
     cohort_p75: float
     cohort_p90: float
-    cohort_label: str = NHANES_COHORT_LABEL
+    cohort_label: CohortLabel = NHANES_COHORT_LABEL
     cohort_n: int
 
 
@@ -52,7 +65,8 @@ class BenchmarkResponse(BaseModel):
     physician_guide: list[PhysicianGuideItem]
     missing_biomarkers: list[str]
     medication_notes: list[str]
-    cohort_label: Literal["NHANES Non-Hispanic Asian"] = NHANES_COHORT_LABEL  # type: ignore[assignment]
+    cohort: str = DEFAULT_COHORT  # selected cohort id (config.COHORT_*)
+    cohort_label: CohortLabel = NHANES_COHORT_LABEL
     disclaimer: str = Field(default=PRODUCT_DISCLAIMER, min_length=20)
     validation_status: str = "Phase 1 — Demo"
 

@@ -1,9 +1,24 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { BiomarkerInput, BenchmarkResponse } from '@/lib/types';
+import type { BiomarkerInput, BenchmarkResponse, CohortId } from '@/lib/types';
 import { submitBiomarkers } from '@/lib/api';
 import { BiomarkerForm } from '@/components/BiomarkerForm';
+
+// Selectable reference cohorts. Labels are honest to each cohort: NHANES is a
+// US population proxy; SAHC is a genuine South Asian clinical cohort.
+const COHORT_OPTIONS: { id: CohortId; label: string; blurb: string }[] = [
+  {
+    id: 'nhanes_asian',
+    label: 'NHANES Non-Hispanic Asian',
+    blurb: 'US national survey, Non-Hispanic Asian adults (2017–2018). A public, reproducible population proxy.',
+  },
+  {
+    id: 'sahc',
+    label: 'South Asian Heart Center cohort',
+    blurb: 'De-identified South Asian clinic patients. South Asian–specific distributions (e.g. lower HDL, higher triglycerides).',
+  },
+];
 
 // Educational example profiles — synthetic, not real patients. Let a visitor or
 // reviewer see a populated result instantly instead of typing values.
@@ -34,6 +49,7 @@ export default function BenchmarkPage() {
   const [error, setError] = useState<string | null>(null);
   const [seed, setSeed] = useState<Partial<BiomarkerInput> | undefined>(undefined);
   const [formKey, setFormKey] = useState(0);
+  const [cohort, setCohort] = useState<CohortId>('nhanes_asian');
 
   function loadExample(key: keyof typeof EXAMPLES) {
     setSeed(EXAMPLES[key].values);
@@ -44,7 +60,7 @@ export default function BenchmarkPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const result: BenchmarkResponse = await submitBiomarkers(input);
+      const result: BenchmarkResponse = await submitBiomarkers(input, cohort);
       sessionStorage.setItem('benchmarkResult', JSON.stringify(result));
       router.push('/results');
     } catch (err) {
@@ -76,6 +92,29 @@ export default function BenchmarkPage() {
             {EXAMPLES[k].label}
           </button>
         ))}
+      </div>
+
+      {/* Reference cohort selector */}
+      <div data-tour="cohort" className="panel-sunken" style={{ marginBottom: 20, padding: 16 }}>
+        <span className="caption" style={{ fontWeight: 600 }}>Compare against</span>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
+          {COHORT_OPTIONS.map((opt) => {
+            const selected = cohort === opt.id;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setCohort(opt.id)}
+                className={selected ? 'btn btn-primary' : 'btn btn-outline'}
+                style={{ flex: '1 1 240px', minHeight: 64, textAlign: 'left', alignItems: 'flex-start', flexDirection: 'column', padding: '10px 14px' }}
+              >
+                <span style={{ fontWeight: 600, fontSize: 13 }}>{opt.label}</span>
+                <span style={{ fontWeight: 400, fontSize: 11, opacity: 0.85, marginTop: 4, whiteSpace: 'normal' }}>{opt.blurb}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div data-tour="form">

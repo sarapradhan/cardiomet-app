@@ -20,11 +20,21 @@ both ethically and as the project's design thesis — and must never be weakened
   ("LDL 168 is in the High category per ACC/AHA") — never "you have X", "your
   10-year risk is Y%", or "start drug Z". There are tests that scan for this;
   keep them passing.
-- **The benchmark cohort is labeled "NHANES Non-Hispanic Asian" — never "South
-  Asian".** NHANES has no South Asian–specific cohort. South Asian ancestry is
-  surfaced separately as a guideline-recognized *risk-enhancing factor*, as
-  qualitative discussion context. Conflating the two is a correctness bug and a
-  credibility problem. This distinction is the intellectual core of the project.
+- **The NHANES benchmark cohort is labeled "NHANES Non-Hispanic Asian" — never
+  "South Asian".** NHANES has no South Asian–specific cohort. South Asian
+  ancestry is surfaced separately as a guideline-recognized *risk-enhancing
+  factor*, as qualitative discussion context. Conflating the two is a
+  correctness bug and a credibility problem. This distinction is the
+  intellectual core of the project.
+  - There is now a **second, opt-in cohort** — the *South Asian Heart Center
+    clinical cohort* (`config.COHORT_SAHC`, id `sahc`) — a genuine South Asian
+    clinical population. It is honestly labeled "South Asian Heart Center
+    clinical cohort" and is a *distinct* cohort from NHANES, not a relabeling of
+    it. The invariant is: each cohort carries its own honest label, the NHANES
+    cohort is never called "South Asian", and the SAHC label is a proper-noun
+    cohort name (not the bare phrase "South Asian"). Default cohort is NHANES;
+    see `docs/SAHC_COHORT.md`. Tests in `tests/test_sahc_cohort.py` enforce the
+    no-crossed-labels invariant.
 - **Disclaimers and limitations are always visible and cannot be dismissed.**
 - **The server is stateless.** No accounts, no database. Longitudinal data is
   user-owned: exported as a "health file" JSON the user keeps, with an optional
