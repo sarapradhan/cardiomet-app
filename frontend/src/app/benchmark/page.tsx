@@ -72,7 +72,7 @@ export default function BenchmarkPage() {
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto', padding: '32px 24px' }}>
+    <div style={{ maxWidth: 1120, margin: '0 auto', padding: '32px 24px' }}>
       <div style={{ marginBottom: 24 }}>
         <p className="eyebrow" style={{ marginBottom: 4 }}>Biomarker Input</p>
         <h1 className="display">Enter Your Lab Values</h1>
@@ -82,58 +82,63 @@ export default function BenchmarkPage() {
         </p>
       </div>
 
-      {/* Example data — for demos and first-time visitors */}
-      <div data-tour="examples" className="panel-sunken" style={{
-        display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 20,
-      }}>
-        <span className="caption" style={{ fontWeight: 600 }}>New here? Try an example:</span>
-        {(Object.keys(EXAMPLES) as (keyof typeof EXAMPLES)[]).map((k) => (
-          <button key={k} className="btn btn-outline" style={{ height: 34, fontSize: 13 }}
-            onClick={() => loadExample(k)}>
-            {EXAMPLES[k].label}
-          </button>
-        ))}
-      </div>
-
-      {/* Reference cohort selector */}
-      <div data-tour="cohort" className="panel-sunken" style={{ marginBottom: 20, padding: 16 }}>
-        <span className="caption" style={{ fontWeight: 600 }}>Compare against</span>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
-          {COHORT_OPTIONS.map((opt) => {
-            const selected = cohort === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => setCohort(opt.id)}
-                className={selected ? 'btn btn-primary' : 'btn btn-outline'}
-                style={{ flex: '1 1 240px', minHeight: 64, textAlign: 'left', alignItems: 'flex-start', flexDirection: 'column', padding: '10px 14px' }}
-              >
-                <span style={{ fontWeight: 600, fontSize: 13 }}>{opt.label}</span>
-                <span style={{ fontWeight: 400, fontSize: 11, opacity: 0.85, marginTop: 4, whiteSpace: 'normal' }}>{opt.blurb}</span>
-              </button>
-            );
-          })}
+      {/* Landscape two-column: lab form left, options rail right */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+        <div data-tour="form" className="lg:col-span-2">
+          <BiomarkerForm key={formKey} onSubmit={handleSubmit} isLoading={isLoading} initialValues={seed} />
         </div>
 
-        {/* Peer matching — SCORE-style: match the comparison group to the patient */}
-        <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 14, cursor: 'pointer' }}>
-          <input type="checkbox" checked={match} onChange={(e) => setMatch(e.target.checked)}
-            style={{ marginTop: 3 }} />
-          <span>
-            <span style={{ fontWeight: 600, fontSize: 13 }}>Match to people like me</span>
-            <span style={{ display: 'block', fontSize: 11, color: 'var(--ink-soft)', marginTop: 2 }}>
-              Compare against peers of the same sex, age range, and medication use (requires age and
-              sex below). Available for the South Asian Heart Center cohort; if a peer group is too
-              small it falls back to the full cohort and says so.
-            </span>
-          </span>
-        </label>
-      </div>
+        <div className="flex flex-col gap-4">
+          {/* Example data — for demos and first-time visitors */}
+          <div data-tour="examples" className="panel-sunken" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <span className="caption" style={{ fontWeight: 600 }}>New here? Try an example:</span>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {(Object.keys(EXAMPLES) as (keyof typeof EXAMPLES)[]).map((k) => (
+                <button key={k} className="btn btn-outline" style={{ height: 34, fontSize: 13 }}
+                  onClick={() => loadExample(k)}>
+                  {EXAMPLES[k].label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      <div data-tour="form">
-        <BiomarkerForm key={formKey} onSubmit={handleSubmit} isLoading={isLoading} initialValues={seed} />
+          {/* Reference cohort selector */}
+          <div data-tour="cohort" className="panel-sunken" style={{ padding: 16 }}>
+            <span className="caption" style={{ fontWeight: 600 }}>Compare against</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
+              {COHORT_OPTIONS.map((opt) => {
+                const selected = cohort === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => setCohort(opt.id)}
+                    className={selected ? 'btn btn-primary' : 'btn btn-outline'}
+                    style={{ width: '100%', minHeight: 64, textAlign: 'left', alignItems: 'flex-start', flexDirection: 'column', padding: '10px 14px' }}
+                  >
+                    <span style={{ fontWeight: 600, fontSize: 13 }}>{opt.label}</span>
+                    <span style={{ fontWeight: 400, fontSize: 11, opacity: 0.85, marginTop: 4, whiteSpace: 'normal' }}>{opt.blurb}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Peer matching — SCORE-style: match the comparison group to the patient */}
+            <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 14, cursor: 'pointer' }}>
+              <input type="checkbox" checked={match} onChange={(e) => setMatch(e.target.checked)}
+                style={{ marginTop: 3 }} />
+              <span>
+                <span style={{ fontWeight: 600, fontSize: 13 }}>Match to people like me</span>
+                <span style={{ display: 'block', fontSize: 11, color: 'var(--ink-soft)', marginTop: 2 }}>
+                  Compare against peers of the same sex, age range, and medication use (requires age
+                  and sex). Available for the South Asian Heart Center cohort; if a peer group is too
+                  small it falls back to the full cohort and says so.
+                </span>
+              </span>
+            </label>
+          </div>
+        </div>
       </div>
 
       {error && (
