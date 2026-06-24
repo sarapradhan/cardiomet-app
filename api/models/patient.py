@@ -17,6 +17,10 @@ class BiomarkerInput(BaseModel):
     SBP_mmhg:   float | None = Field(None, ge=0, le=300)
     DBP_mmhg:   float | None = Field(None, ge=0, le=200)
     BMI_kgm2:   float | None = Field(None, ge=10, le=80)
+    # Advanced lipid risk-enhancing markers (optional; classification-only, not
+    # cohort-benchmarked). See clinical/thresholds.classify_risk_enhancing_markers.
+    ApoB_mgdl:  float | None = Field(None, ge=0, le=300)
+    Lpa_mgdl:   float | None = Field(None, ge=0, le=500)
     age_yr:     int   | None = Field(None, ge=18, le=120)
     sex:        str   | None = Field(None, pattern=r"^[MF]$")
     south_asian:bool  | None = Field(None)

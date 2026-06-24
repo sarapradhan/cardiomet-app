@@ -31,4 +31,5 @@ export function groupClass(biomarker: string): string {
 export const BIOMARKER_NAME: Record<string, string> = {
   LDL: 'LDL cholesterol', HDL: 'HDL cholesterol', TG: 'Triglycerides', TC: 'Total cholesterol',
   HbA1c: 'HbA1c', FPG: 'Fasting glucose', SBP: 'Systolic BP', DBP: 'Diastolic BP', BMI: 'BMI',
+  ApoB: 'Apolipoprotein B', 'Lp(a)': 'Lipoprotein(a)',
 };

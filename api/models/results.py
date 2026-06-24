@@ -66,11 +66,22 @@ class PhysicianGuideItem(BaseModel):
     guideline_note: str
 
 
+class CareNavigationItem(BaseModel):
+    """Informational next-step prompt (family screening, prevention support).
+    Routes the patient toward people/programs — never clinical advice."""
+    title: str
+    description: str
+
+
 class BenchmarkResponse(BaseModel):
     threshold_results: list[ThresholdResult]
+    # Advanced lipid risk-enhancing markers (ApoB, Lp(a)) — classification-only,
+    # not cohort-benchmarked; present only for markers the patient supplied.
+    risk_enhancing_markers: list[ThresholdResult] = []
     benchmark_data: list[BenchmarkPoint]
     south_asian_context: list[SouthAsianContextItem]
     physician_guide: list[PhysicianGuideItem]
+    care_navigation: list[CareNavigationItem] = []
     missing_biomarkers: list[str]
     medication_notes: list[str]
     cohort: str = DEFAULT_COHORT  # selected cohort id (config.COHORT_*)

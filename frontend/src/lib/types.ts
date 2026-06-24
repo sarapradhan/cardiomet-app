@@ -15,6 +15,8 @@ export interface BiomarkerInput {
   SBP_mmhg?:  number | null;
   DBP_mmhg?:  number | null;
   BMI_kgm2?:  number | null;
+  ApoB_mgdl?: number | null;
+  Lpa_mgdl?:  number | null;
   age_yr?:      number | null;
   sex?:         'M' | 'F' | null;
   south_asian?: boolean | null;
@@ -75,6 +77,11 @@ export interface PhysicianGuideItem {
   guideline_note: string;
 }
 
+export interface CareNavigationItem {
+  title: string;
+  description: string;
+}
+
 export interface ThresholdCategory {
   category: string;
   range_description: string;
@@ -83,9 +90,11 @@ export interface ThresholdCategory {
 
 export interface BenchmarkResponse {
   threshold_results: ThresholdResult[];
+  risk_enhancing_markers: ThresholdResult[];   // ApoB, Lp(a) — classification-only
   benchmark_data: BenchmarkPoint[];
   south_asian_context: SouthAsianContextItem[];
   physician_guide: PhysicianGuideItem[];
+  care_navigation: CareNavigationItem[];
   missing_biomarkers: string[];
   medication_notes: string[];
   cohort: CohortId;                            // selected cohort id

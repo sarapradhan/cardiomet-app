@@ -22,6 +22,12 @@ const LIPID_FIELDS: NumField[] = [
   { key: 'TC_mgdl', label: 'Total Cholesterol', unit: 'mg/dL', placeholder: 'e.g. 185' },
 ];
 
+// Advanced lipid risk-enhancing markers — optional, classification-only.
+const ADVANCED_LIPID_FIELDS: NumField[] = [
+  { key: 'ApoB_mgdl', label: 'ApoB', unit: 'mg/dL', placeholder: 'e.g. 90' },
+  { key: 'Lpa_mgdl', label: 'Lp(a)', unit: 'mg/dL', placeholder: 'e.g. 30' },
+];
+
 const METABOLIC_FIELDS: NumField[] = [
   { key: 'FPG_mgdl', label: 'Fasting Glucose', unit: 'mg/dL', placeholder: 'e.g. 90' },
   { key: 'HbA1c_pct', label: 'HbA1c', unit: '%', placeholder: 'e.g. 5.4' },
@@ -79,6 +85,7 @@ export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See 
       FPG_mgdl: num('FPG_mgdl'), HbA1c_pct: num('HbA1c_pct'),
       SBP_mmhg: num('SBP_mmhg'), DBP_mmhg: num('DBP_mmhg'),
       BMI_kgm2: num('BMI_kgm2'),
+      ApoB_mgdl: num('ApoB_mgdl'), Lpa_mgdl: num('Lpa_mgdl'),
       age_yr: age.trim() === '' ? null : Number(age),
       sex: sex === '' ? null : sex,
       south_asian: southAsian,
@@ -114,6 +121,8 @@ export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See 
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
       <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
         {renderGroup('Lipids', LIPID_FIELDS)}
+        <hr className="hairline" />
+        {renderGroup('Advanced lipids (optional)', ADVANCED_LIPID_FIELDS)}
         <hr className="hairline" />
         {renderGroup('Glucose', METABOLIC_FIELDS)}
         <hr className="hairline" />

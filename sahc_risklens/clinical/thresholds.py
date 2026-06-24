@@ -104,6 +104,36 @@ _BMI_SOUTH_ASIAN_TABLE: Table = [
     (27.5,          "High risk",      ">= 27.5 kg/m\u00b2"),
 ]
 
+# ---------------------------------------------------------------------------
+# Risk-enhancing markers (ApoB, Lp(a)) — classification-only, NOT cohort-benchmarked.
+# These are not part of the core 9 benchmarked biomarkers; they are advanced lipid
+# markers the 2018 AHA/ACC Cholesterol Guideline names as risk-enhancing factors,
+# especially relevant to South Asian risk. There is no population percentile for
+# them (the cohorts do not measure them) — they are classified against guideline
+# cut-points only. Cut-points anchored to the 2018 guideline risk-enhancer
+# thresholds (ApoB >= 130 mg/dL; Lp(a) >= 50 mg/dL / >= 125 nmol/L).
+# PENDING CLINICAL REVIEW — see docs/CLINICAL_LOGIC_APPENDIX.md.
+# ---------------------------------------------------------------------------
+_RISK_ENHANCER_SOURCE = "2018 AHA/ACC Cholesterol Guideline (risk-enhancing factor)"
+
+_APOB_TABLE: Table = [
+    (float("-inf"), "Within range",          "< 90 mg/dL"),
+    (90,            "Borderline",            "90-129 mg/dL"),
+    (130,           "High (risk-enhancing)", ">= 130 mg/dL"),
+]
+_LPA_TABLE: Table = [
+    (float("-inf"), "Within range",          "< 30 mg/dL"),
+    (30,            "Borderline",            "30-49 mg/dL"),
+    (50,            "High (risk-enhancing)", ">= 50 mg/dL (>= 125 nmol/L)"),
+]
+
+# label -> (table, source, input_field, unit, full_name)
+_RISK_ENHANCERS: list[tuple[str, Table, str, str, str, str]] = [
+    ("ApoB",  _APOB_TABLE, _RISK_ENHANCER_SOURCE, "ApoB_mgdl", "mg/dL", "Apolipoprotein B"),
+    ("Lp(a)", _LPA_TABLE,  _RISK_ENHANCER_SOURCE, "Lpa_mgdl",  "mg/dL", "Lipoprotein(a)"),
+]
+
+
 # Non-sex-specific, non-BMI biomarkers
 _TABLE_MAP: dict[str, tuple[Table, str]] = {
     "LDL":   (_LDL_TABLE, _LDL_SOURCE),
@@ -212,6 +242,39 @@ def classify_all_biomarkers(data) -> list[dict]:
     return results
 
 
+def classify_risk_enhancing_markers(data) -> list[dict]:
+    """
+    Classify the advanced lipid risk-enhancing markers (ApoB, Lp(a)) against
+    guideline cut-points. Returns ThresholdResult-shaped dicts (one per marker
+    the patient provided); markers left blank are omitted entirely (they are
+    optional add-ons, not part of the core panel, so they are NOT reported as
+    missing_biomarkers). These are classification-only — no cohort benchmark.
+
+    Statins lower ApoB, so an ApoB result carries a medication note when a
+    cholesterol medication is flagged. Lp(a) is largely genetically determined
+    and not meaningfully lowered by statins, so it carries no such note.
+    """
+    results: list[dict] = []
+    for label, table, source, input_field, unit, _full in _RISK_ENHANCERS:
+        value = get_field(data, input_field)
+        if value is None:
+            continue
+        category, range_desc = _classify(value, table)
+        note = None
+        if label == "ApoB" and get_field(data, "chol_med"):
+            note = "May reflect medication effects — see medication notes."
+        results.append({
+            "biomarker": label,
+            "value": value,
+            "unit": unit,
+            "category": category,
+            "category_description": f"{category} ({range_desc})",
+            "guideline_source": source,
+            "note": note,
+        })
+    return results
+
+
 # ---------------------------------------------------------------------------
 # GET /api/v1/thresholds support
 # ---------------------------------------------------------------------------
@@ -260,6 +323,7 @@ def medication_affects() -> dict[str, set[str]]:
 __all__ = [
     "medication_affects",
     "classify_all_biomarkers",
+    "classify_risk_enhancing_markers",
     "classify_bmi_south_asian",
     "get_all_threshold_categories",
     "find_missing_biomarkers",

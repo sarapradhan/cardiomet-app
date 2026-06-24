@@ -109,3 +109,36 @@ are simply the fuller citation form.
 | BMI (standard) | WHO Global Database on Body Mass Index |
 | BMI (South Asian context) | WHO Expert Consultation on BMI in Asian Populations (2004) |
 | South Asian ASCVD context | 2018 AHA/ACC Cholesterol Guideline |
+
+---
+
+## Risk-Enhancing Markers (ApoB, Lp(a)) — classification-only
+
+> **PENDING CLINICAL REVIEW.** These advanced lipid markers are **not**
+> cohort-benchmarked (the NHANES and SAHC cohorts do not measure them); they are
+> classified against guideline cut-points only and presented as guideline-
+> recognized *risk-enhancing factors* (2018 AHA/ACC Cholesterol Guideline),
+> especially relevant to South Asian risk. Source of truth:
+> `sahc_risklens/clinical/thresholds.py` (`_APOB_TABLE`, `_LPA_TABLE`).
+
+**ApoB (mg/dL)** — 2018 AHA/ACC (risk-enhancer ≥ 130 mg/dL)
+
+| Lower bound | Category | Range |
+|---|---|---|
+| — | Within range | < 90 mg/dL |
+| 90 | Borderline | 90–129 mg/dL |
+| 130 | High (risk-enhancing) | ≥ 130 mg/dL |
+
+**Lp(a) (mg/dL)** — 2018 AHA/ACC (risk-enhancer ≥ 50 mg/dL / ≥ 125 nmol/L)
+
+| Lower bound | Category | Range |
+|---|---|---|
+| — | Within range | < 30 mg/dL |
+| 30 | Borderline | 30–49 mg/dL |
+| 50 | High (risk-enhancing) | ≥ 50 mg/dL (≥ 125 nmol/L) |
+
+Notes: ApoB carries a medication note when a cholesterol medication is flagged
+(statins lower ApoB). Lp(a) is largely genetically determined and not statin-
+modifiable, so it carries no medication note. Lp(a) is commonly reported in
+nmol/L; this tool accepts mg/dL — clinicians should confirm units. An Lp(a)
+≥ 50 mg/dL additionally surfaces a South Asian context item.

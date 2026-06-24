@@ -3,10 +3,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { BenchmarkResponse } from '@/lib/types';
 import { ThresholdCards } from '@/components/ThresholdCards';
+import { RiskEnhancingMarkers } from '@/components/RiskEnhancingMarkers';
 import { DistributionChart } from '@/components/DistributionChart';
 import { SouthAsianContextPanel } from '@/components/SouthAsianContextPanel';
 import { MedicationNotes } from '@/components/MedicationNotes';
 import { PhysicianGuide } from '@/components/PhysicianGuide';
+import { ClinicianBrief } from '@/components/ClinicianBrief';
+import { CareNavigation } from '@/components/CareNavigation';
 import { LimitationsPanel } from '@/components/LimitationsPanel';
 
 export default function ResultsPage() {
@@ -64,10 +67,13 @@ export default function ResultsPage() {
       </div>
 
       <ThresholdCards results={result.threshold_results} missingBiomarkers={result.missing_biomarkers} />
+      <RiskEnhancingMarkers markers={result.risk_enhancing_markers} />
       <DistributionChart benchmarkData={result.benchmark_data} cohortLabel={result.cohort_label} />
       <SouthAsianContextPanel items={result.south_asian_context} />
       <MedicationNotes notes={result.medication_notes} />
       <PhysicianGuide items={result.physician_guide} />
+      <CareNavigation items={result.care_navigation} />
+      <ClinicianBrief result={result} />
       <LimitationsPanel />
 
       <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>

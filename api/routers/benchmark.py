@@ -17,8 +17,12 @@ from sahc_risklens.clinical.disclaimers import (
     build_physician_guide,
     get_medication_notes,
 )
+from sahc_risklens.clinical.care_navigation import get_care_navigation
 from sahc_risklens.clinical.south_asian_context import get_south_asian_context
-from sahc_risklens.clinical.thresholds import classify_all_biomarkers
+from sahc_risklens.clinical.thresholds import (
+    classify_all_biomarkers,
+    classify_risk_enhancing_markers,
+)
 from sahc_risklens.config import DEFAULT_COHORT, cohort_label
 
 router = APIRouter()
@@ -61,6 +65,7 @@ def benchmark_biomarkers(
         )
 
     threshold_results = classify_all_biomarkers(data)
+    risk_enhancing_markers = classify_risk_enhancing_markers(data)
     benchmark_data = get_benchmark_data(data, cohort=cohort, match=match)
     any_matched = next((p for p in benchmark_data if p["matched"]), None)
     missing_biomarkers = find_missing_biomarkers(data)
@@ -70,13 +75,17 @@ def benchmark_biomarkers(
     # South Asian context only when the patient indicated South Asian ancestry.
     south_asian_context: list = []
     if getattr(data, "south_asian", None):
-        south_asian_context = get_south_asian_context(bmi_value=data.BMI_kgm2)
+        south_asian_context = get_south_asian_context(
+            bmi_value=data.BMI_kgm2, lpa_value=data.Lpa_mgdl
+        )
 
     return BenchmarkResponse(
         threshold_results=threshold_results,
+        risk_enhancing_markers=risk_enhancing_markers,
         benchmark_data=benchmark_data,
         south_asian_context=south_asian_context,
         physician_guide=physician_guide,
+        care_navigation=get_care_navigation(data),
         missing_biomarkers=missing_biomarkers,
         medication_notes=medication_notes,
         cohort=cohort,
