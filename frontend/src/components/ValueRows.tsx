@@ -14,8 +14,8 @@
  * it is the NHANES cohort).
  */
 import type { BenchmarkPoint, BenchmarkResponse, ThresholdResult } from '@/lib/types';
-import { GROUP_OF, BIOMARKER_NAME } from '@/lib/biomarkerMeta';
-import { chipClass } from '@/lib/categoryStyles';
+import { BIOMARKER_NAME } from '@/lib/biomarkerMeta';
+import { toneColor } from '@/lib/categoryStyles';
 
 function norm(v: number, lo: number, hi: number): number {
   if (hi === lo) return 50;
@@ -39,13 +39,12 @@ function percentileLabel(value: number, b: BenchmarkPoint): string {
   return '';
 }
 
-function PeerBar({ b }: { b: BenchmarkPoint }) {
+function PeerBar({ b, color }: { b: BenchmarkPoint; color: string }) {
   const span = (b.cohort_p90 - b.cohort_p10) || 1;
   const lo = b.cohort_p10 - span * 0.18, hi = b.cohort_p90 + span * 0.18;
   const p10 = norm(b.cohort_p10, lo, hi), p25 = norm(b.cohort_p25, lo, hi);
   const p75 = norm(b.cohort_p75, lo, hi), p90 = norm(b.cohort_p90, lo, hi);
   const med = norm(b.cohort_median, lo, hi);
-  const g = GROUP_OF[b.biomarker] ?? 'body';
   const has = b.patient_value !== null && b.patient_value !== undefined;
   const px = has ? norm(b.patient_value as number, lo, hi) : 0;
   return (
@@ -53,12 +52,12 @@ function PeerBar({ b }: { b: BenchmarkPoint }) {
       <div style={{ position: 'relative', height: 14 }}>
         <div style={{ position: 'absolute', top: 5, left: 0, right: 0, height: 4, borderRadius: 2, background: 'var(--surface-sunken)' }} />
         <div style={{ position: 'absolute', top: 5, height: 4, borderRadius: 2, left: `${p10}%`, width: `${p90 - p10}%`, background: 'var(--hairline)' }} />
-        <div style={{ position: 'absolute', top: 3, height: 8, borderRadius: 4, left: `${p25}%`, width: `${p75 - p25}%`, background: `var(--grp-${g})`, opacity: 0.32 }} />
+        <div style={{ position: 'absolute', top: 3, height: 8, borderRadius: 4, left: `${p25}%`, width: `${p75 - p25}%`, background: color, opacity: 0.30 }} />
         <div style={{ position: 'absolute', top: 1, height: 12, width: 1.5, left: `${med}%`, background: 'var(--ink-faint)' }} />
         {has && (
           <div title={`You: ${b.patient_value}`} style={{
             position: 'absolute', top: 0, height: 14, width: 14, borderRadius: '50%',
-            left: `calc(${px}% - 7px)`, background: `var(--grp-${g})`,
+            left: `calc(${px}% - 7px)`, background: color,
             border: '2.5px solid var(--surface)', boxShadow: 'var(--shadow-1)',
           }} />
         )}
@@ -86,11 +85,14 @@ function Row({ r, bench }: { r: ThresholdResult; bench?: BenchmarkPoint }) {
         <span className="caption" style={{ marginLeft: 4 }}>{r.unit}</span>
         <div className="caption" style={{ marginTop: 2 }}>{BIOMARKER_NAME[r.biomarker] ?? r.biomarker}</div>
       </div>
-      <span className={chipClass(r.category)} style={{ justifySelf: 'start' }}>
-        <span className="chip-dot" />{missing ? 'Not provided' : r.category}
+      <span style={{
+        justifySelf: 'center', textAlign: 'center', fontSize: 12.5, fontWeight: 600,
+        color: toneColor(r.category),
+      }}>
+        {missing ? 'Not provided' : r.category}
       </span>
       <div>
-        {bench ? <PeerBar b={bench} />
+        {bench ? <PeerBar b={bench} color={toneColor(r.category)} />
                : <span className="caption">{r.guideline_source}</span>}
       </div>
     </div>

@@ -50,3 +50,17 @@ export function categoryTone(category: string | null): ChipTone {
 export function chipClass(category: string | null): string {
   return `chip chip-${categoryTone(category)}`;
 }
+
+// The status color for a category, as a CSS variable. Used to render category
+// labels (Optimal, Protective, High, …) as colored text — consistent across the
+// app and matching the distribution-bar accents.
+const TONE_VAR: Record<ChipTone, string> = {
+  normal: 'var(--in-range)',
+  elevated: 'var(--elevated)',
+  high: 'var(--high)',
+  missing: 'var(--missing)',
+};
+
+export function toneColor(category: string | null): string {
+  return TONE_VAR[categoryTone(category)];
+}

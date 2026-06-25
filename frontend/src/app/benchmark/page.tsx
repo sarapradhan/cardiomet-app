@@ -7,16 +7,18 @@ import { BiomarkerForm } from '@/components/BiomarkerForm';
 
 // Selectable reference cohorts. Labels are honest to each cohort: NHANES is a
 // US population proxy; SAHC is a genuine South Asian clinical cohort.
-const COHORT_OPTIONS: { id: CohortId; label: string; blurb: string }[] = [
+const COHORT_OPTIONS: { id: CohortId; short: string; label: string; blurb: string }[] = [
   {
     id: 'nhanes_asian',
+    short: 'NHANES',
     label: 'NHANES Non-Hispanic Asian',
     blurb: 'US national survey, Non-Hispanic Asian adults (2017–2018). A public, reproducible population proxy.',
   },
   {
     id: 'sahc',
+    short: 'SAHC cohort',
     label: 'South Asian Heart Center cohort',
-    blurb: 'De-identified South Asian clinic patients. South Asian–specific distributions (e.g. lower HDL, higher triglycerides).',
+    blurb: 'De-identified South Asian clinic patients — South Asian–specific distributions (e.g. lower HDL, higher triglycerides).',
   },
 ];
 
@@ -102,10 +104,13 @@ export default function BenchmarkPage() {
             </div>
           </div>
 
-          {/* Reference cohort selector */}
+          {/* Reference cohort selector — compact segmented control + caption */}
           <div data-tour="cohort" className="panel-sunken" style={{ padding: 16 }}>
             <span className="caption" style={{ fontWeight: 600 }}>Compare against</span>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
+            <div role="group" aria-label="Reference cohort" style={{
+              display: 'flex', marginTop: 10, border: '1px solid var(--hairline)',
+              borderRadius: 999, overflow: 'hidden', background: 'var(--surface)',
+            }}>
               {COHORT_OPTIONS.map((opt) => {
                 const selected = cohort === opt.id;
                 return (
@@ -114,15 +119,21 @@ export default function BenchmarkPage() {
                     type="button"
                     aria-pressed={selected}
                     onClick={() => setCohort(opt.id)}
-                    className={selected ? 'btn btn-primary' : 'btn btn-outline'}
-                    style={{ width: '100%', minHeight: 64, textAlign: 'left', alignItems: 'flex-start', flexDirection: 'column', padding: '10px 14px' }}
+                    style={{
+                      flex: 1, height: 34, border: 'none', cursor: 'pointer',
+                      fontSize: 12.5, fontWeight: 550, whiteSpace: 'nowrap',
+                      background: selected ? 'var(--primary)' : 'transparent',
+                      color: selected ? 'var(--on-primary)' : 'var(--primary)',
+                    }}
                   >
-                    <span style={{ fontWeight: 600, fontSize: 13 }}>{opt.label}</span>
-                    <span style={{ fontWeight: 400, fontSize: 11, opacity: 0.85, marginTop: 4, whiteSpace: 'normal' }}>{opt.blurb}</span>
+                    {opt.short}
                   </button>
                 );
               })}
             </div>
+            <p className="caption" style={{ marginTop: 8, lineHeight: 1.5 }}>
+              {COHORT_OPTIONS.find((o) => o.id === cohort)?.blurb}
+            </p>
 
             {/* Peer matching — SCORE-style: match the comparison group to the patient */}
             <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 14, cursor: 'pointer' }}>
