@@ -6,7 +6,7 @@ colorTo: green
 sdk: docker
 app_port: 7860
 pinned: false
-short_description: Educational South Asian cardiometabolic lab context — not a diagnosis
+short_description: Educational South Asian cardiometabolic lab context
 ---
 
 # SAHC RiskLens
