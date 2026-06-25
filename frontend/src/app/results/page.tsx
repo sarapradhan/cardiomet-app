@@ -2,9 +2,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { BenchmarkResponse } from '@/lib/types';
-import { ThresholdCards } from '@/components/ThresholdCards';
-import { RiskEnhancingMarkers } from '@/components/RiskEnhancingMarkers';
-import { DistributionChart } from '@/components/DistributionChart';
+import { ValueRows } from '@/components/ValueRows';
+import { Legend } from '@/components/Legend';
 import { SouthAsianContextPanel } from '@/components/SouthAsianContextPanel';
 import { MedicationNotes } from '@/components/MedicationNotes';
 import { PhysicianGuide } from '@/components/PhysicianGuide';
@@ -50,31 +49,37 @@ export default function ResultsPage() {
         {result.disclaimer}
       </div>
 
-      {/* Cohort + matching + validation badges */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <span className="chip chip-primary">{result.cohort_label}</span>
-        {result.matched && result.match_description && (
-          <span className="chip chip-primary" title="Compared against a matched peer subgroup">
-            Matched peers: {result.match_description}
+      {/* Hero — serif headline with cohort + matched badges */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap' }}>
+        <div>
+          <p className="eyebrow" style={{ marginBottom: 6 }}>Your results · South Asian cardiometabolic health</p>
+          <h1 className="display" style={{ fontSize: 30 }}>Your numbers, in context.</h1>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span className="chip chip-primary">{result.cohort_label}</span>
+          {result.matched && result.match_description && (
+            <span className="chip chip-primary" title="Compared against a matched peer subgroup">
+              Matched: {result.match_description}
+            </span>
+          )}
+          <span style={{
+            padding: '4px 10px', borderRadius: 20, fontSize: 11,
+            backgroundColor: 'var(--panel-sunken)', color: 'var(--ink-soft)',
+          }}>
+            {result.validation_status}
           </span>
-        )}
-        <span style={{
-          padding: '4px 10px', borderRadius: 20, fontSize: 11,
-          backgroundColor: 'var(--panel-sunken)', color: 'var(--ink-soft)',
-        }}>
-          {result.validation_status}
-        </span>
+        </div>
       </div>
+
+      <Legend />
 
       {/* At-a-glance summary strip */}
       <ResultsSummary result={result} />
 
-      {/* Landscape two-column body: main content + right rail */}
+      {/* Landscape two-column body: values + peers on the left, context rail right */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
         <div className="lg:col-span-2 flex flex-col gap-4">
-          <ThresholdCards results={result.threshold_results} missingBiomarkers={result.missing_biomarkers} />
-          <DistributionChart benchmarkData={result.benchmark_data} cohortLabel={result.cohort_label} />
-          <RiskEnhancingMarkers markers={result.risk_enhancing_markers} />
+          <ValueRows result={result} />
           <PhysicianGuide items={result.physician_guide} />
         </div>
         <div className="flex flex-col gap-4">

@@ -32,9 +32,9 @@ def test_benchmark_full_journey(page, base_url):
     page.wait_for_url("**/results/**")
     page.wait_for_load_state("networkidle")
 
-    # Results sections present
-    expect(page.get_by_text("Each number, in clinical context")).to_be_visible()
-    expect(page.get_by_text("Where you sit in the distribution")).to_be_visible()
+    # Results sections present (unified value rows with inline peer comparison)
+    expect(page.get_by_text("Each value, beside your peers")).to_be_visible()
+    expect(page.get_by_text("Your numbers, in context.")).to_be_visible()
     # Cohort label exact + safety
     assert page.get_by_text("NHANES Non-Hispanic Asian").first.is_visible()
     # A High classification chip appears (LDL 168)
@@ -142,4 +142,4 @@ def test_example_data_loads_and_submits(page, base_url):
     page.get_by_role("button", name="See My Results").click()
     page.wait_for_url("**/results/**")
     page.wait_for_load_state("networkidle")
-    expect(page.get_by_text("Each number, in clinical context")).to_be_visible()
+    expect(page.get_by_text("Each value, beside your peers")).to_be_visible()
