@@ -32,9 +32,9 @@ def test_benchmark_full_journey(page, base_url):
     page.wait_for_url("**/results/**")
     page.wait_for_load_state("networkidle")
 
-    # Results sections present (unified value rows with inline peer comparison)
-    expect(page.get_by_text("Each value, beside your peers")).to_be_visible()
-    expect(page.get_by_text("Your numbers, in context.")).to_be_visible()
+    # Results sections present
+    expect(page.get_by_text("Each number, on its guideline range")).to_be_visible()
+    expect(page.get_by_text("Where you sit in the distribution")).to_be_visible()
     # Cohort label exact + safety
     assert page.get_by_text("NHANES Non-Hispanic Asian").first.is_visible()
     # A High classification chip appears (LDL 168)
@@ -142,4 +142,23 @@ def test_example_data_loads_and_submits(page, base_url):
     page.get_by_role("button", name="See My Results").click()
     page.wait_for_url("**/results/**")
     page.wait_for_load_state("networkidle")
-    expect(page.get_by_text("Each value, beside your peers")).to_be_visible()
+    expect(page.get_by_text("Each number, on its guideline range")).to_be_visible()
+
+
+def test_daylight_snapshot_and_benchmark_bars(page, base_url):
+    """The Daylight snapshot summary and per-value benchmark bars render with data."""
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_role("button", name="Elevated-risk example").click()
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    # snapshot summary
+    expect(page.get_by_text("Your snapshot")).to_be_visible()
+    expect(page.get_by_text("markers to review")).to_be_visible()
+    # benchmark bars present (each reported value has a "You" + "Benchmark" label)
+    assert page.get_by_text("Benchmark", exact=False).count() >= 1
+    # SA tags surface on South Asian-relevant markers
+    assert page.get_by_text("SA", exact=True).count() >= 1
+    # safety surfaces intact under the new design
+    expect(page.get_by_text("NHANES Non-Hispanic Asian").first).to_be_visible()
+    expect(page.get_by_text("Important Limitations")).to_be_visible()

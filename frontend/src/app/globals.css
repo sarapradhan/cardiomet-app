@@ -2,41 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;450;500;600&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-  --bg:               #F6F7F9;
-  --surface:          #FFFFFF;
-  --surface-sunken:   #F0F2F5;
-  --ink:              #18222F;
-  --ink-soft:         #51616F;
-  --ink-faint:        #8A97A3;
-  --hairline:         #E4E8ED;
-
-  --primary:          #0B6E8C;
-  --primary-hover:    #095B74;
-  --primary-tint:     #E5F1F5;
-  --on-primary:       #FFFFFF;
-
-  --in-range:         #4F8A6D;
-  --in-range-tint:    #E8F1EC;
-  --elevated:         #B7791F;
-  --elevated-tint:    #F6EEDF;
-  --high:             #A8512F;
-  --high-tint:        #F3E4DD;
-  --missing:          #97A3AE;
-  --missing-tint:     #EEF0F2;
-
-  --grp-lipids:       #5B7DB1;
-  --grp-glucose:      #8A6BB1;
-  --grp-bp:           #C2683E;
-  --grp-body:         #5E927E;
-
-  --shadow-1: 0 1px 2px rgba(24,34,47,0.06), 0 1px 3px rgba(24,34,47,0.04);
-  --shadow-2: 0 2px 8px rgba(24,34,47,0.07), 0 1px 3px rgba(24,34,47,0.05);
-
-  --radius:    14px;
-  --radius-sm: 10px;
+  --bg:#EDF3F4;
+  --surface:#FFFFFF;
+  --surface-sunken:#E8EFF0;
+  --ink:#16323F;
+  --ink-soft:#51666F;
+  --ink-faint:#87999F;
+  --hairline:#DEE7E9;
+  --primary:#0E7C90;
+  --primary-hover:#0A6475;
+  --primary-tint:#E1F0F2;
+  --on-primary:#FFFFFF;
+  --in-range:#2F8F66;
+  --in-range-tint:#E4F1EA;
+  --elevated:#BD801C;
+  --elevated-tint:#F7EEDC;
+  --high:#B14E2E;
+  --high-tint:#F4E4DC;
+  --missing:#94A1A8;
+  --missing-tint:#EBEFF0;
+  --grp-lipids:#4E7AAE;
+  --grp-glucose:#836BB0;
+  --grp-bp:#C2683E;
+  --grp-body:#4F9079;
+  --shadow-1:0 1px 2px rgba(16,40,55,.05),0 4px 14px -10px rgba(16,55,75,.16);
+  --shadow-2:0 2px 8px rgba(16,40,55,.07),0 14px 30px -18px rgba(16,55,75,.22);
+  --radius:16px;
+  --radius-sm:12px;
 }
 
 * { box-sizing: border-box; }
@@ -45,7 +40,7 @@ html { scroll-behavior: smooth; }
 body {
   background-color: var(--bg);
   color: var(--ink);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-feature-settings: 'tnum' 1, 'cv05' 1;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -57,12 +52,12 @@ body {
 }
 
 @layer components {
-  .display { font-family: 'Fraunces', Georgia, serif; font-weight: 500; letter-spacing: -0.01em; color: var(--ink); line-height: 1.12; }
+  .display { font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 500; letter-spacing: -0.01em; color: var(--ink); line-height: 1.12; }
   .eyebrow { @apply uppercase; font-size: 11px; font-weight: 600; letter-spacing: 0.09em; color: var(--primary); }
   .title { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); }
   .body  { font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
   .caption { font-size: 12px; color: var(--ink-faint); }
-  .num { font-variant-numeric: tabular-nums; }
+  .num { font-family: 'Space Mono', monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 
   .card { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-1); }
   .panel-sunken { background: var(--surface-sunken); border-radius: var(--radius-sm); padding: 16px; }
