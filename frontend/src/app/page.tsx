@@ -16,7 +16,7 @@ const TOUR: TourStep[] = [
 
 export default function Home() {
   return (
-    <div style={{ maxWidth: 880, margin: '0 auto', padding: '56px 24px 40px' }}>
+    <div style={{ maxWidth: 'var(--content-w, 880px)', margin: '0 auto', padding: '56px 24px 40px' }}>
       <GuidedTour steps={TOUR} tourId="home" autoStart />
       {/* Hero */}
       <p className="eyebrow" style={{ marginBottom: 14 }}>South Asian cardiometabolic health</p>
@@ -38,7 +38,7 @@ export default function Home() {
       <div data-tour="legend"><Legend /></div>
 
       {/* What you get */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginTop: 32 }}>
+      <div className="what-you-get" style={{ marginTop: 32 }}>
         {[
           ['Guideline context', 'Each value placed in its category — Optimal to High — with the source guideline named (ACC/AHA, ADA, NCEP, WHO).'],
           ['Population benchmark', 'See where you sit in the NHANES Non-Hispanic Asian distribution, labeled honestly — not a false South Asian–specific claim.'],

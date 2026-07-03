@@ -14,9 +14,9 @@ interface Props {
 }
 
 const TONE_COLOR: Record<string, string> = {
-  normal: 'var(--primary)',
-  elevated: '#E65100',
-  high: '#B71C1C',
+  normal: 'var(--in-range)',
+  elevated: 'var(--elevated)',
+  high: 'var(--high)',
   missing: 'var(--ink-faint)',
 };
 

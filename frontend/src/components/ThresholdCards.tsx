@@ -1,16 +1,20 @@
 'use client';
 /**
- * frontend/src/components/ThresholdCards.tsx  (Daylight)
- * Per-biomarker cards grouped by panel. Each card: name (+ SA tag when South
- * Asian context applies), status chip, large Space Mono value, a BenchmarkBar
- * vs the NHANES Non-Hispanic Asian median, the guideline range description, the
- * source guideline, and any SA note. Presentation only — values, categories,
- * benchmarks, and notes all come from the API.
+ * frontend/src/components/ThresholdCards.tsx
+ * Per-biomarker cards grouped by panel. Each card places the value on its guideline
+ * range (MetricRangeBar) with the population median as a benchmark ring, alongside a
+ * clinical-status chip and — where relevant — a South Asian context tag. The chip and
+ * legend colours are the legend in action; the range zones add visual context.
+ *
+ * The Body panel (BMI) is rendered separately by <BodyCard> above this section, so
+ * it's intentionally excluded here. Glucose and Blood pressure share one section
+ * (each keeping its own group-color label) so their four cards read as one row.
  */
 import type { ThresholdResult, BenchmarkPoint } from '@/lib/types';
-import { chipClass, categoryTone } from '@/lib/categoryStyles';
-import { BenchmarkBar } from '@/components/BenchmarkBar';
-import { GROUP_OF, GROUP_LABEL, GROUP_ORDER, BIOMARKER_NAME, type BiomarkerGroup } from '@/lib/biomarkerMeta';
+import { categoryTone, chipClass } from '@/lib/categoryStyles';
+import { GROUP_OF, GROUP_LABEL, BIOMARKER_NAME, type BiomarkerGroup } from '@/lib/biomarkerMeta';
+import { SA_FLAGGED, TONE_COLOR } from '@/lib/biomarkerScale';
+import { MetricRangeBar } from './MetricRangeBar';
 
 interface Props {
   results: ThresholdResult[];
@@ -18,60 +22,61 @@ interface Props {
   missingBiomarkers?: string[];
 }
 
-// Biomarkers whose interpretation carries South Asian–specific context.
-const SA_RELEVANT = new Set(['HDL', 'FPG', 'HbA1c', 'SBP', 'DBP', 'BMI']);
+const SECTIONS: { key: string; groups: BiomarkerGroup[] }[] = [
+  { key: 'lipids', groups: ['lipids'] },
+  { key: 'glucose-bp', groups: ['glucose', 'bp'] },
+];
 
 export function ThresholdCards({ results, benchmarkData = [] }: Props) {
-  const benchOf = (bm: string) => benchmarkData.find((b) => b.biomarker === bm);
+  const benchOf: Record<string, number> = {};
+  for (const b of benchmarkData) benchOf[b.biomarker] = b.cohort_median;
 
   const byGroup: Record<BiomarkerGroup, ThresholdResult[]> = { lipids: [], glucose: [], bp: [], body: [] };
   for (const r of results) (byGroup[GROUP_OF[r.biomarker] ?? 'body']).push(r);
 
+  const sections = SECTIONS
+    .map((s) => ({ ...s, items: s.groups.flatMap((g) => byGroup[g]) }))
+    .filter((s) => s.items.length);
+
   return (
-    <section className="card" data-tour="values">
+    <section className="card">
       <p className="eyebrow" style={{ marginBottom: 4 }}>Your values</p>
-      <h2 className="display" style={{ fontSize: 22, marginBottom: 18 }}>Each number, on its guideline range</h2>
+      <h2 className="title" style={{ marginBottom: 18 }}>Each number, on its guideline range</h2>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
-        {GROUP_ORDER.filter((g) => byGroup[g].length).map((g) => (
-          <div key={g}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <span style={{ width: 9, height: 9, borderRadius: 3, background: `var(--grp-${g})` }} />
-              <span className="caption" style={{ fontWeight: 600, color: 'var(--ink-soft)' }}>{GROUP_LABEL[g]}</span>
-              <span className="caption" style={{ marginLeft: 'auto', color: 'var(--ink-faint)' }}>{byGroup[g].length}</span>
+        {sections.map(({ key, groups, items }) => (
+          <div key={key}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 12, flexWrap: 'wrap' }}>
+              {groups.filter((g) => byGroup[g].length).map((g) => (
+                <span key={g} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: 3, background: `var(--grp-${g})`, flex: 'none' }} />
+                  <span className="caption" style={{ fontWeight: 600, color: 'var(--ink-soft)' }}>{GROUP_LABEL[g]}</span>
+                </span>
+              ))}
+              <span style={{ flex: 1, height: 1, background: 'var(--hairline)', minWidth: 20 }} />
+              <span className="caption" style={{ color: 'var(--ink-faint)' }}>{items.length}</span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
-              {byGroup[g].map((r) => {
-                const missing = r.category === null;
-                const b = benchOf(r.biomarker);
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
+              {items.map((r) => {
+                const missing = r.category === null || r.value === null;
                 const tone = categoryTone(r.category);
-                const isSA = SA_RELEVANT.has(r.biomarker);
-                // display scale for the bar: pad around p10..p90 when we have benchmark data
-                let lo = 0, hi = 1;
-                if (b) {
-                  const span = (b.cohort_p90 - b.cohort_p10) || 1;
-                  lo = b.cohort_p10 - span * 0.25;
-                  hi = b.cohort_p90 + span * 0.25;
-                  if (r.value !== null) { lo = Math.min(lo, r.value - span * 0.1); hi = Math.max(hi, r.value + span * 0.1); }
-                }
+                const bench = benchOf[r.biomarker];
                 return (
                   <div key={r.biomarker} style={{
                     padding: 16, borderRadius: 'var(--radius-sm)',
                     border: '1px solid var(--hairline)', background: 'var(--surface)',
-                    opacity: missing ? 0.7 : 1,
+                    boxShadow: 'var(--shadow-1)', opacity: missing ? 0.7 : 1,
                   }}>
-                    {/* header: name + SA tag + status chip */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {BIOMARKER_NAME[r.biomarker] ?? r.biomarker}
                         </span>
-                        {isSA && (
-                          <span style={{
-                            fontSize: 9, fontWeight: 700, letterSpacing: '.04em',
-                            color: 'var(--primary)', background: 'var(--primary-tint)',
-                            padding: '2px 5px', borderRadius: 5,
+                        {SA_FLAGGED.has(r.biomarker) && (
+                          <span title="South Asian–specific interpretation applies" style={{
+                            fontSize: 9, fontWeight: 700, letterSpacing: '0.04em', color: 'var(--primary)',
+                            background: 'var(--primary-tint)', padding: '2px 5px', borderRadius: 5, flex: 'none',
                           }}>SA</span>
                         )}
                       </div>
@@ -80,30 +85,35 @@ export function ThresholdCards({ results, benchmarkData = [] }: Props) {
                       </span>
                     </div>
 
-                    {/* big value */}
-                    <div style={{ marginTop: 10, display: 'flex', alignItems: 'baseline', gap: 5 }}>
-                      <span className="num" style={{ fontSize: 30, fontWeight: 700, color: 'var(--ink)' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 10 }}>
+                      <span className="num" style={{ fontSize: 28, fontWeight: 600, lineHeight: 1, color: 'var(--ink)' }}>
                         {missing ? '—' : r.value}
                       </span>
                       <span className="caption">{r.unit}</span>
                     </div>
 
-                    {/* benchmark bar */}
-                    {!missing && b && (
-                      <BenchmarkBar value={r.value} benchmark={b.cohort_median} low={lo} high={hi}
-                        tone={tone} group={`grp-${g}`} unit={r.unit} />
+                    {!missing && (
+                      <MetricRangeBar biomarker={r.biomarker} value={r.value as number} tone={tone} benchmark={bench} />
                     )}
 
-                    {/* range description + source */}
                     {!missing && (
+                      <div className="num" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10.5, color: 'var(--ink-faint)' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                          <span style={{ width: 7, height: 7, borderRadius: 2, background: TONE_COLOR[tone], flex: 'none' }} />You {r.value}
+                        </span>
+                        {bench !== undefined && (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                            <span style={{ width: 8, height: 8, borderRadius: 999, border: '1.5px solid var(--ink-faint)', boxSizing: 'border-box', flex: 'none' }} />Benchmark {bench}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {!missing && r.category_description && (
                       <p className="caption" style={{ marginTop: 10, lineHeight: 1.5 }}>{r.category_description}</p>
                     )}
-                    <p className="caption" style={{ marginTop: 6, color: 'var(--ink-faint)', fontSize: 10.5 }}>
-                      {r.guideline_source}
-                    </p>
-                    {r.note && (
-                      <p className="caption" style={{ marginTop: 6, color: 'var(--primary)', fontStyle: 'italic' }}>{r.note}</p>
-                    )}
+                    <p className="caption" style={{ marginTop: 6, color: 'var(--ink-faint)', fontSize: 10.5 }}>{r.guideline_source}</p>
+                    {r.note && <p className="caption" style={{ marginTop: 4, color: 'var(--primary)', fontStyle: 'italic' }}>{r.note}</p>}
                   </div>
                 );
               })}

@@ -1,9 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import type { BenchmarkResponse } from '@/lib/types';
+import type { BenchmarkResponse, BiomarkerInput } from '@/lib/types';
+import { RiskSnapshot } from '@/components/RiskSnapshot';
+import { InputRecap } from '@/components/InputRecap';
+import { BodyCard } from '@/components/BodyCard';
 import { ThresholdCards } from '@/components/ThresholdCards';
-import { SnapshotSummary } from '@/components/SnapshotSummary';
 import { DistributionChart } from '@/components/DistributionChart';
 import { SouthAsianContextPanel } from '@/components/SouthAsianContextPanel';
 import { MedicationNotes } from '@/components/MedicationNotes';
@@ -12,6 +14,7 @@ import { LimitationsPanel } from '@/components/LimitationsPanel';
 
 export default function ResultsPage() {
   const [result, setResult] = useState<BenchmarkResponse | null>(null);
+  const [input, setInput] = useState<BiomarkerInput | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -19,6 +22,11 @@ export default function ResultsPage() {
     if (stored) {
       try { setResult(JSON.parse(stored) as BenchmarkResponse); }
       catch { sessionStorage.removeItem('benchmarkResult'); }
+    }
+    const storedInput = sessionStorage.getItem('benchmarkInput');
+    if (storedInput) {
+      try { setInput(JSON.parse(storedInput) as BiomarkerInput); }
+      catch { sessionStorage.removeItem('benchmarkInput'); }
     }
     setLoaded(true);
   }, []);
@@ -37,14 +45,13 @@ export default function ResultsPage() {
   if (!result) return null;
 
   return (
-    <div style={{ maxWidth: 840, margin: '0 auto', padding: '24px',
+    <div style={{ maxWidth: 'calc(var(--content-w, 880px) - 40px)', margin: '0 auto', padding: '24px',
       display: 'flex', flexDirection: 'column', gap: 16 }}>
 
       {/* Disclaimer — always first, always rendered, verbatim from API */}
       <div style={{
-        padding: '12px 16px', borderRadius: 'var(--radius-sm)', fontSize: 13,
-        backgroundColor: 'var(--elevated-tint)', color: '#79520F',
-        border: '1px solid #EAD9B0',
+        padding: '12px 16px', borderRadius: 8, fontSize: 13,
+        backgroundColor: '#FFF8E1', color: '#E65100', border: '1px solid #FFE082',
       }}>
         {result.disclaimer}
       </div>
@@ -60,7 +67,13 @@ export default function ResultsPage() {
         </span>
       </div>
 
-      <SnapshotSummary results={result.threshold_results} />
+      <InputRecap results={result.threshold_results} input={input} />
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16, alignItems: 'stretch' }}>
+        <RiskSnapshot results={result.threshold_results} />
+        <BodyCard results={result.threshold_results} benchmarkData={result.benchmark_data} />
+      </div>
+
       <ThresholdCards results={result.threshold_results} benchmarkData={result.benchmark_data} missingBiomarkers={result.missing_biomarkers} />
       <DistributionChart benchmarkData={result.benchmark_data} cohortLabel={result.cohort_label} />
       <SouthAsianContextPanel items={result.south_asian_context} />
