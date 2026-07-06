@@ -1,53 +1,62 @@
-# Contributing & Engineering Guide — SAHC RiskLens
+# Contributing to SAHC RiskLens
 
-## Ground Truth Imports
-@docs/CLINICAL_LOGIC_APPENDIX.md
-@docs/DATA_DICTIONARY.md
+Thanks for your interest in contributing. SAHC RiskLens is a clinical-safety-first project, so the contribution workflow is built around a single rule: **safety is enforced by code and tests, not by reviewer memory.** Please read this before opening a pull request.
 
-## Operating Model
-Main session = tech lead + implementer.
-Subagents = independent reviewers — they do not write code unless explicitly asked.
+## Ground rules
 
-## Architecture
-| Layer | Technology | Directory |
-|---|---|---|
-| Frontend | Next.js 14 + TypeScript + Tailwind + Material Design | `frontend/` |
-| Backend API | FastAPI + Pydantic v2 | `api/` |
-| Clinical logic | Python | `sahc_risklens/` |
+RiskLens is an educational tool, not a medical device. Any contribution must preserve these boundaries:
 
-`sahc_risklens/` owns all business rules. API routers are thin wrappers.
-Frontend calls the API — no clinical logic in the browser.
+- **No diagnosis, no individual risk prediction, no treatment advice** in any patient-facing output.
+- **No server-side storage** of patient values — the API stays stateless.
+- **No LLM or generated prose** in the patient-facing path — all copy is fixed templates.
+- **Honest cohort labeling** — NHANES is a proxy cohort and is never labeled "South Asian."
 
-## Authority Hierarchy
-1. Medical safety and clinical correctness.
-2. `docs/PRD.md` over implementation convenience.
-3. `docs/DATA_DICTIONARY.md` — only permitted NHANES variable names.
-4. `docs/CLINICAL_LOGIC_APPENDIX.md` — only permitted threshold values.
-5. `api/models/results.py` ↔ `frontend/src/lib/types.ts` must stay in sync.
+If a change would weaken any of these, it belongs in a design discussion (open an issue) before any code.
 
-Never invent a NHANES variable name or clinical threshold value.
-API field change → update `results.py` AND `types.ts` in the same session.
+## Where things live (one source of truth per fact)
 
-## Medical Safety Rules
-- No diagnosis, no treatment advice, no medication recommendations.
-- `cohort_label` → always exactly `"NHANES Non-Hispanic Asian"` (Pydantic Literal).
-- `disclaimer` → required field, min_length=20, always rendered in frontend.
-- Physician discussion guide → rule-based template in Phase 1 (no LLM).
-- Limitations panel → always visible, never suppressed.
-- South Asian BMI thresholds → risk-context discussion only, never NHANES benchmark.
+- Guideline thresholds → `sahc_risklens/clinical/thresholds.py` **only**.
+- API response contract → `api/models/results.py`, mirrored to the frontend's `types.ts`.
+- Clinical logic → `sahc_risklens/` **only** (this package imports no web framework).
+- The API tier (`api/`) validates input and delegates — it contains no clinical logic.
+- The frontend renders the API response verbatim and computes nothing clinical.
 
-## Engineering — Python
-- Business logic in `sahc_risklens/`. API routers: validate → call library → return.
-- Pydantic v2 for all I/O models. Type hints on all functions.
-- Docstrings cite guideline source on all clinical functions.
-- Tests for every clinical or data logic change.
+If you find yourself adding a threshold or a clinical rule outside `sahc_risklens/`, stop — it's in the wrong place.
 
-## Engineering — TypeScript
-- Strict mode. No `any` types. All API types from `frontend/src/lib/types.ts`.
-- `NEXT_PUBLIC_API_URL` only — never hardcode API URLs.
-- No PHI/biomarker values in localStorage or cookies beyond current session.
-- Always render `disclaimer` and `cohort_label` exactly as received from API.
+## Development setup
 
-## Session Continuity
-Read `docs/SESSION_STATUS.md` at start. Update it at end.
-Run `bash scripts/run_validation_gate.sh` before closing.
+```bash
+bash scripts/setup_env.sh            # backend env + dependencies
+python scripts/download_nhanes.py    # optional: public NHANES data
+python scripts/build_strata_tables.py# optional: regenerate frozen strata tables
+uvicorn api.main:app --reload        # run the API
+cd frontend && npm install && npm run dev   # run the frontend
+```
+
+## The one command that gates every change
+
+Before opening a PR, run the full validation gate and make sure it is green:
+
+```bash
+bash scripts/run_validation_gate.sh
+```
+
+This runs all backend test tiers (smoke → unit → integration → e2e), the TypeScript type-check, the **diagnostic-language scan** (fails if patient-facing copy reads as diagnostic or predictive), and the structural checks (cohort filters, fasting filter, BP variable names, trajectory descriptive-only invariant). A PR that does not pass the gate will not be merged.
+
+## Pull request checklist
+
+- [ ] `bash scripts/run_validation_gate.sh` passes clean locally.
+- [ ] New clinical logic lives in `sahc_risklens/`, with tests.
+- [ ] New thresholds are in `thresholds.py` only, sourced to a named guideline.
+- [ ] Any new patient-facing copy is a fixed template and passes the diagnostic-language scan.
+- [ ] If you touched the result contract, `results.py` and `types.ts` are both updated.
+- [ ] Safety invariants (disclaimer-first, limitations panel, cohort labeling, small-cell suppression) still hold.
+- [ ] The PR description explains *why*, and flags any clinical-content change for review.
+
+## Clinical content changes
+
+Changes to thresholds, biomarker categories, or South Asian context notes are **clinical content** and carry extra weight. Cite the guideline and version (e.g. ACC/AHA 2018) in the PR, and expect these to be held for review before merge. When Phase 2 physician review is in place, clinical-content changes will additionally require documented sign-off.
+
+## Reporting issues
+
+Please open an issue for bugs, clinical-accuracy concerns, or safety questions. For anything that could affect patient-facing safety, label it clearly so it can be triaged first.
