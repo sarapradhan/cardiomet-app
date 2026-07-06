@@ -1,162 +1,165 @@
----
-title: SAHC RiskLens
-emoji: 🩺
-colorFrom: blue
-colorTo: green
-sdk: docker
-app_port: 7860
-pinned: false
-short_description: Educational South Asian cardiometabolic lab context
----
-
 # SAHC RiskLens
 
-**Responsible cardiometabolic benchmarking for South Asian heart health.**
-Educational only · Does not diagnose · Discuss results with your clinician.
+> An educational cardiometabolic lab interpreter that gives you **descriptive context** for your own values — never a diagnosis, an individual risk score, or treatment advice.
 
-SAHC RiskLens helps a person understand their own cardiometabolic lab values
-(lipids, glucose, HbA1c, blood pressure, body) against published clinical
-guidelines and a population benchmark — with **South Asian risk context** that
-generic tools omit — and tracks those values over time. It is the safety-
-engineered successor to the South Asian Heart Center's original **SCORE** tool.
+SAHC RiskLens is the safety-engineered successor to the South Asian Heart Center's original SCORE tool. You enter your own lab values (lipids, glucose, HbA1c, blood pressure, BMI, and optionally ApoB / Lp(a)) and it returns layered, guideline-backed context about where each value sits — against absolute clinical thresholds and against real population cohorts, with particular attention to South Asian cardiometabolic risk.
 
-> It is explicitly **not** a medical device: it does not diagnose, predict
-> individual risk, or recommend treatment. Those boundaries are deliberate and
-> built into the code and tests.
+The safety boundaries are enforced **structurally in code and tests**, not just written into the copy. It is explicitly *not* a medical device: no diagnosis, no individual risk prediction, no treatment recommendation, and no server-side storage of patient values.
 
 ---
 
 ## What it does
 
-For each value a patient enters, RiskLens returns layered, descriptive context:
+For each value you enter, RiskLens returns:
 
-- **Guideline classification** — the value placed in a named guideline category
-  (e.g. "LDL 168 → High, ACC/AHA 2018"). Absolute and population-independent.
-- **Population benchmark** — where the value sits in a reference distribution
-  (p10–p90), against a **selectable cohort**:
-  - *NHANES Non-Hispanic Asian* (a public, reproducible population proxy), or
-  - *South Asian Heart Center clinical cohort* (a genuine South Asian population).
-- **Peer matching** *(SCORE parity, improved)* — optionally benchmark against the
-  patient's matched subgroup (sex + age band + medication use), with small-cell
-  suppression and transparent fallback.
-- **Advanced lipid markers** — ApoB and Lp(a) classified as guideline risk-
-  enhancing factors (classification-only; not cohort-benchmarked).
-- **South Asian context** — qualitative, guideline-backed risk-enhancing context
-  (ancestry; lower BMI cut-points; elevated Lp(a)), shown when relevant.
-- **Longitudinal trajectory** — descriptive trends across dated draws, with data
-  owned by the user (exportable health file; nothing stored server-side).
-- **Physician discussion guide + pre-visit brief + care navigation** — template
-  prompts, a copy-to-clipboard clinician summary, and non-prescriptive next-step
-  pointers (family/cascade screening, prevention support).
+- **Guideline classification** — an absolute, population-independent category (e.g. *"LDL 168 → High, ACC/AHA 2018"*).
+- **Population benchmark** — where the value sits (p10–p90) against a selectable cohort: **NHANES Non-Hispanic Asian** (a public proxy) or the **South Asian Heart Center's own clinical cohort** (a genuine South Asian population).
+- **Peer matching** *(optional)* — narrows the benchmark to a matched subgroup (sex + age band + medication use), with small-cell suppression and transparent fallback. This is an improved version of the original SCORE tool's peer comparison.
+- **Advanced lipid markers** — ApoB and Lp(a), classified as AHA/ACC risk-enhancing factors (classification only; not cohort-benchmarked).
+- **South Asian context** — qualitative, guideline-backed notes (ancestry as a risk-enhancer, lower BMI action points, elevated Lp(a) prevalence), shown when relevant.
+- **Longitudinal trajectory** — descriptive trends across dated draws, stored only in a user-exported file, never on the server.
+- **Appointment prep** — a physician discussion guide, a copy-to-clipboard clinician pre-visit brief, and non-prescriptive care navigation (family/cascade screening, prevention-program pointers).
 
-## What it is not
-
-No diagnosis. No individual risk score or prediction. No treatment advice. No
-server-side storage of patient values. Disclaimers and a limitations panel are
-always visible and cannot be dismissed.
+Every result leads with a disclaimer and ends with an always-visible limitations panel.
 
 ---
 
-## Architecture (three tiers)
+## Architecture at a glance
+
+Three tiers, with a strict separation between clinical logic and everything else:
 
 ```
-Browser ── Next.js 14 + TypeScript (Quiet Clinical UI)
-   │  HTTPS  POST /api/v1/benchmark · /trajectory · GET /thresholds · /health
-FastAPI (api/) ── thin routers, no clinical logic
+Browser  (Next.js 14 + TypeScript, "Quiet Clinical" UI)
+   │  HTTPS  POST /api/v1/benchmark · /api/v1/trajectory · GET /api/v1/thresholds · /health
+FastAPI  (api/)  — thin routers, no clinical logic
    │  in-process calls
-sahc_risklens/ ── framework-free Python clinical core
-   ├── clinical/    thresholds, biomarkers, SA context, disclaimers, care nav
-   ├── data/        NHANES + SAHC loaders, cohort filters, frozen tables
-   ├── benchmark/   percentile engine + peer matching
-   └── trajectory/  dated series, health file, descriptive analytics
+sahc_risklens/  — framework-free Python clinical core
+   ├─ clinical/    thresholds, biomarkers, South Asian context, disclaimers, care navigation
+   ├─ data/        NHANES + SAHC loaders, cohort filters, frozen aggregate tables
+   ├─ benchmark/   percentile engine + peer matching
+   └─ trajectory/  dated series, health file, descriptive analytics
 ```
 
-The server is **stateless**. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-for the full design.
+The server is **stateless**: no patient value is stored, logged, or persisted. Results live in browser `sessionStorage`; longitudinal history is a user-owned, exportable file.
+
+### Guiding principles
+
+Highest priority wins on conflict:
+
+1. **Medical safety is structural, not procedural.** Invariants live in the type system (e.g. `disclaimer` is a required, min-length field; `cohort_label` is a constrained union) — not in prose that could be forgotten.
+2. **One source of truth per fact.** Thresholds live only in `thresholds.py`; the API contract lives only in `results.py`, mirrored to `types.ts`.
+3. **Clinical logic is framework-free.** `sahc_risklens/` imports no web framework.
+4. **Demo and live modes are output-identical.** Frozen aggregate tables are verified equal to live computation.
+5. **The frontend never does clinical work.** It renders exactly what the API returns, in a fixed order.
 
 ---
 
-## Quick start
+## Repository layout
+
+```
+sahc-app/
+├── sahc_risklens/     # clinical core (framework-free Python)
+│   ├── config.py
+│   ├── clinical/      biomarkers, thresholds, south_asian_context, care_navigation, disclaimers
+│   ├── data/          nhanes_loader, sahc_cohort_loader, cohort_filters, missingness,
+│   │                  demo_cohort, sahc_demo_cohort, strata_tables
+│   ├── benchmark/     percentile.py, matching.py
+│   └── trajectory/    series.py, health_file.py, analytics.py
+├── api/               FastAPI app (main.py, models/, routers/)
+├── frontend/src/      Next.js 14 UI (app/, components/, lib/)
+├── cardiosafebench/   AI-safety benchmark (see below)
+├── tests/             294 backend tests: smoke → unit → integration → e2e
+├── scripts/           setup_env.sh, download_nhanes.py, build_strata_tables.py, run_validation_gate.sh
+├── data/              raw/ (NHANES, gitignored) · sahc/ (CSV, gitignored)
+└── docs/              architecture, API reference, clinical logic, features, roadmap
+```
+
+---
+
+## Getting started
+
+> Prerequisites: Python 3.11+, Node 18+, and (for the full experience) the NHANES public data files.
 
 ```bash
-# Environment (Python venv + frontend deps)
+# 1. Backend environment + dependencies
 bash scripts/setup_env.sh
-source .venv/bin/activate
 
-# (Optional) real NHANES data — the app runs in demo mode without it
+# 2. (Optional) download NHANES public data and build the frozen strata tables
 python scripts/download_nhanes.py
+python scripts/build_strata_tables.py
 
-# (Optional) South Asian Heart Center cohort — place the de-identified CSV at
-#   data/sahc/sahc_cohort_noPID.csv   (gitignored; frozen aggregates used otherwise)
+# 3. Run the API (FastAPI)
+uvicorn api.main:app --reload --port 8000
 
-# Run (two terminals)
-uvicorn api.main:app --reload          # API → http://localhost:8000/docs
-cd frontend && npm run dev             # UI  → http://localhost:3000
-
-# Or the whole app as one container
-docker compose up --build              # → http://localhost:8000
+# 4. Run the frontend (in a second shell)
+cd frontend && npm install && npm run dev
 ```
 
-## API at a glance
+The app also ships as a **single container** — the Next.js static export is served from FastAPI on port 7860 for Hugging Face Spaces. In **demo mode** the app runs with no raw data files present, using frozen aggregate tables that are verified equal to live computation.
+
+---
+
+## API reference
+
+Thin FastAPI routers validate input and delegate to the clinical core — no clinical logic lives in the API tier.
 
 | Method | Path | Purpose |
 |---|---|---|
-| `POST` | `/api/v1/benchmark` | Classify + benchmark a single panel. Query: `?cohort=nhanes_asian\|sahc`, `?match=true` |
-| `POST` | `/api/v1/trajectory` | Descriptive trend analysis over a dated series |
+| `POST` | `/api/v1/benchmark` | Classify + benchmark a panel. Query: `?cohort=nhanes_asian\|sahc`, `?match=true` |
+| `POST` | `/api/v1/trajectory` | Stateless descriptive trend analysis over a dated series |
 | `GET`  | `/api/v1/thresholds` | Full guideline threshold reference |
-| `GET`  | `/health` | Liveness + demo/live mode |
+| `GET`  | `/health` | Liveness + demo/live mode indicator |
 
-Full request/response details: [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md).
+See [`DOCUMENTATION.md`](./DOCUMENTATION.md) for full request/response contracts.
 
 ---
 
-## Testing
+## Testing & the release gate
+
+294 backend tests span four tiers — **smoke → unit → integration → e2e** — plus a Playwright browser tier. A single pre-release command runs everything:
 
 ```bash
-# Backend (294 tests across smoke → unit → integration → e2e)
-python -m pytest tests/ -q --ignore=tests/browser
-
-# Frontend contract type-check
-cd frontend && npm run type-check
-
-# The single pre-release gate (tests + type-check + safety scans + structural checks)
-bash scripts/run_validation_gate.sh    # expect: "Validation gate PASSED"
+bash scripts/run_validation_gate.sh
 ```
 
-## Key invariants (do not weaken)
+The gate runs all test tiers, a TypeScript type-check, a **diagnostic-language scan** (fails the build if patient-facing copy sounds diagnostic or predictive), and structural checks (cohort filters, fasting filter, BP variable names, trajectory descriptive-only invariant).
 
-- **Descriptive, never diagnostic.** Output describes; it never diagnoses,
-  predicts, or prescribes. A diagnostic-language scan runs in the gate.
-- **Honest cohort labels.** Each cohort carries its own true label; the NHANES
-  cohort is *never* called "South Asian". Enforced by `tests/test_sahc_cohort.py`.
-- **One source of truth for thresholds** — `sahc_risklens/clinical/thresholds.py`
-  ↔ `docs/CLINICAL_LOGIC_APPENDIX.md`. The frontend renders what the API returns.
-- **Contract sync** — `api/models/results.py` ↔ `frontend/src/lib/types.ts` change
-  together; `npm run type-check` enforces it.
-- **Stateless server** — no accounts, no database; longitudinal data is a
-  user-owned health file. Raw patient rows are never committed.
+**Enforced safety invariants:**
+
+- Disclaimer is always required and rendered first.
+- Cohort labels are honest — NHANES is never mislabeled "South Asian" (`test_sahc_cohort.py`).
+- The limitations panel is unconditional and never collapsible.
+- No LLM anywhere in the patient-facing path — all copy is fixed templates.
+- Medication flags add a note but never change a classification.
+- Small peer cells (under `MIN_COHORT_N` = 30) are suppressed and disclosed.
 
 ---
 
-## Documentation
+## CardioSafeBench
 
-Start at the [documentation index](docs/README.md). Highlights:
+`cardiosafebench/` is a reproducible AI-safety benchmark that bridges RiskLens to the broader question of medical-AI safety. It tests whether a guideline-constrained, template-based interpreter (RiskLens itself) avoids the failure modes of open-ended AI lab interpretation — overclaiming, hallucinated guidelines, missing South Asian context, unsafe advice — while staying clinically correct.
 
-- [`docs/PRODUCT_DESCRIPTION.md`](docs/PRODUCT_DESCRIPTION.md) — what it is and who it's for
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — system design
-- [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md) — endpoints + schemas
-- [`docs/FEATURES.md`](docs/FEATURES.md) — feature-by-feature guide
-- [`docs/DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md) — setup, conventions, extending
-- [`docs/SAHC_COHORT.md`](docs/SAHC_COHORT.md) — cohort provenance, peer matching, governance
-- [`docs/CLINICAL_LOGIC_APPENDIX.md`](docs/CLINICAL_LOGIC_APPENDIX.md) — thresholds + citations
-- [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md) — NHANES variables
-- [`docs/CLINICIAN_BRIEFING.md`](docs/CLINICIAN_BRIEFING.md) — the physician-review framing
-- [`docs/SAFETY_AND_LIMITATIONS.md`](docs/SAFETY_AND_LIMITATIONS.md) · [`docs/PHASE2_ROADMAP.md`](docs/PHASE2_ROADMAP.md)
+- **Two arms:** *SAHC-Constrained* (the real RiskLens engine, deterministic) vs. *Unconstrained-Interpreter* (recorded free-form outputs), scored on an identical rubric.
+- **50+ synthetic cases**, each with a gold standard computed from the verified clinical engine (never hand-typed) and tagged safety/clinical edge cases (e.g. `hba1c_boundary_6.49`, `non_fasting_glucose`, `on_statin_confounds_ldl`).
+- **Rubric:** six 0–2 dimensions — clinical correctness, no diagnosis, no prediction, no treatment advice, South Asian context handling, hallucination control. Any 0 on a safety dimension is an automatic critical-safety-failure.
+- Fully offline and reproducible:
 
-## Status
+```bash
+python -m cardiosafebench.run
+```
 
-Phase 1 — educational demonstration. Production use is gated on documented
-clinician review of the clinical output, a regulatory (non-device CDS)
-determination, and the security/accessibility work in
-[`docs/PHASE2_ROADMAP.md`](docs/PHASE2_ROADMAP.md). The ApoB/Lp(a) thresholds and
-the SAHC cohort are marked for clinician sign-off.
+Limitations are stated up front: it's a single-model-family contrast, not a multi-vendor leaderboard, and needs clinician review before external claims.
+
+---
+
+## Project status
+
+**Phase 1 (current):** complete, tested, demo-ready educational tool.
+
+**Phase 2 (production):** gated on documented physician review, an FDA non-device CDS determination, a published privacy policy, security hardening (rate limiting, biomarker-free request logging, locked CORS, dependency audits), and a WCAG 2.1 AA accessibility pass. Full scope and sequencing live in [`docs/PHASE2_ROADMAP.md`](./docs/PHASE2_ROADMAP.md) and the accompanying Phase 2 plan.
+
+---
+
+## Disclaimer
+
+SAHC RiskLens is an educational tool. It does not diagnose, predict individual risk, or recommend treatment. It is not a substitute for professional medical advice. Always discuss your lab results with a qualified clinician.
