@@ -302,7 +302,7 @@ via `NEXT_PUBLIC_API_URL` and `ALLOWED_ORIGINS`. See [`DEPLOYMENT.md`](DEPLOYMEN
 ## 12. Repository map
 
 ```
-sahc-app/
+cardiomet-app/
 ├── README.md · CLAUDE.md · CONTRIBUTING.md · docker-compose.yml · Dockerfile
 ├── sahc_risklens/            # clinical core (framework-free)
 │   ├── config.py

@@ -2,7 +2,7 @@
 
 This document is the deep reference for SAHC RiskLens: how the system is structured, how the clinical logic behaves, what the API contracts are, and how the whole thing is verified before release. For a quick orientation, start with the [README](./README.md); come here when you need the detail.
 
-Repository: `github.com/sarapradhan/sahc-app`
+Repository: `github.com/sarapradhan/cardiomet-app`
 
 ---
 

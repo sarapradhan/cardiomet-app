@@ -57,7 +57,7 @@ Highest priority wins on conflict:
 ## Repository layout
 
 ```
-sahc-app/
+cardiomet-app/
 ├── sahc_risklens/     # clinical core (framework-free Python)
 │   ├── config.py
 │   ├── clinical/      biomarkers, thresholds, south_asian_context, care_navigation, disclaimers
