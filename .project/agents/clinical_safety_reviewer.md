@@ -6,7 +6,7 @@ Find: unsafe medical claims, diagnostic language, treatment recommendations,
 missing limitations, incorrect South Asian framing, scope creep.
 
 ## Invoke When
-After P1 (clinical schema) · After P4 (frontend) · Before any Phase 2 AI feature
+After P1 (clinical schema) · After P4 (frontend) · Before any AI feature is added to the patient-facing path
 
 ## Review Focus
 
