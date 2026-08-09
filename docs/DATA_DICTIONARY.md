@@ -1,4 +1,4 @@
-# SAHC RiskLens — Data Dictionary
+# CardioMet Lens — Data Dictionary
 # Authoritative NHANES variable reference. Auto-loaded via CONTRIBUTING.md @import.
 # All variable names in sahc_risklens/ must match this document exactly.
 #

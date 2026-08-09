@@ -1,6 +1,6 @@
-# SAHC RiskLens — Documentation Index
+# CardioMet Lens — Documentation Index
 
-Start here. SAHC RiskLens is an educational, non-diagnostic web app for
+Start here. CardioMet Lens is an educational, non-diagnostic web app for
 understanding cardiometabolic lab values with South Asian risk context. The
 project root [`README.md`](../README.md) has the quick start.
 

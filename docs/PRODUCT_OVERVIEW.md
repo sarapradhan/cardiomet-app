@@ -1,6 +1,6 @@
-# SAHC RiskLens — Product Overview
+# CardioMet Lens — Product Overview
 
-> **South Asian Heart & Cardiometabolic RiskLens**
+> **CardioMet Lens — South Asian Heart & Cardiometabolic Risk Context**
 > An educational tool that helps people understand their cardiometabolic lab values in context — clinical guidelines, a population benchmark, and South Asian–specific risk considerations — and prepare better conversations with their clinician.
 >
 > Educational only. Not a diagnostic tool, not a medical device, not a substitute for professional medical advice.

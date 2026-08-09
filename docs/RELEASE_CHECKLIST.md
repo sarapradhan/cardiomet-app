@@ -1,4 +1,4 @@
-# SAHC RiskLens — Release Checklist
+# CardioMet Lens — Release Checklist
 # [BLOCKER] = must resolve before proceeding.
 
 ## P0: Foundation

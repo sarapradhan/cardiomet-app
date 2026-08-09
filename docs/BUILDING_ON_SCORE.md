@@ -1,30 +1,30 @@
-# Building on SCORE: How RiskLens Extends the South Asian Heart Center's Work
+# Building on SCORE: How CardioMet Lens Extends the South Asian Heart Center's Work
 
 ## Credit where it's due
 
-SAHC RiskLens exists because of **SCORE**, the South Asian Heart Center's original
+CardioMet Lens exists because of **SCORE**, the South Asian Heart Center's original
 cardiometabolic comparison tool. SCORE pioneered the core idea this whole project
 rests on: that a South Asian patient is best understood not against a generic
 population, but against **peers like them** — matched on age, sex, ethnicity, and
 medication use — using the center's own real South Asian patient data. SCORE put
 that idea in front of patients first, established the clinical framing, and proved
 there was genuine value in helping people see where their numbers stand before an
-appointment. RiskLens does not replace that insight; it builds directly on it.
+appointment. CardioMet Lens does not replace that insight; it builds directly on it.
 
-## What RiskLens inherits from SCORE
+## What CardioMet Lens inherits from SCORE
 
 - **The premise:** compare a patient to a meaningful peer group, not a generic
   average.
 - **The peer-matching capability:** benchmarking against people of the same sex,
   age band, and medication use.
 - **The data asset:** the center's de-identified South Asian clinical cohort —
-  the same population behind SCORE now powers RiskLens's South Asian benchmark.
+  the same population behind SCORE now powers CardioMet Lens's South Asian benchmark.
 - **The mission and tone:** educational, prevention-focused, culturally aware, and
   routed back to the clinician.
 
 ## Two reference populations, kept honestly distinct
 
-The most important conceptual advance is how RiskLens handles *who you are compared
+The most important conceptual advance is how CardioMet Lens handles *who you are compared
 against*. It offers **two clearly and separately labeled cohorts**, never blended:
 
 1. **South Asian Heart Center clinical cohort** — a genuine South Asian
@@ -39,11 +39,11 @@ single blended filter didn't draw, and it matters for credibility.
 
 ## How it takes the idea further
 
-RiskLens keeps SCORE's strengths and improves on them, then adds layers SCORE
+CardioMet Lens keeps SCORE's strengths and improves on them, then adds layers SCORE
 didn't have:
 
 - **Peer matching, made trustworthy.** SCORE computed a percentile on whatever
-  matched group resulted, however small. RiskLens suppresses statistically
+  matched group resulted, however small. CardioMet Lens suppresses statistically
   unreliable small groups, falls back transparently to a broader peer set, and
   *discloses* the exact group used and its size.
 - **Guideline-versioned classification.** Every threshold is traceable to a named
@@ -74,7 +74,7 @@ stays with the clinician, where it belongs.
 ## In one line
 
 SCORE showed that South Asian patients deserve to be compared to the right peers.
-RiskLens takes that idea, makes the comparison honest and reliable across two
+CardioMet Lens takes that idea, makes the comparison honest and reliable across two
 clearly distinct cohorts, and wraps it in the classification, tracking, and
 clinical handoff that turn a single snapshot into something patients and
 clinicians can actually act on.

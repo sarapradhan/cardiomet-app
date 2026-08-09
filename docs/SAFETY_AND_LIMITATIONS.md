@@ -1,4 +1,4 @@
-# SAHC RiskLens — Safety and Limitations
+# CardioMet Lens — Safety and Limitations
 
 ## What This Tool Is
 Educational benchmarking for cardiometabolic biomarker context.

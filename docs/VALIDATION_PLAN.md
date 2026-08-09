@@ -1,4 +1,4 @@
-# SAHC RiskLens — Validation Plan
+# CardioMet Lens — Validation Plan
 
 ## Principle
 Validation precedes features. Every threshold value, variable mapping, and data

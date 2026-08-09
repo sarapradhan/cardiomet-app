@@ -1,6 +1,6 @@
-# SAHC RiskLens — Technical Documentation
+# CardioMet Lens — Technical Documentation
 
-This document is the deep reference for SAHC RiskLens: how the system is structured, how the clinical logic behaves, what the API contracts are, and how the whole thing is verified before release. For a quick orientation, start with the [README](./README.md); come here when you need the detail.
+This document is the deep reference for CardioMet Lens: how the system is structured, how the clinical logic behaves, what the API contracts are, and how the whole thing is verified before release. For a quick orientation, start with the [README](./README.md); come here when you need the detail.
 
 Repository: `github.com/sarapradhan/cardiomet-app`
 
@@ -8,7 +8,7 @@ Repository: `github.com/sarapradhan/cardiomet-app`
 
 ## 1. Purpose and boundaries
 
-SAHC RiskLens interprets a person's own cardiometabolic lab panel and returns **descriptive context** — where each value sits relative to clinical guidelines and to real population cohorts. It is deliberately constrained to never behave like a medical device.
+CardioMet Lens interprets a person's own cardiometabolic lab panel and returns **descriptive context** — where each value sits relative to clinical guidelines and to real population cohorts. It is deliberately constrained to never behave like a medical device.
 
 What it is:
 
@@ -220,12 +220,12 @@ These are guaranteed by tests and/or types, not by reviewer diligence alone:
 
 ## 10. CardioSafeBench (`cardiosafebench/`)
 
-A reproducible AI-safety benchmark that connects RiskLens to the broader question of medical-AI safety: does a guideline-constrained, template-based interpreter avoid the failure modes of open-ended AI lab interpretation while remaining clinically correct?
+A reproducible AI-safety benchmark that connects CardioMet Lens to the broader question of medical-AI safety: does a guideline-constrained, template-based interpreter avoid the failure modes of open-ended AI lab interpretation while remaining clinically correct?
 
 ### 10.1 Design
 
 - **Two arms, one rubric:**
-  - *SAHC-Constrained* — the real RiskLens engine, deterministic.
+  - *SAHC-Constrained* — the real CardioMet Lens engine, deterministic.
   - *Unconstrained-Interpreter* — recorded free-form outputs representing general-assistant-style interpretation.
 - **50+ synthetic cases (`cases/`)** — each has a panel, a **gold standard computed from the verified clinical engine** (never hand-typed), and tags for safety/clinical edge cases (e.g. `hba1c_boundary_6.49`, `non_fasting_glucose`, `on_statin_confounds_ldl`).
 - **Rubric (`scoring/rubric.py`)** — six dimensions scored 0–2:

@@ -1,4 +1,4 @@
-# SAHC RiskLens — Product Requirements Document
+# CardioMet Lens — Product Requirements Document
 
 ## 1. Summary
 Responsible cardiometabolic benchmarking and physician-discussion tool for South Asian

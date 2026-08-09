@@ -1,4 +1,4 @@
-# SAHC RiskLens - End-to-End Checklist
+# CardioMet Lens - End-to-End Checklist
 
 Two tiers of end-to-end verification:
 

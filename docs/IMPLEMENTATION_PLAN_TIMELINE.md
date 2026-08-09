@@ -1,5 +1,5 @@
-# SAHC RiskLens — Implementation Plan
-## Longitudinal Trajectory Tracking ("RiskLens Timeline")
+# CardioMet Lens — Implementation Plan
+## Longitudinal Trajectory Tracking ("CardioMet Lens Timeline")
 
 > Companion to `INCREMENTAL_VALUE_SPEC.md`. This is the build plan: phases, concrete file-level tasks, tests, acceptance criteria, and sequencing. It follows the same milestone discipline (P-phases, reviewer subagents, validation gate) as the original Phase 1 build, so it slots into the existing engineering workflow.
 

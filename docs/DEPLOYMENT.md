@@ -1,6 +1,6 @@
 # Deployment — Single Container
 
-SAHC RiskLens packages as one container that serves both the web UI and the API
+CardioMet Lens packages as one container that serves both the web UI and the API
 from a single URL. This is the simplest path for both a shareable demo and a real
 product.
 

@@ -1,11 +1,11 @@
 cat > CLAUDE.md << 'ENDOFFILE'
-# CLAUDE.md — Project context for SAHC RiskLens
+# CLAUDE.md — Project context for CardioMet Lens
 
 This file gives an AI coding assistant the standing context to work in this repo
 effectively. Read it first, then the docs referenced below as needed.
 
 ## What this project is
-SAHC RiskLens is an **educational, non-diagnostic** web app that helps a person
+CardioMet Lens is an **educational, non-diagnostic** web app that helps a person
 understand their cardiometabolic lab values (lipids, glucose, blood pressure,
 body) against published clinical guidelines and a population benchmark, with
 **South Asian** risk context that generic tools omit. It also tracks values over
