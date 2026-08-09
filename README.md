@@ -68,7 +68,7 @@ cardiomet-app/
 ├── api/ FastAPI app (main.py, models/, routers/)
 ├── frontend/src/ Next.js 14 UI (app/, components/, lib/)
 ├── cardiosafebench/ AI-safety benchmark (see below)
-├── tests/ 294 backend tests: smoke → unit → integration → e2e
+├── tests/ 307 backend tests: smoke → unit → integration → e2e
 ├── scripts/ setup_env.sh, download_nhanes.py, build_strata_tables.py, run_validation_gate.sh
 ├── data/ raw/ (NHANES, gitignored) · sahc/ (CSV, gitignored)
 └── docs/ architecture, API reference, clinical logic, features, roadmap
@@ -116,7 +116,7 @@ See [`DOCUMENTATION.md`](./DOCUMENTATION.md) for full request/response contracts
 
 ## Testing & the release gate
 
-294 backend tests span four tiers — **smoke → unit → integration → e2e** — plus a Playwright browser tier. A single pre-release command runs everything:
+307 backend tests span four tiers — **smoke → unit → integration → e2e** — plus a 23-test Playwright browser tier. A single pre-release command runs everything:
 
 ```bash
 bash scripts/run_validation_gate.sh
