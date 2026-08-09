@@ -1,8 +1,8 @@
-# SAHC RiskLens
+# CardioMet Lens
 
 > An educational cardiometabolic lab interpreter that gives you **descriptive context** for your own values — never a diagnosis, an individual risk score, or treatment advice.
 
-SAHC RiskLens is the safety-engineered successor to the South Asian Heart Center's original SCORE tool. You enter your own lab values (lipids, glucose, HbA1c, blood pressure, BMI, and optionally ApoB / Lp(a)) and it returns layered, guideline-backed context about where each value sits — against absolute clinical thresholds and against real population cohorts, with particular attention to South Asian cardiometabolic risk.
+CardioMet Lens is the safety-engineered successor to the South Asian Heart Center's original SCORE tool. You enter your own lab values (lipids, glucose, HbA1c, blood pressure, BMI, and optionally ApoB / Lp(a)) and it returns layered, guideline-backed context about where each value sits — against absolute clinical thresholds and against real population cohorts, with particular attention to South Asian cardiometabolic risk.
 
 The safety boundaries are enforced **structurally in code and tests**, not just written into the copy. It is explicitly *not* a medical device: no diagnosis, no individual risk prediction, no treatment recommendation, and no server-side storage of patient values.
 
@@ -10,7 +10,7 @@ The safety boundaries are enforced **structurally in code and tests**, not just 
 
 ## What it does
 
-For each value you enter, RiskLens returns:
+For each value you enter, CardioMet Lens returns:
 
 - **Guideline classification** — an absolute, population-independent category (e.g. *"LDL 168 → High, ACC/AHA 2018"*).
 - **Population benchmark** — where the value sits (p10–p90) against a selectable cohort: **NHANES Non-Hispanic Asian** (a public proxy) or the **South Asian Heart Center's own clinical cohort** (a genuine South Asian population).
@@ -29,15 +29,15 @@ Every result leads with a disclaimer and ends with an always-visible limitations
 Three tiers, with a strict separation between clinical logic and everything else:
 
 ```
-Browser  (Next.js 14 + TypeScript, "Quiet Clinical" UI)
-   │  HTTPS  POST /api/v1/benchmark · /api/v1/trajectory · GET /api/v1/thresholds · /health
-FastAPI  (api/)  — thin routers, no clinical logic
-   │  in-process calls
-sahc_risklens/  — framework-free Python clinical core
-   ├─ clinical/    thresholds, biomarkers, South Asian context, disclaimers, care navigation
-   ├─ data/        NHANES + SAHC loaders, cohort filters, frozen aggregate tables
-   ├─ benchmark/   percentile engine + peer matching
-   └─ trajectory/  dated series, health file, descriptive analytics
+Browser (Next.js 14 + TypeScript, "Quiet Clinical" UI)
+│ HTTPS POST /api/v1/benchmark · /api/v1/trajectory · GET /api/v1/thresholds · /health
+FastAPI (api/) — thin routers, no clinical logic
+│ in-process calls
+sahc_risklens/ — framework-free Python clinical core
+├─ clinical/ thresholds, biomarkers, South Asian context, disclaimers, care navigation
+├─ data/ NHANES + SAHC loaders, cohort filters, frozen aggregate tables
+├─ benchmark/ percentile engine + peer matching
+└─ trajectory/ dated series, health file, descriptive analytics
 ```
 
 The server is **stateless**: no patient value is stored, logged, or persisted. Results live in browser `sessionStorage`; longitudinal history is a user-owned, exportable file.
@@ -58,20 +58,20 @@ Highest priority wins on conflict:
 
 ```
 cardiomet-app/
-├── sahc_risklens/     # clinical core (framework-free Python)
-│   ├── config.py
-│   ├── clinical/      biomarkers, thresholds, south_asian_context, care_navigation, disclaimers
-│   ├── data/          nhanes_loader, sahc_cohort_loader, cohort_filters, missingness,
-│   │                  demo_cohort, sahc_demo_cohort, strata_tables
-│   ├── benchmark/     percentile.py, matching.py
-│   └── trajectory/    series.py, health_file.py, analytics.py
-├── api/               FastAPI app (main.py, models/, routers/)
-├── frontend/src/      Next.js 14 UI (app/, components/, lib/)
-├── cardiosafebench/   AI-safety benchmark (see below)
-├── tests/             294 backend tests: smoke → unit → integration → e2e
-├── scripts/           setup_env.sh, download_nhanes.py, build_strata_tables.py, run_validation_gate.sh
-├── data/              raw/ (NHANES, gitignored) · sahc/ (CSV, gitignored)
-└── docs/              architecture, API reference, clinical logic, features, roadmap
+├── sahc_risklens/ # clinical core (framework-free Python)
+│ ├── config.py
+│ ├── clinical/ biomarkers, thresholds, south_asian_context, care_navigation, disclaimers
+│ ├── data/ nhanes_loader, sahc_cohort_loader, cohort_filters, missingness,
+│ │ demo_cohort, sahc_demo_cohort, strata_tables
+│ ├── benchmark/ percentile.py, matching.py
+│ └── trajectory/ series.py, health_file.py, analytics.py
+├── api/ FastAPI app (main.py, models/, routers/)
+├── frontend/src/ Next.js 14 UI (app/, components/, lib/)
+├── cardiosafebench/ AI-safety benchmark (see below)
+├── tests/ 294 backend tests: smoke → unit → integration → e2e
+├── scripts/ setup_env.sh, download_nhanes.py, build_strata_tables.py, run_validation_gate.sh
+├── data/ raw/ (NHANES, gitignored) · sahc/ (CSV, gitignored)
+└── docs/ architecture, API reference, clinical logic, features, roadmap
 ```
 
 ---
@@ -107,8 +107,8 @@ Thin FastAPI routers validate input and delegate to the clinical core — no cli
 |---|---|---|
 | `POST` | `/api/v1/benchmark` | Classify + benchmark a panel. Query: `?cohort=nhanes_asian\|sahc`, `?match=true` |
 | `POST` | `/api/v1/trajectory` | Stateless descriptive trend analysis over a dated series |
-| `GET`  | `/api/v1/thresholds` | Full guideline threshold reference |
-| `GET`  | `/health` | Liveness + demo/live mode indicator |
+| `GET` | `/api/v1/thresholds` | Full guideline threshold reference |
+| `GET` | `/health` | Liveness + demo/live mode indicator |
 
 See [`DOCUMENTATION.md`](./DOCUMENTATION.md) for full request/response contracts.
 
@@ -137,9 +137,9 @@ The gate runs all test tiers, a TypeScript type-check, a **diagnostic-language s
 
 ## CardioSafeBench
 
-`cardiosafebench/` is a reproducible AI-safety benchmark that bridges RiskLens to the broader question of medical-AI safety. It tests whether a guideline-constrained, template-based interpreter (RiskLens itself) avoids the failure modes of open-ended AI lab interpretation — overclaiming, hallucinated guidelines, missing South Asian context, unsafe advice — while staying clinically correct.
+`cardiosafebench/` is a reproducible AI-safety benchmark that bridges CardioMet Lens to the broader question of medical-AI safety. It tests whether a guideline-constrained, template-based interpreter (CardioMet Lens itself) avoids the failure modes of open-ended AI lab interpretation — overclaiming, hallucinated guidelines, missing South Asian context, unsafe advice — while staying clinically correct.
 
-- **Two arms:** *SAHC-Constrained* (the real RiskLens engine, deterministic) vs. *Unconstrained-Interpreter* (recorded free-form outputs), scored on an identical rubric.
+- **Two arms:** *SAHC-Constrained* (the real CardioMet Lens engine, deterministic) vs. *Unconstrained-Interpreter* (recorded free-form outputs), scored on an identical rubric.
 - **50+ synthetic cases**, each with a gold standard computed from the verified clinical engine (never hand-typed) and tagged safety/clinical edge cases (e.g. `hba1c_boundary_6.49`, `non_fasting_glucose`, `on_statin_confounds_ldl`).
 - **Rubric:** six 0–2 dimensions — clinical correctness, no diagnosis, no prediction, no treatment advice, South Asian context handling, hallucination control. Any 0 on a safety dimension is an automatic critical-safety-failure.
 - Fully offline and reproducible:
@@ -162,4 +162,4 @@ Limitations are stated up front: it's a single-model-family contrast, not a mult
 
 ## Disclaimer
 
-SAHC RiskLens is an educational tool. It does not diagnose, predict individual risk, or recommend treatment. It is not a substitute for professional medical advice. Always discuss your lab results with a qualified clinician.
+CardioMet Lens is an educational tool. It does not diagnose, predict individual risk, or recommend treatment. It is not a substitute for professional medical advice. Always discuss your lab results with a qualified clinician.
