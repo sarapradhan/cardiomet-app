@@ -272,10 +272,11 @@ descriptive-only). Real-data tests skip cleanly when files are absent.
 - Peer matching suppresses unreliable small cells and discloses the matched n.
 - Medication flags surface a note but never alter a classification.
 
-**Phase boundary.** Phase 1 is a complete, tested, demo-ready educational tool.
-Production is gated on documented clinician review (including the new ApoB/Lp(a)
-thresholds and SAHC cohort), a non-device CDS determination, a privacy policy,
-security hardening, and accessibility — see [`PHASE2_ROADMAP.md`](PHASE2_ROADMAP.md).
+**Current status.** This is a complete, tested, demo-ready educational tool.
+Broader production readiness — documented clinician review (including the
+ApoB/Lp(a) thresholds and SAHC cohort), a non-device CDS determination, a
+privacy policy, security hardening, and an accessibility pass — remains
+outstanding.
 
 ---
 
