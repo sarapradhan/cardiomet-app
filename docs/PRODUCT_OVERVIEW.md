@@ -71,7 +71,7 @@ The benchmark uses NHANES, the large U.S. public health survey. NHANES groups So
 - **The reference benchmark uses real public NHANES data** — the actual Non-Hispanic Asian cohort percentiles, computed from the 2017–2018 survey files.
 - **Safety guarantees are enforced by the software's structure**, not left to discipline: the cohort label is fixed at the type level, a disclaimer is a required part of every response, and the limitations panel cannot be hidden.
 - **The physician discussion guide is template-generated** — fixed, reviewable wording, with no AI text generation in the live product, so its output is predictable and auditable.
-- **The system is verified by 184 automated tests** spanning every clinical threshold boundary, the data pipeline, the API, and a real end-to-end run.
+- **The system is verified by 307 automated tests** spanning every clinical threshold boundary, the data pipeline, the API, and a real end-to-end run.
 
 ### How it can be used responsibly to support — not replace — medicine
 The design philosophy is "AI and software in a supporting role." Software is good at instant, consistent, tireless application of published rules and at surfacing relevant context a busy person would miss. Clinicians are irreplaceable for judgment, diagnosis, the whole-person picture, and treatment. This tool deliberately occupies only the first half: it does the rote organizing and contextualizing, and explicitly routes every meaningful decision back to a human clinician. That division of labor is where software genuinely helps medicine without overreaching.
