@@ -109,7 +109,7 @@ Extends the tool safely: adds biomarkers, updates thresholds when guidelines cha
 
 ## 5. User Stories
 
-Written in standard form, grouped by persona, with acceptance criteria. These map directly to the implemented Phase 1 feature set.
+Written in standard form, grouped by persona, with acceptance criteria. These map directly to the implemented feature set.
 
 ### Epic A — Understand my numbers in context
 
@@ -183,17 +183,17 @@ Written in standard form, grouped by persona, with acceptance criteria. These ma
 
 ---
 
-## 6. Success measures (pragmatic, Phase 1)
+## 6. Success measures (pragmatic)
 
-Phase 1 is a demo, so success is qualitative and gate-oriented, not adoption metrics:
+This is a demo, so success is qualitative and gate-oriented, not adoption metrics:
 - A clinician reviews the output and would be comfortable with patients using it to prepare.
 - Test users report the results were clear and the questions useful for an appointment.
 - No output is found that reads as diagnosis, prediction, or treatment advice.
 - The South Asian framing is judged accurate and not overstated by a clinical reviewer.
 
-Adoption, engagement, and outcome measures belong to a later phase, only after clinical sign-off.
+Adoption, engagement, and outcome measures belong to a later stage, only after clinical sign-off.
 
 ---
 
 ## 7. What's next
-Phase 1 is complete and demo-ready, and the longitudinal trajectory capability (the key differentiator) is now implemented end-to-end — stateless API plus a timeline UI with user-owned data. The gate to going further is **clinical review** — a licensed clinician confirming the thresholds are current, the South Asian framing is defensible, and the language is safe. Everything beyond that (deployment at scale, regulatory determination, accessibility, security hardening) follows that sign-off. See the companion clinician briefing document and `docs/PHASE2_ROADMAP.md`.
+The tool is complete and demo-ready, and the longitudinal trajectory capability (the key differentiator) is implemented end-to-end — stateless API plus a timeline UI with user-owned data. The gate to going further is **clinical review** — a licensed clinician confirming the thresholds are current, the South Asian framing is defensible, and the language is safe. Everything beyond that (deployment at scale, regulatory determination, accessibility, security hardening) follows that sign-off.
