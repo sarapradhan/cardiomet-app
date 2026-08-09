@@ -190,7 +190,7 @@ It performs no clinical computation of its own.
 
 ### 9.1 Test tiers
 
-294 backend tests organized as **smoke → unit → integration → e2e**, plus a Playwright browser tier. The tiering lets a fast smoke pass catch gross breakage before the slower integration and end-to-end suites run.
+307 backend tests organized as **smoke → unit → integration → e2e**, plus a 23-test Playwright browser tier. The tiering lets a fast smoke pass catch gross breakage before the slower integration and end-to-end suites run.
 
 ### 9.2 The single release command
 
