@@ -256,27 +256,7 @@ Fully offline and reproducible. Stated limitations: it is a single-model-family 
 
 ---
 
-## 12. Phase 2 — production readiness
-
-Phase 1 is a complete, tested, demo-ready educational tool. Phase 2 (production) is gated on items that are partly external (physician/legal) and partly engineering. Full scope lives in `docs/PHASE2_ROADMAP.md`; the sequenced plan is summarized below.
-
-| Bucket | Contents |
-|---|---|
-| **P2.0 Clinical & Legal** | Physician review, FDA non-device CDS determination, privacy policy + ToS, HIPAA statelessness analysis |
-| **P2.1 Security** | Rate limiting, request logging (no biomarker values), CORS lock, dependency audits, error sanitization |
-| **P2.2 Authentication** | Optional — stateless is strongly preferred and currently recommended to skip |
-| **P2.3 Infrastructure** | Vercel Pro (frontend) + Railway Hobby (API container) |
-| **P2.4 CI/CD** | GitHub Actions: PR gate mirroring the validation gate, staging on merge, production on tag |
-| **P2.5 Observability** | Sentry (FE + BE, with biomarker scrubbing), uptime monitoring, Plausible analytics |
-| **P2.6 Accessibility** | WCAG 2.1 AA — keyboard nav, ARIA, contrast, mobile, Lighthouse ≥ 90 |
-
-**Sequencing rationale:** long-lead external work (physician review, legal/FDA/privacy) starts on day one and runs in the background, because elapsed time — not engineering effort — is the constraint. Infrastructure stands up early because CORS-lock, Lighthouse-against-a-real-URL, and observability hooks all need a live deployment to test against. Authentication is deliberately deferred; the stateless architecture is the safety feature, not a gap.
-
-**Release criteria:** all Phase 1 criteria + documented physician review + documented FDA CDS determination + published privacy policy + passing CI/CD + clean security + completed WCAG audit.
-
----
-
-## 13. Glossary
+## 12. Glossary
 
 - **NHANES Non-Hispanic Asian** — a public national health survey cohort used as a *proxy* population benchmark. Always labeled as NHANES.
 - **SAHC cohort** — the South Asian Heart Center's own clinical cohort; a genuine South Asian population benchmark.
