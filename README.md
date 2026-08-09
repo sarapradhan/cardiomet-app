@@ -154,9 +154,7 @@ Limitations are stated up front: it's a single-model-family contrast, not a mult
 
 ## Project status
 
-**Phase 1 (current):** complete, tested, demo-ready educational tool.
-
-**Phase 2 (production):** gated on documented physician review, an FDA non-device CDS determination, a published privacy policy, security hardening (rate limiting, biomarker-free request logging, locked CORS, dependency audits), and a WCAG 2.1 AA accessibility pass. Full scope and sequencing live in [`docs/PHASE2_ROADMAP.md`](./docs/PHASE2_ROADMAP.md) and the accompanying Phase 2 plan.
+Complete, tested, demo-ready educational tool.
 
 ---
 
