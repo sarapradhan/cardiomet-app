@@ -90,8 +90,8 @@ tests, not just stated in copy.
 
 ## Status
 
-Phase 1 — educational demonstration. Production use is gated on documented
-clinician review, a regulatory (non-device clinical decision support)
-determination, a privacy policy, security hardening, and an accessibility audit.
-See [`PHASE2_ROADMAP.md`](PHASE2_ROADMAP.md). For the deeper persona and
-user-story treatment, see [`PRODUCT_OVERVIEW.md`](PRODUCT_OVERVIEW.md).
+Complete, tested, demo-ready educational tool. Broader production use remains
+gated on documented clinician review, a regulatory (non-device clinical decision
+support) determination, a privacy policy, security hardening, and an
+accessibility audit. For the deeper persona and user-story treatment, see
+[`PRODUCT_OVERVIEW.md`](PRODUCT_OVERVIEW.md).
