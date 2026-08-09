@@ -241,7 +241,7 @@ The output shape is defined once in `api/models/results.py` and mirrored in
 
 ## 8. Testing architecture
 
-**294 backend tests** (plus a browser tier), run in order by the validation gate:
+**307 backend tests** (plus a 23-test browser tier), run in order by the validation gate:
 
 | Tier | Representative files | Proves |
 |---|---|---|
@@ -272,11 +272,10 @@ descriptive-only). Real-data tests skip cleanly when files are absent.
 - Peer matching suppresses unreliable small cells and discloses the matched n.
 - Medication flags surface a note but never alter a classification.
 
-**Current status.** This is a complete, tested, demo-ready educational tool.
-Broader production readiness — documented clinician review (including the
-ApoB/Lp(a) thresholds and SAHC cohort), a non-device CDS determination, a
-privacy policy, security hardening, and an accessibility pass — remains
-outstanding.
+**Production readiness.** This is a complete, tested, demo-ready educational tool.
+Moving beyond a demo is gated on documented clinician review (including the
+ApoB/Lp(a) thresholds and SAHC cohort), a non-device CDS determination, a privacy
+policy, security hardening, and accessibility.
 
 ---
 
