@@ -47,9 +47,4 @@
 - [ ] [BLOCKER] Release Gate Reviewer: Approved
 - [ ] End-to-end flow works: form -> submit -> results renders
 - [ ] Demo mode works without NHANES files
-- [ ] Deployed: Vercel + Railway
-
-## Pre-Phase 2 Gate
-- [ ] [BLOCKER] All P0–P5 complete
-- [ ] [BLOCKER] Physician review documented
-- [ ] [BLOCKER] All three reviewers approve Phase 2 plan
+- [ ] Deployed: single container to Hugging Face Spaces
