@@ -36,7 +36,7 @@ We support longitudinal tracking *without a server-side database* via two mechan
 
 This preserves the "we store nothing" claim — the strongest trust and regulatory property of the product — while delivering the longitudinal value. It is also a *better* privacy story than competitors who silently warehouse health data, and it is itself a differentiator worth stating out loud.
 
-> Server-side accounts and storage are explicitly **out of scope** for this capability and deferred to a future phase that would require the full HIPAA/security treatment in `PHASE2_ROADMAP.md`. We are choosing the architecture that keeps the regulatory gate low.
+> Server-side accounts and storage are explicitly **out of scope** for this capability and deferred to a future phase that would require a full HIPAA/security review. We are choosing the architecture that keeps the regulatory gate low.
 
 ---
 
