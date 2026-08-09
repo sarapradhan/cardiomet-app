@@ -10,7 +10,6 @@ _Last updated: 2026-06-13 - P0-P5 complete; full stack implemented, tested, and 
 | P3: FastAPI endpoints | Complete | benchmark.py + thresholds.py routers wired to P1/P2. All 17 endpoint tests pass. |
 | P4: Next.js frontend | Complete | 7 MD3 components + wired pages. Type-check clean, production build 6/6 pages. Next pinned to patched 14.2.35. |
 | P5: Integration + release | Complete | Smoke (32) + integration (14) + e2e (7, real uvicorn). Validation gate 8/8. Release Gate Reviewer: compliance pass. |
-| Phase 2 | Deferred | Begins after physician review. See docs/PHASE2_ROADMAP.md. |
 
 ## Test Inventory (184 total, all passing)
 | Suite | Tests | Scope |
@@ -41,14 +40,13 @@ results.py <-> types.ts: In sync. No schema changes in P2-P5 (only router wiring
 | Release Gate Reviewer | After P5 | Compliance pass (Literal cohort_label, required disclaimer, no-LLM guide, limitations always shown, no diagnostic language) | None |
 
 ## Open Issues
-- npm audit: remaining high items require Next 16 (breaking) - deferred to Phase 2 P2.1 security.
-- starlette TestClient deprecation warning (cosmetic) - httpx2 migration, Phase 2.
+- npm audit: remaining high items require Next 16 (breaking) - deferred.
+- starlette TestClient deprecation warning (cosmetic) - httpx2 migration pending.
 
 ## Next Session Start Point
-Phase 1 is functionally complete and deployable in demo mode. Next actions:
-1. Deploy: frontend -> Vercel, backend -> Railway (set NEXT_PUBLIC_API_URL + ALLOWED_ORIGINS).
-2. Run docs/E2E_CHECKLIST.md Tier 2 (browser) against the deployed URLs.
-3. Begin Phase 2 gate: physician review (docs/PHASE2_ROADMAP.md P2.0).
+The core app is functionally complete and deployed. Next actions:
+1. Deploy: single container to Hugging Face Spaces (set NEXT_PUBLIC_API_URL + ALLOWED_ORIGINS as needed).
+2. Run docs/E2E_CHECKLIST.md Tier 2 (browser) against the deployed Space.
 
 
 ## Trajectory Tracking — T0/T1 (Clinical Core) — COMPLETE
