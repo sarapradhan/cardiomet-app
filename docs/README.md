@@ -21,14 +21,11 @@ project root [`README.md`](../README.md) has the quick start.
 - [`CLINICAL_LOGIC_APPENDIX.md`](CLINICAL_LOGIC_APPENDIX.md) — every threshold + citation (source of truth)
 - [`DATA_DICTIONARY.md`](DATA_DICTIONARY.md) — NHANES variables and real-data gotchas
 - [`SAHC_COHORT.md`](SAHC_COHORT.md) — SAHC cohort provenance, peer matching, governance
-- [`CLINICIAN_BRIEFING.md`](CLINICIAN_BRIEFING.md) — the physician-review framing and safety posture
-- [`SAHC_RiskLens_Clinician_Briefing.docx`](SAHC_RiskLens_Clinician_Briefing.docx) — clinician-facing briefing (Word)
 
 **Safety, validation, release**
 - [`SAFETY_AND_LIMITATIONS.md`](SAFETY_AND_LIMITATIONS.md) — boundaries and known limits
 - [`VALIDATION_PLAN.md`](VALIDATION_PLAN.md) · [`E2E_CHECKLIST.md`](E2E_CHECKLIST.md) · [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md)
 - [`DEPLOYMENT.md`](DEPLOYMENT.md) — single-container deployment
-- [`PHASE2_ROADMAP.md`](PHASE2_ROADMAP.md) — what gates production use
 - [`INCREMENTAL_VALUE_SPEC.md`](INCREMENTAL_VALUE_SPEC.md) — the differentiation thesis
 - [`SESSION_STATUS.md`](SESSION_STATUS.md) — living status + decision log
 - [`PR_feat_sahc_cohort.md`](PR_feat_sahc_cohort.md) — PR description for the cohort/matching/markers work
