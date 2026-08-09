@@ -41,10 +41,10 @@ project root [`README.md`](../README.md) has the quick start.
 
 ## Current state
 
-Phase 1 — educational demonstration. Implemented: guideline classification,
+Educational demonstration. Implemented: guideline classification,
 dual-cohort benchmarking (NHANES + SAHC), SCORE-style peer matching, ApoB/Lp(a)
 risk-enhancing markers, South Asian context, longitudinal trajectory, physician
-guide + clinician pre-visit brief + care navigation. **294 backend tests pass;
+guide + clinician pre-visit brief + care navigation. **307 backend tests pass;
 the validation gate passes.** Pending clinician sign-off: the ApoB/Lp(a)
 thresholds and the SAHC cohort. Data-blocked follow-ups (response-to-intervention,
 velocity benchmarking) require a linked, date-stamped extract — see
