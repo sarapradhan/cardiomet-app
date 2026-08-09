@@ -149,4 +149,4 @@ Not part of this build, but the natural follow-ons once trajectory exists:
 - **Guideline-version tracking** — record which guideline version classified each draw, so historical points stay accurate as guidelines evolve. Deepens the "verifiable" moat.
 - **Expanded verified biomarker set** (e.g. ApoB, Lp(a)) — each added with the same single-source-of-truth + test discipline.
 - **Clinician-shareable export** — a clean PDF of the timeline for an appointment (builds on the existing PDF capability).
-- **Server-side accounts** — only behind the full Phase 2 HIPAA/security gate, and only if user demand justifies trading away the statelessness advantage.
+- **Server-side accounts** — only behind a full HIPAA/security review, and only if user demand justifies trading away the statelessness advantage.
