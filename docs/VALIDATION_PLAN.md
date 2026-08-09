@@ -27,7 +27,7 @@ P1 → Clinical & Safety Reviewer
 P2/P3 → Data & QA Auditor
 P4 → Clinical & Safety Reviewer
 P5 → Release Gate Reviewer
-Pre-Phase2 AI feature → all three reviewers
+Before any AI feature is added to the patient-facing path → all three reviewers
 
 ## Release Criteria
 run_validation_gate.sh exits 0 · npm run type-check passes ·
