@@ -115,7 +115,6 @@ results are reported — do not overclaim.
 
 ## Where to read more
 docs/ARCHITECTURE.md (system), docs/PRODUCT_OVERVIEW.md (why/what/personas),
-docs/CLINICIAN_BRIEFING.md (the physician-review framing and safety posture),
 docs/INCREMENTAL_VALUE_SPEC.md (the differentiation thesis: longitudinal +
 verifiable + population-calibrated + user-owned), docs/DATA_DICTIONARY.md
 (NHANES specifics and the real-data gotchas), and the build logs under
