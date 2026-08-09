@@ -18,5 +18,5 @@ Patients on medications may have values that do not reflect untreated baseline.
 South Asian BMI thresholds (>=23/>=27.5) are discussion context only.
 
 ## Physician Review Status
-Formal physician review planned for Phase 2. Until complete, use for educational
+Formal physician review has not yet been completed. Until it is, use for educational
 demonstration and discussion preparation only.
