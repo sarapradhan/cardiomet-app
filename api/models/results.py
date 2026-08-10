@@ -5,13 +5,15 @@ frontend/src/lib/types.ts must mirror every field in BenchmarkResponse exactly.
 When this file changes, update types.ts in the same session.
 """
 from __future__ import annotations
+
 from typing import Literal
+
 from pydantic import BaseModel, Field
+
 from sahc_risklens.config import (
     DEFAULT_COHORT,
     NHANES_COHORT_LABEL,
     PRODUCT_DISCLAIMER,
-    SAHC_COHORT_LABEL,
 )
 
 # The set of honest cohort labels a benchmark response may carry. Each is tied to

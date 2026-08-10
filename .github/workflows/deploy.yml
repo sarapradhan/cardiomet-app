@@ -1,13 +1,20 @@
 name: Deploy
 
+# Gated on CI: this only runs after the "CI" workflow finishes successfully on
+# main, so an image can no longer be published/deployed without first passing
+# the backend, frontend, and browser test suites. (Previously this triggered on
+# every push to main independently of CI.)
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
     branches: [main]
+    types: [completed]
   workflow_dispatch:
 
 jobs:
   image:
     name: Build & publish container image
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,15 +43,22 @@ jobs:
     env:
       RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
     steps:
-      - name: Trigger deploy or explain how
+      # This step only runs (and only shows green) if a deploy hook is actually
+      # configured. If it's missing, this step is SKIPPED rather than reporting
+      # a false success — the run summary below makes the gap impossible to miss.
+      - name: Trigger host deploy
+        if: env.RENDER_DEPLOY_HOOK != ''
+        run: |
+          echo "Triggering host deploy via deploy hook..."
+          curl -fsS -X POST "${RENDER_DEPLOY_HOOK}"
+          echo "Deploy triggered."
+      - name: Report deploy status
         run: |
           if [ -n "${RENDER_DEPLOY_HOOK}" ]; then
-            echo "Triggering host deploy via deploy hook..."
-            curl -fsS -X POST "${RENDER_DEPLOY_HOOK}"
-            echo "Deploy triggered."
+            echo "### Deploy: triggered" >> "$GITHUB_STEP_SUMMARY"
+            echo "Host deploy hook was called for ghcr.io/${{ github.repository }}:${{ github.sha }}." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "No RENDER_DEPLOY_HOOK secret set — image published, no host hook called."
-            echo "Image: ghcr.io/${{ github.repository }}:latest"
-            echo "To enable auto-deploy: add a deploy-hook secret (Render/Railway/etc.),"
-            echo "or point your host at the published image above."
+            echo "::warning title=No host deploy occurred::Image ghcr.io/${{ github.repository }}:latest was published, but RENDER_DEPLOY_HOOK is not set, so no host was actually deployed. Add the secret or point your host at the published image."
+            echo "### Deploy: NOT triggered" >> "$GITHUB_STEP_SUMMARY"
+            echo "Image ghcr.io/${{ github.repository }}:${{ github.sha }} was published, but **no host deploy hook is configured** — nothing was deployed. Add a \`RENDER_DEPLOY_HOOK\` secret (or equivalent) to enable auto-deploy." >> "$GITHUB_STEP_SUMMARY"
           fi

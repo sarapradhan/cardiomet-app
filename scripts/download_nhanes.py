@@ -65,7 +65,7 @@ def main() -> int:
             continue
 
         if not _is_valid_xport(dest):
-            print(f"    ERROR: not a valid XPORT file (HTML/error page?)")
+            print("    ERROR: not a valid XPORT file (HTML/error page?)")
             dest.unlink(missing_ok=True)
             errors.append(fname)
             continue

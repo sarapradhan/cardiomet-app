@@ -89,8 +89,8 @@ def test_smoke_get_south_asian_context():
 
 
 def test_smoke_build_physician_guide():
-    from sahc_risklens.clinical.thresholds import classify_all_biomarkers
     from sahc_risklens.clinical.disclaimers import build_physician_guide
+    from sahc_risklens.clinical.thresholds import classify_all_biomarkers
     guide = build_physician_guide(classify_all_biomarkers({**_MINIMAL_PATIENT, "LDL_mgdl": 165}))
     assert any(g["biomarker"] == "LDL" for g in guide)
 
@@ -115,6 +115,7 @@ def test_smoke_get_cohort_percentiles():
 
 def test_smoke_cohort_filter():
     import pandas as pd
+
     from sahc_risklens.data.cohort_filters import filter_non_hispanic_asian
     df = pd.DataFrame({"SEQN": [1, 2], "RIDRETH3": [6, 3]})
     assert len(filter_non_hispanic_asian(df)) == 1
@@ -122,6 +123,7 @@ def test_smoke_cohort_filter():
 
 def test_smoke_missingness_report():
     import pandas as pd
+
     from sahc_risklens.data.missingness import missingness_report
     rep = missingness_report(pd.DataFrame({"A": [1, None]}))
     assert rep["A"]["n_missing"] == 1
@@ -157,8 +159,9 @@ def test_smoke_openapi_schema():
 
 def test_smoke_make_series_and_analyze():
     import datetime as dt
-    from sahc_risklens.trajectory.series import BiomarkerDraw, make_series
+
     from sahc_risklens.trajectory.analytics import analyze_series
+    from sahc_risklens.trajectory.series import BiomarkerDraw, make_series
     series = make_series([
         BiomarkerDraw(dt.date(2025, 12, 1), {"LDL_mgdl": 162}),
         BiomarkerDraw(dt.date(2026, 5, 1), {"LDL_mgdl": 124}),
@@ -169,8 +172,9 @@ def test_smoke_make_series_and_analyze():
 
 def test_smoke_health_file_round_trip():
     import datetime as dt
+
+    from sahc_risklens.trajectory.health_file import from_health_file, to_health_file
     from sahc_risklens.trajectory.series import BiomarkerDraw, make_series
-    from sahc_risklens.trajectory.health_file import to_health_file, from_health_file
     s = make_series([BiomarkerDraw(dt.date(2026, 1, 1), {"LDL_mgdl": 100})])
     assert from_health_file(to_health_file(s)).draws[0].values["LDL_mgdl"] == 100
 

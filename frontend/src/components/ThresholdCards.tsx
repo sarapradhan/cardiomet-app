@@ -59,7 +59,13 @@ export function ThresholdCards({ results, benchmarkData = [] }: Props) {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
               {items.map((r) => {
-                const missing = r.category === null || r.value === null;
+                // Two distinct null-category states: a value that was never
+                // entered (missing) vs. a value that WAS entered but can't be
+                // classified — e.g. FPG without confirmed fasting status. The
+                // latter must still show the patient's value and the reason,
+                // not collapse to the same "Not provided" treatment.
+                const missing = r.value === null;
+                const unclassified = !missing && r.category === null;
                 const tone = categoryTone(r.category);
                 const bench = benchOf[r.biomarker];
                 return (
@@ -81,7 +87,8 @@ export function ThresholdCards({ results, benchmarkData = [] }: Props) {
                         )}
                       </div>
                       <span className={chipClass(r.category)}>
-                        <span className="chip-dot" />{missing ? 'Not provided' : r.category}
+                        <span className="chip-dot" />
+                        {missing ? 'Not provided' : unclassified ? 'Not classified' : r.category}
                       </span>
                     </div>
 
@@ -92,11 +99,15 @@ export function ThresholdCards({ results, benchmarkData = [] }: Props) {
                       <span className="caption">{r.unit}</span>
                     </div>
 
-                    {!missing && (
+                    {/* Range bar needs a category to place the tone/zone — skip
+                        for unclassified values (e.g. FPG pending fasting
+                        confirmation) rather than imply a category that wasn't
+                        actually assigned. */}
+                    {!missing && !unclassified && (
                       <MetricRangeBar biomarker={r.biomarker} value={r.value as number} tone={tone} benchmark={bench} />
                     )}
 
-                    {!missing && (
+                    {!missing && !unclassified && (
                       <div className="num" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10.5, color: 'var(--ink-faint)' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                           <span style={{ width: 7, height: 7, borderRadius: 2, background: TONE_COLOR[tone], flex: 'none' }} />You {r.value}

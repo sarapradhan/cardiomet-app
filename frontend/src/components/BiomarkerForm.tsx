@@ -6,7 +6,7 @@
  * toggles default to a value. Calls onSubmit with a fully-typed BiomarkerInput.
  */
 import { useState } from 'react';
-import type { BiomarkerInput } from '@/lib/types';
+import type { BiomarkerInput, FastingStatus } from '@/lib/types';
 
 interface NumField {
   key: keyof BiomarkerInput;
@@ -29,7 +29,7 @@ const ADVANCED_LIPID_FIELDS: NumField[] = [
 ];
 
 const METABOLIC_FIELDS: NumField[] = [
-  { key: 'FPG_mgdl', label: 'Fasting Glucose', unit: 'mg/dL', placeholder: 'e.g. 90' },
+  { key: 'FPG_mgdl', label: 'Glucose', unit: 'mg/dL', placeholder: 'e.g. 90' },
   { key: 'HbA1c_pct', label: 'HbA1c', unit: '%', placeholder: 'e.g. 5.4' },
 ];
 
@@ -63,6 +63,14 @@ export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See 
   const [age, setAge] = useState<string>(typeof seed.age_yr === 'number' ? String(seed.age_yr) : '');
   const [sex, setSex] = useState<'M' | 'F' | ''>((seed.sex as 'M' | 'F') ?? '');
   const [southAsian, setSouthAsian] = useState<boolean>(seed.south_asian === true);
+  // Fasting status gates whether FPG is classified against fasting-glucose
+  // thresholds at all (sahc_risklens/clinical/thresholds.py) — a random/
+  // non-fasting glucose in the same numeric range is not clinically the same
+  // thing as a fasting one. Defaults to '' (sent as null -> treated as
+  // "unknown" server-side, same as not_fasting) rather than assuming fasting.
+  const [fastingStatus, setFastingStatus] = useState<FastingStatus | ''>(
+    (seed.fasting_status as FastingStatus) ?? ''
+  );
   const [meds, setMeds] = useState<Record<string, boolean>>({
     chol_med: seed.chol_med === true, bp_med: seed.bp_med === true,
     insulin: seed.insulin === true, dm_pills: seed.dm_pills === true,
@@ -82,7 +90,9 @@ export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See 
     return {
       LDL_mgdl: num('LDL_mgdl'), HDL_mgdl: num('HDL_mgdl'),
       TG_mgdl: num('TG_mgdl'), TC_mgdl: num('TC_mgdl'),
-      FPG_mgdl: num('FPG_mgdl'), HbA1c_pct: num('HbA1c_pct'),
+      FPG_mgdl: num('FPG_mgdl'),
+      fasting_status: fastingStatus === '' ? null : fastingStatus,
+      HbA1c_pct: num('HbA1c_pct'),
       SBP_mmhg: num('SBP_mmhg'), DBP_mmhg: num('DBP_mmhg'),
       BMI_kgm2: num('BMI_kgm2'),
       ApoB_mgdl: num('ApoB_mgdl'), Lpa_mgdl: num('Lpa_mgdl'),
@@ -125,6 +135,24 @@ export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See 
         {renderGroup('Advanced lipids (optional)', ADVANCED_LIPID_FIELDS)}
         <hr className="hairline" />
         {renderGroup('Glucose', METABOLIC_FIELDS)}
+        {values['FPG_mgdl']?.trim() && (
+          <label style={{ display: 'block', marginTop: -12 }}>
+            <span style={{ display: 'block', fontSize: 13, marginBottom: 6, color: 'var(--ink)' }}>
+              Was this glucose draw fasting (≥ 8 hours, nothing but water)?
+            </span>
+            <select className="input" value={fastingStatus}
+              onChange={(e) => setFastingStatus(e.target.value as FastingStatus | '')}
+              style={{ maxWidth: 320 }}>
+              <option value="">Not sure / prefer not to say</option>
+              <option value="confirmed">Yes — fasted at least 8 hours</option>
+              <option value="not_fasting">No — this was not a fasting draw</option>
+            </select>
+            <span className="caption" style={{ display: 'block', marginTop: 6, color: 'var(--ink-soft)' }}>
+              Fasting plasma glucose categories only apply to a confirmed fasting draw.
+              If unsure, we&apos;ll show your value without a category rather than guess.
+            </span>
+          </label>
+        )}
         <hr className="hairline" />
         {renderGroup('Vitals & Body', VITALS_FIELDS)}
       </div>

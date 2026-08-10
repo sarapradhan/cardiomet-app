@@ -13,11 +13,11 @@ from api.models.patient import BiomarkerInput
 from api.models.results import BenchmarkResponse
 from sahc_risklens.benchmark.percentile import SUPPORTED_COHORTS, get_benchmark_data
 from sahc_risklens.clinical.biomarkers import find_missing_biomarkers
+from sahc_risklens.clinical.care_navigation import get_care_navigation
 from sahc_risklens.clinical.disclaimers import (
     build_physician_guide,
     get_medication_notes,
 )
-from sahc_risklens.clinical.care_navigation import get_care_navigation
 from sahc_risklens.clinical.south_asian_context import get_south_asian_context
 from sahc_risklens.clinical.thresholds import (
     classify_all_biomarkers,

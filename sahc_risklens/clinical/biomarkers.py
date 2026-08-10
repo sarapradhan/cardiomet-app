@@ -14,6 +14,7 @@ All other clinical modules import BIOMARKERS from here rather than
 hardcoding field names.
 """
 from __future__ import annotations
+
 from dataclasses import dataclass
 
 

@@ -3,6 +3,7 @@ sahc_risklens/config.py — Runtime configuration.
 Import from here — never hardcode these values elsewhere.
 """
 from __future__ import annotations
+
 import os
 from pathlib import Path
 

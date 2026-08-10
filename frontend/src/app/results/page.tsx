@@ -10,6 +10,9 @@ import { DistributionChart } from '@/components/DistributionChart';
 import { SouthAsianContextPanel } from '@/components/SouthAsianContextPanel';
 import { MedicationNotes } from '@/components/MedicationNotes';
 import { PhysicianGuide } from '@/components/PhysicianGuide';
+import { RiskEnhancingMarkers } from '@/components/RiskEnhancingMarkers';
+import { CareNavigation } from '@/components/CareNavigation';
+import { ClinicianBrief } from '@/components/ClinicianBrief';
 import { LimitationsPanel } from '@/components/LimitationsPanel';
 
 export default function ResultsPage() {
@@ -56,9 +59,14 @@ export default function ResultsPage() {
         {result.disclaimer}
       </div>
 
-      {/* Cohort + validation badges */}
+      {/* Cohort + peer-matching + validation badges */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         <span className="chip chip-primary">{result.cohort_label}</span>
+        {result.matched && result.match_description && (
+          <span className="chip chip-primary" title="Peer-matched benchmark, small cells suppressed">
+            Matched: {result.match_description}
+          </span>
+        )}
         <span style={{
           padding: '4px 10px', borderRadius: 20, fontSize: 11,
           backgroundColor: 'var(--panel-sunken)', color: 'var(--ink-soft)',
@@ -75,10 +83,13 @@ export default function ResultsPage() {
       </div>
 
       <ThresholdCards results={result.threshold_results} benchmarkData={result.benchmark_data} missingBiomarkers={result.missing_biomarkers} />
+      <RiskEnhancingMarkers markers={result.risk_enhancing_markers} />
       <DistributionChart benchmarkData={result.benchmark_data} cohortLabel={result.cohort_label} />
       <SouthAsianContextPanel items={result.south_asian_context} />
       <MedicationNotes notes={result.medication_notes} />
       <PhysicianGuide items={result.physician_guide} />
+      <CareNavigation items={result.care_navigation} />
+      <ClinicianBrief result={result} />
       <LimitationsPanel />
 
       <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>

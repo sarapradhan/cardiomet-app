@@ -1,7 +1,8 @@
 """tests/test_api_endpoints.py — FastAPI endpoint tests."""
 from __future__ import annotations
-import pytest
+
 from fastapi.testclient import TestClient
+
 from api.main import app
 
 client = TestClient(app)

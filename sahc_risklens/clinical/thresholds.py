@@ -18,7 +18,7 @@ text matching the appendix's printed ranges and are not used for classification 
 """
 from __future__ import annotations
 
-from sahc_risklens.clinical.biomarkers import BIOMARKERS, get_field, find_missing_biomarkers
+from sahc_risklens.clinical.biomarkers import BIOMARKERS, find_missing_biomarkers, get_field
 
 Table = list[tuple[float, str, str]]
 
@@ -179,6 +179,18 @@ def classify_bmi_south_asian(value: float) -> tuple[str, str]:
     return _classify(value, _BMI_SOUTH_ASIAN_TABLE)
 
 
+def _fasting_confirmed(data) -> bool:
+    """
+    True only when fasting_status is explicitly "confirmed". Missing, "unknown",
+    and "not_fasting" are all treated as NOT confirmed — default-deny, not
+    default-allow, per docs/CLINICAL_LOGIC_APPENDIX.md's "do not classify
+    non-fasting values". fasting_hours >= 8 alone does not set this; the explicit
+    status field is the single source of truth so a caller can't accidentally
+    imply confirmation by supplying a plausible-looking hour count.
+    """
+    return get_field(data, "fasting_status") == "confirmed"
+
+
 def _medication_note_for(label: str, data) -> str | None:
     """Short per-biomarker note if any active medication flag affects this biomarker."""
     active = [flag for flag, affected in _MED_AFFECTS.items() if label in affected and get_field(data, flag)]
@@ -225,6 +237,30 @@ def classify_all_biomarkers(data) -> list[dict]:
                 "category_description": "Not provided",
                 "guideline_source": source,
                 "note": None,
+            })
+            continue
+
+        if spec.label == "FPG" and not _fasting_confirmed(data):
+            # docs/CLINICAL_LOGIC_APPENDIX.md: "Requires PHAFSTHR >= 8. Do not
+            # classify non-fasting values." Fasting plasma glucose thresholds are
+            # only valid for a value drawn after >= 8 hours fasting; a random/
+            # non-fasting glucose in the same numeric range does not mean the same
+            # thing clinically. category is deliberately None here (same shape as
+            # "not provided") so this never renders as a diagnostic-range label —
+            # ADA guidance also calls for confirmatory testing, not a same-visit
+            # single-value classification either way.
+            results.append({
+                "biomarker": spec.label,
+                "value": value,
+                "unit": spec.unit,
+                "category": None,
+                "category_description": (
+                    "Glucose result — not classifiable as fasting plasma glucose "
+                    "(fasting status not confirmed as >= 8 hours). Confirm fasting "
+                    "status, or use HbA1c for a non-fasting-dependent picture."
+                ),
+                "guideline_source": source,
+                "note": _medication_note_for(spec.label, data),
             })
             continue
 

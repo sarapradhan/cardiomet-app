@@ -9,13 +9,11 @@ from __future__ import annotations
 
 import datetime as dt
 
-import pytest
-
-from sahc_risklens.trajectory.series import BiomarkerDraw, make_series
 from sahc_risklens.trajectory.analytics import (
-    analyze_series,
     SeriesAnalysis,
+    analyze_series,
 )
+from sahc_risklens.trajectory.series import BiomarkerDraw, make_series
 
 _BASE = {
     "LDL_mgdl": 100, "HDL_mgdl": 55, "TG_mgdl": 120, "TC_mgdl": 180,

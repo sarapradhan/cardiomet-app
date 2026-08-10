@@ -15,14 +15,13 @@ from __future__ import annotations
 import pytest
 
 from sahc_risklens.clinical.biomarkers import BIOMARKERS, find_missing_biomarkers
+from sahc_risklens.clinical.disclaimers import build_physician_guide, get_medication_notes
+from sahc_risklens.clinical.south_asian_context import get_south_asian_context
 from sahc_risklens.clinical.thresholds import (
     classify_all_biomarkers,
     classify_bmi_south_asian,
     get_all_threshold_categories,
 )
-from sahc_risklens.clinical.south_asian_context import get_south_asian_context
-from sahc_risklens.clinical.disclaimers import build_physician_guide, get_medication_notes
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -36,7 +35,8 @@ def _normal_data(**overrides) -> dict:
     """
     data = {
         "LDL_mgdl": 95, "HDL_mgdl": 62, "TG_mgdl": 120, "TC_mgdl": 185,
-        "FPG_mgdl": 88, "HbA1c_pct": 5.2, "SBP_mmhg": 115, "DBP_mmhg": 74,
+        "FPG_mgdl": 88, "fasting_status": "confirmed", "HbA1c_pct": 5.2,
+        "SBP_mmhg": 115, "DBP_mmhg": 74,
         "BMI_kgm2": 22.1, "age_yr": 45, "sex": "M", "south_asian": True,
         "bp_med": False, "chol_med": False, "insulin": False, "dm_pills": False,
     }
@@ -140,6 +140,46 @@ def test_hba1c_boundaries(value, expected):
 ])
 def test_fpg_boundaries(value, expected):
     assert _category_for("FPG", FPG_mgdl=value) == expected
+
+
+# ---------------------------------------------------------------------------
+# Fasting Plasma Glucose — fasting-status gating.
+# docs/CLINICAL_LOGIC_APPENDIX.md: "Requires PHAFSTHR >= 8. Do not classify
+# non-fasting values." Regression coverage for a gap external review found:
+# FPG was classified against fasting thresholds regardless of fasting status,
+# because there was no fasting_status field at all.
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("fasting_status", [None, "unknown", "not_fasting"])
+def test_fpg_not_classified_without_confirmed_fasting(fasting_status):
+    """Default-deny: anything other than an explicit 'confirmed' must not
+    produce a fasting-glucose category, even at an unambiguous value."""
+    data = _normal_data(FPG_mgdl=140, fasting_status=fasting_status)
+    results = classify_all_biomarkers(data)
+    fpg = next(r for r in results if r["biomarker"] == "FPG")
+    assert fpg["category"] is None
+    assert fpg["value"] == 140  # value is still reported, just not categorized
+    assert "not classifiable" in fpg["category_description"].lower()
+    # Must never render as a diagnostic label for an unconfirmed-fasting draw.
+    assert "diabetes" not in fpg["category_description"].lower()
+
+
+def test_fpg_classified_when_fasting_confirmed():
+    data = _normal_data(FPG_mgdl=140, fasting_status="confirmed")
+    results = classify_all_biomarkers(data)
+    fpg = next(r for r in results if r["biomarker"] == "FPG")
+    assert fpg["category"] == "Diabetes"
+
+
+def test_fpg_missing_fasting_status_field_treated_as_unconfirmed():
+    """A caller that never sends fasting_status at all (e.g. an old client
+    built before this field existed) must get the safe default, not a silent
+    classification."""
+    data = _normal_data(FPG_mgdl=140)
+    del data["fasting_status"]
+    results = classify_all_biomarkers(data)
+    fpg = next(r for r in results if r["biomarker"] == "FPG")
+    assert fpg["category"] is None
 
 
 # ---------------------------------------------------------------------------

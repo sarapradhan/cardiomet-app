@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=68"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "cardiomet-lens"
@@ -9,9 +9,19 @@ description = "Responsible cardiometabolic benchmarking for South Asian heart he
 readme = "README.md"
 requires-python = ">=3.11"
 
+[tool.setuptools.packages.find]
+# Only the actual Python packages — not frontend/ (Node) or data/ (gitignored
+# raw files). Flat-layout auto-discovery otherwise treats every top-level
+# directory as a package and setuptools refuses to build.
+include = ["sahc_risklens*", "api*", "cardiosafebench*"]
+
 [tool.ruff]
-line-length = 100
+# 120, not 100: most overages are guideline-citation strings and parametrized
+# test literals that read worse hand-wrapped than left on one line.
+line-length = 120
 target-version = "py311"
+
+[tool.ruff.lint]
 select = ["E","F","W","I"]
 
 [tool.pytest.ini_options]

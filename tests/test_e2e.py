@@ -15,12 +15,12 @@ These tests are marked e2e and skip automatically if a server cannot be started
 """
 from __future__ import annotations
 
+import json
 import socket
 import subprocess
 import time
 import urllib.error
 import urllib.request
-import json
 
 import pytest
 

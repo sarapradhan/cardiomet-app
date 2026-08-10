@@ -26,7 +26,7 @@ export default function Home() {
       <p className="body" style={{ fontSize: 16, maxWidth: 560, marginBottom: 28 }}>
         Enter your cardiometabolic labs to see each value against clinical guidelines
         and a population benchmark — with the South Asian risk context generic tools
-        leave out. Nothing is stored; this is context for a conversation, not a diagnosis.
+        leave out. Nothing is stored on our servers; this is context for a conversation, not a diagnosis.
       </p>
       <div data-tour="cta" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16, alignItems: 'center' }}>
         <Link href="/benchmark" className="btn btn-primary">Check my labs</Link>

@@ -109,7 +109,7 @@ export default function TimelinePage() {
             </button>
             <button className="btn btn-outline" onClick={() => exportHealthFile({ draws })}>Export my file</button>
             <button className="btn btn-text" onClick={() => fileRef.current?.click()}>Import a file</button>
-            <button className="btn btn-text" onClick={resetAll}>Clear all</button>
+            <button className="btn btn-text" onClick={resetAll} title="Removes the locally-cached health file from this browser">Clear local data</button>
             <input ref={fileRef} type="file" accept="application/json" style={{ display: 'none' }} onChange={onImport} />
           </div>
         </div>

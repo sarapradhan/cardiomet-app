@@ -11,17 +11,17 @@ import datetime as dt
 
 import pytest
 
-from sahc_risklens.trajectory.series import (
-    BiomarkerDraw,
-    BiomarkerSeries,
-    SeriesValidationError,
-    make_series,
-)
 from sahc_risklens.trajectory.health_file import (
     SCHEMA_VERSION,
     HealthFileError,
     from_health_file,
     to_health_file,
+)
+from sahc_risklens.trajectory.series import (
+    BiomarkerDraw,
+    BiomarkerSeries,
+    SeriesValidationError,
+    make_series,
 )
 
 
