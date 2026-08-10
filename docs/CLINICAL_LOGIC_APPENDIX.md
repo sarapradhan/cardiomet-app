@@ -47,6 +47,11 @@
 | Prediabetes (IFG)| 100–125 |
 | Diabetes         | >= 126  |
 Requires PHAFSTHR >= 8. Do not classify non-fasting values.
+Enforced in code via `BiomarkerInput.fasting_status` (`api/models/patient.py`):
+`classify_all_biomarkers` (`sahc_risklens/clinical/thresholds.py`) only applies
+this table when `fasting_status == "confirmed"`. Missing / `"unknown"` /
+`"not_fasting"` all return `category: None` with an explanatory
+`category_description` instead of a category — default-deny, not default-allow.
 
 ## Systolic BP (mm Hg) — ACC/AHA 2017 HTN Guideline
 | Category             | Range   |

@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import type { BiomarkerInput, BenchmarkResponse } from '@/lib/types';
+import type { BiomarkerInput, BenchmarkResponse, CohortId } from '@/lib/types';
+import { COHORT_LABELS } from '@/lib/types';
 import { submitBiomarkers } from '@/lib/api';
 import { BiomarkerForm } from '@/components/BiomarkerForm';
 
@@ -12,7 +13,8 @@ const EXAMPLES: Record<string, { label: string; values: Partial<BiomarkerInput> 
     label: 'Elevated-risk example',
     values: {
       LDL_mgdl: 168, HDL_mgdl: 40, TG_mgdl: 210, TC_mgdl: 240,
-      FPG_mgdl: 112, HbA1c_pct: 6.1, SBP_mmhg: 136, DBP_mmhg: 86,
+      FPG_mgdl: 112, fasting_status: 'confirmed', HbA1c_pct: 6.1,
+      SBP_mmhg: 136, DBP_mmhg: 86,
       BMI_kgm2: 27.0, age_yr: 52, sex: 'M', south_asian: true,
       chol_med: false, bp_med: false, insulin: false, dm_pills: false,
     },
@@ -21,7 +23,8 @@ const EXAMPLES: Record<string, { label: string; values: Partial<BiomarkerInput> 
     label: 'In-range example',
     values: {
       LDL_mgdl: 92, HDL_mgdl: 62, TG_mgdl: 90, TC_mgdl: 170,
-      FPG_mgdl: 88, HbA1c_pct: 5.2, SBP_mmhg: 112, DBP_mmhg: 72,
+      FPG_mgdl: 88, fasting_status: 'confirmed', HbA1c_pct: 5.2,
+      SBP_mmhg: 112, DBP_mmhg: 72,
       BMI_kgm2: 22.0, age_yr: 41, sex: 'F', south_asian: true,
       chol_med: false, bp_med: false, insulin: false, dm_pills: false,
     },
@@ -34,6 +37,8 @@ export default function BenchmarkPage() {
   const [error, setError] = useState<string | null>(null);
   const [seed, setSeed] = useState<Partial<BiomarkerInput> | undefined>(undefined);
   const [formKey, setFormKey] = useState(0);
+  const [cohort, setCohort] = useState<CohortId>('nhanes_asian');
+  const [match, setMatch] = useState(false);
 
   // Re-seed the form when returning from results via "Adjust".
   useEffect(() => {
@@ -55,7 +60,7 @@ export default function BenchmarkPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const result: BenchmarkResponse = await submitBiomarkers(input);
+      const result: BenchmarkResponse = await submitBiomarkers(input, cohort, match);
       sessionStorage.setItem('benchmarkResult', JSON.stringify(result));
       sessionStorage.setItem('benchmarkInput', JSON.stringify(input));
       router.push('/results');
@@ -75,6 +80,26 @@ export default function BenchmarkPage() {
           Every field is optional — anything you leave blank is simply flagged as
           not provided. No data is stored beyond this browser session.
         </p>
+      </div>
+
+      {/* Cohort + peer-matching controls. Both flow straight through to the API
+          (?cohort=&match=) — see frontend/src/lib/api.ts submitBiomarkers. */}
+      <div className="panel-sunken" style={{
+        display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 20,
+      }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="caption" style={{ fontWeight: 600 }}>Compare against:</span>
+          <select className="input" style={{ maxWidth: 280 }} value={cohort}
+            onChange={(e) => setCohort(e.target.value as CohortId)}>
+            <option value="nhanes_asian">{COHORT_LABELS.nhanes_asian}</option>
+            <option value="sahc">{COHORT_LABELS.sahc}</option>
+          </select>
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+          title="Narrow the benchmark to a matched peer subgroup (sex + age band + medication use). Small cells are suppressed and disclosed. NHANES falls back to the whole-cohort distribution — peer matching is only available on the SAHC cohort.">
+          <input type="checkbox" checked={match} onChange={(e) => setMatch(e.target.checked)} />
+          <span className="caption">Match to peers (sex, age, medications)</span>
+        </label>
       </div>
 
       {/* Example data — for demos and first-time visitors */}

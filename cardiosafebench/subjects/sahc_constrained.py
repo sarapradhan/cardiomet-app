@@ -14,9 +14,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from sahc_risklens.clinical.thresholds import classify_all_biomarkers
 from sahc_risklens.clinical.disclaimers import build_physician_guide
 from sahc_risklens.clinical.south_asian_context import get_south_asian_context
+from sahc_risklens.clinical.thresholds import classify_all_biomarkers
 from sahc_risklens.config import NHANES_COHORT_LABEL, PRODUCT_DISCLAIMER
 
 

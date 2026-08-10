@@ -33,6 +33,8 @@ validated; out-of-range → `422`.
 | `TG_mgdl` | float? | 0–5000 | mg/dL |
 | `TC_mgdl` | float? | 0–700 | mg/dL |
 | `FPG_mgdl` | float? | 0–1000 | mg/dL |
+| `fasting_status` | `"confirmed" \| "not_fasting" \| "unknown"`? | — | FPG is only classified against fasting-glucose categories when this is exactly `"confirmed"`. Omitted/`null`/`"unknown"`/`"not_fasting"` all suppress FPG classification (`category: null`, with an explanatory `category_description`) — see `docs/CLINICAL_LOGIC_APPENDIX.md`. |
+| `fasting_hours` | float? | 0–72 | Informational only; does not itself confirm fasting status. |
 | `HbA1c_pct` | float? | 0–20 | % |
 | `SBP_mmhg` | float? | 0–300 | mm Hg |
 | `DBP_mmhg` | float? | 0–200 | mm Hg |

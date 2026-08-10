@@ -3,14 +3,20 @@ tests/conftest.py — Shared synthetic patient fixtures.
 9 cases per VALIDATION_PLAN.md Layer 2.1. All values match CLINICAL_LOGIC_APPENDIX.md.
 """
 from __future__ import annotations
+
 from typing import Any
+
 import pytest
 
 
 def _base() -> dict[str, Any]:
     return {
         "LDL_mgdl": 95, "HDL_mgdl": 62, "TG_mgdl": 120, "TC_mgdl": 185,
-        "FPG_mgdl": 88, "HbA1c_pct": 5.2, "SBP_mmhg": 115, "DBP_mmhg": 74,
+        # fasting_status defaults to "confirmed" here since these fixtures exist
+        # to exercise classification, not the fasting-status gate itself — see
+        # tests/test_thresholds.py's dedicated fasting-status gating tests.
+        "FPG_mgdl": 88, "fasting_status": "confirmed", "HbA1c_pct": 5.2,
+        "SBP_mmhg": 115, "DBP_mmhg": 74,
         "BMI_kgm2": 22.1, "age_yr": 45, "sex": "M", "south_asian": True,
         "bp_med": False, "chol_med": False, "insulin": False, "dm_pills": False,
     }

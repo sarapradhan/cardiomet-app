@@ -145,6 +145,81 @@ def test_example_data_loads_and_submits(page, base_url):
     expect(page.get_by_text("Each number, on its guideline range")).to_be_visible()
 
 
+def test_cohort_selector_switches_to_sahc(page, base_url):
+    """
+    Regression coverage for a gap external review found: the cohort selector
+    and peer-matching toggle existed at the API level but were never exposed
+    in the form, so every submission silently used the NHANES default.
+    """
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_placeholder("e.g. 100").fill("168")
+    page.get_by_label("Compare against:").select_option("sahc")
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    expect(page.get_by_text("South Asian Heart Center clinical cohort")).to_be_visible()
+    assert page.get_by_text("NHANES Non-Hispanic Asian").count() == 0
+
+
+def test_peer_matching_toggle_reflected_in_results(page, base_url):
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_placeholder("e.g. 100").fill("168")
+    page.get_by_label("Age (years)").fill("52")
+    page.get_by_label("Sex").select_option("M")
+    page.get_by_label("Compare against:").select_option("sahc")
+    page.get_by_text("Match to peers (sex, age, medications)").click()
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    # Either a "Matched: ..." badge (cell large enough) or the page still renders
+    # cleanly with the whole-cohort fallback — either way, no crash, and the
+    # cohort badge is still the SAHC one, never silently reverted to NHANES.
+    expect(page.get_by_text("South Asian Heart Center clinical cohort")).to_be_visible()
+
+
+def test_advanced_markers_render_when_provided(page, base_url):
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_placeholder("e.g. 100").fill("168")
+    page.get_by_placeholder("e.g. 90").first.fill("140")   # ApoB
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    expect(page.get_by_text("Advanced lipid markers")).to_be_visible()
+    expect(page.get_by_text("High (risk-enhancing)")).to_be_visible()
+
+
+def test_clinician_brief_copy_button_present(page, base_url):
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_role("button", name="Elevated-risk example").click()
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    expect(page.get_by_text("Pre-visit summary")).to_be_visible()
+    expect(page.get_by_role("button", name="Copy summary")).to_be_visible()
+    # The brief text itself is derived from the same response already asserted
+    # elsewhere (South Asian context, cohort label) — just confirm it rendered
+    # non-empty content, not the component silently no-op'ing.
+    expect(page.get_by_text("PRE-VISIT SUMMARY")).to_be_visible()
+
+
+def test_fpg_not_classified_without_confirmed_fasting_status(page, base_url):
+    """
+    Regression coverage for a gap external review found: FPG was classified
+    against fasting-glucose thresholds regardless of whether the draw was
+    actually fasting. Leaving the fasting-status question unanswered must not
+    produce a fasting-glucose category label.
+    """
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_placeholder("e.g. 90").last.fill("140")   # Glucose
+    # Do NOT answer the fasting-status question — leave it at the default.
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    expect(page.get_by_text("Not classified")).to_be_visible()
+    body = page.inner_text("body").lower()
+    assert "diabetes" not in body
+
+
 def test_daylight_snapshot_and_benchmark_bars(page, base_url):
     """The Daylight snapshot summary and per-value benchmark bars render with data."""
     page.goto(f"{base_url}/benchmark/", wait_until="networkidle")

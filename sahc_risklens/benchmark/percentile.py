@@ -29,11 +29,18 @@ from functools import lru_cache
 
 import numpy as np
 
+from sahc_risklens.benchmark.matching import (
+    resolve_patient_strata,
+    stratified_from_frame,
+    stratified_from_table,
+)
 from sahc_risklens.clinical.biomarkers import get_biomarker_spec, get_field
 from sahc_risklens.config import (
     COHORT_NHANES,
     COHORT_SAHC,
     DEFAULT_COHORT,
+)
+from sahc_risklens.config import (
     cohort_label as _cohort_label,
 )
 from sahc_risklens.data.demo_cohort import get_demo_percentiles
@@ -44,18 +51,17 @@ from sahc_risklens.data.nhanes_loader import (
 )
 from sahc_risklens.data.sahc_cohort_loader import (
     load_biomarker_frame as load_sahc_biomarker_frame,
+)
+from sahc_risklens.data.sahc_cohort_loader import (
     load_matching_frame as load_sahc_matching_frame,
+)
+from sahc_risklens.data.sahc_cohort_loader import (
     sahc_file_available,
 )
 from sahc_risklens.data.sahc_demo_cohort import (
     get_demo_percentiles as get_sahc_demo_percentiles,
 )
 from sahc_risklens.data.strata_tables import get_strata_table
-from sahc_risklens.benchmark.matching import (
-    resolve_patient_strata,
-    stratified_from_frame,
-    stratified_from_table,
-)
 
 # Minimum non-missing cohort values for a biomarker to be benchmarked.
 MIN_COHORT_N = 30
