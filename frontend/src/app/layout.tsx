@@ -50,8 +50,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main" role="main" style={{ minHeight: 'calc(100vh - 140px)' }}>{children}</main>
 
         <footer role="contentinfo" style={{ borderTop: '1px solid var(--hairline)', padding: '24px 20px', textAlign: 'center', background: 'var(--surface)' }}>
+          {/* This is static, site-wide chrome with no access to a session's chosen
+              cohort — it used to hardcode "NHANES Non-Hispanic Asian" here, which
+              was only ever accurate because the cohort selector didn't exist in the
+              UI yet. Now that SAHC is a selectable benchmark, that specific claim
+              would be wrong whenever a visitor picks SAHC. Guideline thresholds are
+              population-independent (see README), so those are still safe to state
+              unconditionally; the cohort itself is stated per-result on the page. */}
           <p className="caption" style={{ margin: 0 }}>
-            Reference: NHANES Non-Hispanic Asian (2017–2018) · Thresholds: ACC/AHA · ADA · NCEP · WHO
+            Population benchmarks: NHANES Non-Hispanic Asian or South Asian Heart
+            Center cohort (selected per comparison) · Classification thresholds:
+            ACC/AHA · ADA · NCEP · WHO
           </p>
           <p className="caption" style={{ marginTop: 4 }}>Educational tool · not a medical device</p>
         </footer>

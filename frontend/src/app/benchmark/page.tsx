@@ -87,14 +87,21 @@ export default function BenchmarkPage() {
       <div className="panel-sunken" style={{
         display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 20,
       }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="caption" style={{ fontWeight: 600 }}>Compare against:</span>
-          <select className="input" style={{ maxWidth: 280 }} value={cohort}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', minWidth: 0 }}>
+          {/* htmlFor/id, not a nested <label>: nesting pulls the select's option
+              text into the computed accessible name (e.g. "Compare
+              against:NHANES...South Asian..."), which breaks screen readers
+              and exact-name test locators alike. flexWrap + width:100% on the
+              select: at narrow (mobile) widths the caption + a fixed-width
+              select together overflowed the viewport — this lets the select
+              drop to its own line instead. */}
+          <label htmlFor="cohort-select" className="caption" style={{ fontWeight: 600 }}>Compare against:</label>
+          <select id="cohort-select" className="input" style={{ maxWidth: 280, width: '100%' }} value={cohort}
             onChange={(e) => setCohort(e.target.value as CohortId)}>
             <option value="nhanes_asian">{COHORT_LABELS.nhanes_asian}</option>
             <option value="sahc">{COHORT_LABELS.sahc}</option>
           </select>
-        </label>
+        </div>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
           title="Narrow the benchmark to a matched peer subgroup (sex + age band + medication use). Small cells are suppressed and disclosed. NHANES falls back to the whole-cohort distribution — peer matching is only available on the SAHC cohort.">
           <input type="checkbox" checked={match} onChange={(e) => setMatch(e.target.checked)} />

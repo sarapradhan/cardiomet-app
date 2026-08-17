@@ -136,11 +136,11 @@ export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See 
         <hr className="hairline" />
         {renderGroup('Glucose', METABOLIC_FIELDS)}
         {values['FPG_mgdl']?.trim() && (
-          <label style={{ display: 'block', marginTop: -12 }}>
-            <span style={{ display: 'block', fontSize: 13, marginBottom: 6, color: 'var(--ink)' }}>
+          <div style={{ marginTop: -12 }}>
+            <label htmlFor="fasting-status" style={{ display: 'block', fontSize: 13, marginBottom: 6, color: 'var(--ink)' }}>
               Was this glucose draw fasting (≥ 8 hours, nothing but water)?
-            </span>
-            <select className="input" value={fastingStatus}
+            </label>
+            <select id="fasting-status" className="input" value={fastingStatus}
               onChange={(e) => setFastingStatus(e.target.value as FastingStatus | '')}
               style={{ maxWidth: 320 }}>
               <option value="">Not sure / prefer not to say</option>
@@ -151,7 +151,7 @@ export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See 
               Fasting plasma glucose categories only apply to a confirmed fasting draw.
               If unsure, we&apos;ll show your value without a category rather than guess.
             </span>
-          </label>
+          </div>
         )}
         <hr className="hairline" />
         {renderGroup('Vitals & Body', VITALS_FIELDS)}
@@ -166,15 +166,19 @@ export function BiomarkerForm({ onSubmit, isLoading = false, submitLabel = 'See 
               <input type="number" inputMode="numeric" className="input" placeholder="e.g. 45"
                 value={age} onChange={(e) => setAge(e.target.value)} />
             </label>
-            <label style={{ display: 'block' }}>
-              <span style={{ display: 'block', fontSize: 13, marginBottom: 6 }}>Sex</span>
-              <select className="input" value={sex}
+            <div>
+              {/* htmlFor/id, not a nested <label>: a <select>'s option text is
+                  part of its label's subtree, so implicit nesting produces a
+                  garbled accessible name (e.g. "SexSelect…MaleFemale") for
+                  screen readers. Explicit association keeps the name just "Sex". */}
+              <label htmlFor="biomarker-sex" style={{ display: 'block', fontSize: 13, marginBottom: 6 }}>Sex</label>
+              <select id="biomarker-sex" className="input" value={sex}
                 onChange={(e) => setSex(e.target.value as 'M' | 'F' | '')}>
                 <option value="">Select…</option>
                 <option value="M">Male</option>
                 <option value="F">Female</option>
               </select>
-            </label>
+            </div>
           </div>
           <label style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16, cursor: 'pointer' }}>
             <input type="checkbox" checked={southAsian}
