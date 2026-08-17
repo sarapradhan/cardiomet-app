@@ -95,7 +95,7 @@ uvicorn api.main:app --reload --port 8000
 cd frontend && npm install && npm run dev
 ```
 
-The app also ships as a **single container** — the Next.js static export is served from FastAPI on port 7860 for Hugging Face Spaces. In **demo mode** the app runs with no raw data files present, using frozen aggregate tables that are verified equal to live computation.
+The app also ships as a **single container** — the Next.js static export is served from FastAPI on port 7860 for Hugging Face Spaces (Docker SDK). If Docker Spaces aren't available on your account, the same app splits into a Static Space (UI) + a separately hosted API instead — see [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md). In **demo mode** the app runs with no raw data files present, using frozen aggregate tables that are verified equal to live computation.
 
 ---
 
