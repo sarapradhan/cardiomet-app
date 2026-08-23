@@ -124,7 +124,7 @@ def test_guided_tour_runs_and_dismisses(page, base_url):
     page.goto(f"{base_url}/", wait_until="networkidle")
     page.get_by_role("button", name="Take a tour").click()
     expect(page.get_by_role("dialog", name="Guided tour")).to_be_visible()
-    expect(page.get_by_text("Welcome to SAHC RiskLens")).to_be_visible()
+    expect(page.get_by_text("Welcome to CardioMet Lens")).to_be_visible()
     # Step forward through the tour
     page.get_by_role("button", name="Next").click()
     expect(page.get_by_text("The color legend")).to_be_visible()

@@ -12,7 +12,7 @@ pytestmark = pytest.mark.browser
 
 def test_home_loads(page, base_url):
     page.goto(f"{base_url}/", wait_until="networkidle")
-    assert "SAHC RiskLens" in page.content()
+    assert "CardioMet Lens" in page.content()
     expect(page.get_by_text("Understand your lab numbers")).to_be_visible()
 
 

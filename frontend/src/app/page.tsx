@@ -4,7 +4,7 @@ import { Legend } from '@/components/Legend';
 import { GuidedTour, TourButton, type TourStep } from '@/components/GuidedTour';
 
 const TOUR: TourStep[] = [
-  { anchor: '', title: 'Welcome to SAHC RiskLens',
+  { anchor: '', title: 'Welcome to CardioMet Lens',
     body: 'A quick 4-step tour. This tool puts your cardiometabolic labs in clinical and population context — educational only, never a diagnosis.' },
   { anchor: 'legend', title: 'The color legend',
     body: 'Every value is coded by status (in range / elevated / high) and grouped by panel (lipids, glucose, blood pressure, body). You will see this language throughout.' },

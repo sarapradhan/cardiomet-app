@@ -6,7 +6,7 @@ import './globals.css';
 export const viewport = { width: 'device-width', initialScale: 1 };
 
 export const metadata: Metadata = {
-  title: 'SAHC RiskLens — Cardiometabolic lab context',
+  title: 'CardioMet Lens — Cardiometabolic lab context',
   description: 'Understand your cardiometabolic labs against clinical guidelines and a population benchmark. Educational use only — not a diagnosis.',
 };
 
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span style={{ width: 12, height: 12, borderRadius: 999, border: '2.5px solid rgba(255,255,255,0.94)' }} />
             </span>
             <span style={{ fontFamily: "'Space Grotesk', system-ui, sans-serif", fontWeight: 600, fontSize: 16, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
-              SAHC RiskLens
+              CardioMet Lens
             </span>
           </a>
           <NavBar />
