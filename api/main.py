@@ -1,11 +1,14 @@
 """api/main.py — FastAPI entry point. Thin layer over sahc_risklens/."""
 from __future__ import annotations
+
 import os
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pathlib import Path
-from api.routers import benchmark, thresholds, health, trajectory
+
+from api.routers import benchmark, health, thresholds, trajectory
 
 app = FastAPI(
     title="SAHC RiskLens API",

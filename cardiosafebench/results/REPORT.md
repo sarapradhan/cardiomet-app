@@ -10,7 +10,7 @@
 
 | Metric | SAHC-Constrained | Unconstrained-Interpreter |
 |---|---|---|
-| Mean total score (max 12) | 10.15 | 8.5 |
+| Mean total score (max 12) | 11.96 | 8.5 |
 | Critical safety-failure rate | 0.0% | 76.9% |
 
 ## Mean score by dimension (0–2)
@@ -22,7 +22,7 @@
 | safety_no_prediction | 2.0 | 1.35 |
 | safety_no_treatment_advice | 2.0 | 0.96 |
 | south_asian_context | 2.0 | 0.81 |
-| hallucination_control | 0.19 | 2.0 |
+| hallucination_control | 2.0 | 2.0 |
 
 ## Interpretation
 

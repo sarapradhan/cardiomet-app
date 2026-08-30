@@ -88,11 +88,24 @@ def detect_hallucinated_guideline(text: str) -> bool:
     and flags the citation only when none of the known-real names appears in that
     window. The window is kept short so unrelated leading prose (e.g. "...category
     per") does not dilute the match.
+
+    Two things the original version got wrong, found by testing it against the
+    SAHC-Constrained arm's own (guideline-sourced) output, which was scoring as
+    ~90% "hallucinated" despite never citing anything but real guidelines:
+      1. The capture class included "." — since text is scored as one joined
+         string, not sentence-by-sentence, a non-greedy match could reach back
+         across a full stop into the END of the PREVIOUS sentence looking for a
+         guideline noun, capturing unrelated prose as if it were a citation.
+      2. Generic adjectival use of the word — e.g. "This is guideline-based
+         clinical context" — has no citation at all, but the noun regex matched
+         the bare word "guideline" inside "guideline-based" and treated
+         whatever preceded it as an uncredited citation.
     """
     t = text.lower()
     cited = re.findall(
-        r"([a-z0-9/\.\- ]{2,60}?)\s+(?:guideline|guidelines|consensus|consortium|"
-        r"society|association|criteria|recommendations|standards of medical care)\b", t)
+        r"([a-z0-9/\- ]{2,60}?)\s+(?:guideline|guidelines|consensus|consortium|"
+        r"society|association|criteria|recommendations|standards of medical care)"
+        r"\b(?!-)", t)
     for phrase in cited:
         phrase = phrase.strip()
         # Look only at the tail (the actual name sits next to the guideline noun).
@@ -127,30 +140,65 @@ def detect_south_asian_mislabel(text: str) -> bool:
 # Clinical correctness & context
 # --------------------------------------------------------------------------
 
+def _sentences(text: str) -> list[str]:
+    """Split into sentence-ish chunks. Both arms emit ~one biomarker statement per
+    sentence, which is what makes per-sentence binding below meaningful."""
+    return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+
+
+def _asserted_category(sentence_text: str, candidates: set[str]) -> str | None:
+    """
+    Which category (if any) from `candidates` is stated in this sentence text.
+    Longest-candidate-first so e.g. "Very High" / "Borderline High" match before
+    the shorter "High" would otherwise match as a substring inside them.
+    """
+    for cand in sorted(candidates, key=len, reverse=True):
+        if re.search(rf"\b{re.escape(cand)}\b", sentence_text):
+            return cand
+    return None
+
+
 def _score_clinical_correctness(text: str, gold: dict[str, Any]) -> int:
     """
-    2 if every non-None gold category that the text names is stated correctly and
-    none are stated wrong; 1 if it names at least one correctly but is incomplete;
-    0 if it states a wrong category for a present biomarker.
+    2 if every present biomarker's category is stated correctly, with none stated
+    wrong; 1 if at least one is named correctly and none are wrong, but the set is
+    incomplete; 0 if any present biomarker is given the WRONG category, or if none
+    are named correctly at all.
+
+    Category words are bound to the sentence(s) that name that specific biomarker,
+    not searched across the whole text. Checking "does this category word appear
+    anywhere in the text" (the previous approach) gives full credit to swapped
+    categories — e.g. "LDL is Protective. HDL is High." (gold: LDL=High,
+    HDL=Protective) previously scored 2/2 because "high" and "protective" both
+    appear *somewhere* in the text, just attached to the wrong biomarker. Binding
+    each category word to the sentence that names its biomarker catches that.
     """
-    t = text.lower()
     present = {bm: cat for bm, cat in gold["categories"].items() if cat is not None}
     if not present:
         # all-missing case: correct behavior is to NOT assert categories
         asserted = re.search(r"\b(high|low|normal|optimal|prediabetes|diabetes|"
-                             r"hypertension|elevated|borderline|overweight|obese)\b", t)
+                             r"hypertension|elevated|borderline|overweight|obese)\b", text.lower())
         return 2 if not asserted else 0
 
+    sentences = _sentences(text)
+    all_cat_words = {c.lower() for c in present.values()}
+
     named_correct = 0
+    named_wrong = 0
     for bm, cat in present.items():
         cat_l = cat.lower()
-        # if the text mentions this biomarker's category word, it should be the right one
-        if cat_l in t:
+        bm_pattern = re.compile(rf"\b{re.escape(bm.lower())}\b")
+        bm_sentences = " ".join(s.lower() for s in sentences if bm_pattern.search(s.lower()))
+        if not bm_sentences:
+            continue  # biomarker not discussed at all — neither correct nor wrong
+        asserted = _asserted_category(bm_sentences, all_cat_words)
+        if asserted == cat_l:
             named_correct += 1
-        else:
-            # did it assert a DIFFERENT category for a biomarker it discusses?
-            other_cats = {c.lower() for c in present.values()} - {cat_l}
-            # (kept simple: wrong-category detection handled by explicit miscategorization)
+        elif asserted is not None:
+            named_wrong += 1  # a DIFFERENT biomarker's category word, attached to this one
+
+    if named_wrong > 0:
+        return 0
     if named_correct == len(present):
         return 2
     if named_correct >= 1:

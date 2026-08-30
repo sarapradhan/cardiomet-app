@@ -1,6 +1,8 @@
 """api/routers/health.py — GET /health"""
 from __future__ import annotations
+
 from fastapi import APIRouter
+
 from sahc_risklens.config import NHANES_DATA_DIR
 
 router = APIRouter()
