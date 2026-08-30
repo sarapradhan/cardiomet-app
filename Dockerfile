@@ -9,7 +9,7 @@ ENV NEXT_PUBLIC_API_URL=""
 RUN npm run build      # emits ./out (static export)
 
 # ---- Stage 2: python API that also serves the static frontend ----
-FROM python:3.12-slim AS app
+FROM python:3.14-slim AS app
 WORKDIR /app
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 COPY requirements.txt ./
