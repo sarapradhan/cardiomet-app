@@ -99,7 +99,7 @@ body {
      class exactly (a deliberate departure from the earlier rounded-pill
      attempt). Status chips below stay pill-shaped, matching the marketing
      site's .status-chip, which is the one pill-radius element it uses. */
-  .btn { @apply inline-flex items-center justify-center gap-2 select-none; height: 42px; padding: 0 20px; border-radius: 4px; font-size: 13px; font-weight: 800; letter-spacing: -0.005em; transition: background-color .16s ease, box-shadow .16s ease, opacity .16s ease, transform .16s ease; cursor: pointer; }
+  .btn { @apply inline-flex items-center justify-center gap-2 select-none; height: 42px; padding: 0 20px; border-radius: 4px; font-size: 13px; font-weight: 800; letter-spacing: -0.005em; text-decoration: none; text-align: center; transition: background-color .16s ease, box-shadow .16s ease, opacity .16s ease, transform .16s ease; cursor: pointer; }
   .btn-primary { background: var(--pine); color: var(--on-primary); border: none; box-shadow: var(--shadow-2); }
   .btn-primary:hover { background: var(--teal); box-shadow: 0 17px 26px -17px rgba(14,19,32,0.85); transform: translateY(-1px); }
   .btn-primary:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; transform: none; }
