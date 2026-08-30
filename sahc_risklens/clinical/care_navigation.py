@@ -62,11 +62,12 @@ def get_care_navigation(data) -> list[dict]:
         items.append({
             "title": "Culturally-tailored prevention",
             "description": (
-                "The South Asian Heart Center offers culturally-tailored, lifestyle-"
-                "focused prevention support — diet, activity, and stress guidance adapted "
-                "to South Asian contexts. Consider discussing these programs with your "
-                "clinician or the center. This is informational, not personalized medical "
-                "advice."
+                "Culturally-tailored, lifestyle-focused prevention programs — diet, "
+                "activity, and stress guidance adapted to South Asian contexts — are "
+                "offered by some clinics and community health programs; the South Asian "
+                "Heart Center is one example. This tool has no affiliation with any of "
+                "them. Consider asking your clinician what is available near you. This is "
+                "informational, not personalized medical advice."
             ),
         })
 

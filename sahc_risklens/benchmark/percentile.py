@@ -7,14 +7,17 @@ own value placed against that distribution.
 
 Selectable cohorts (config.COHORT_LABELS):
   - config.COHORT_NHANES ("nhanes_asian"): NHANES 2017-2018 Non-Hispanic Asian.
-  - config.COHORT_SAHC   ("sahc"): South Asian Heart Center clinical cohort.
-The default is config.DEFAULT_COHORT (NHANES), which preserves the original
-single-cohort contract.
+
+Exactly one cohort is registered today. A second cohort ("sahc") was removed on
+2026-08-30 because its provenance could not be established (docs/SAHC_COHORT.md).
+This module stays cohort-parameterised on purpose: get_cohort_percentiles(cohort),
+get_matched_percentiles(data, cohort), SUPPORTED_COHORTS and the peer-matching
+engine below are the seam a properly sourced cohort plugs into.
 
 Data source resolution, per cohort:
   - If the cohort's real source files are present, percentiles are computed live.
   - Otherwise the cohort's frozen demo percentiles are used (the same real
-    numbers). See demo_cohort.py / sahc_demo_cohort.py.
+    numbers). See demo_cohort.py.
 
 Output dicts are shaped exactly like api/models/results.py BenchmarkPoint:
     biomarker, patient_value, cohort_p10, cohort_p25, cohort_median,
@@ -37,7 +40,6 @@ from sahc_risklens.benchmark.matching import (
 from sahc_risklens.clinical.biomarkers import get_biomarker_spec, get_field
 from sahc_risklens.config import (
     COHORT_NHANES,
-    COHORT_SAHC,
     DEFAULT_COHORT,
 )
 from sahc_risklens.config import (
@@ -49,18 +51,6 @@ from sahc_risklens.data.nhanes_loader import (
     load_biomarker_frame,
     nhanes_files_available,
 )
-from sahc_risklens.data.sahc_cohort_loader import (
-    load_biomarker_frame as load_sahc_biomarker_frame,
-)
-from sahc_risklens.data.sahc_cohort_loader import (
-    load_matching_frame as load_sahc_matching_frame,
-)
-from sahc_risklens.data.sahc_cohort_loader import (
-    sahc_file_available,
-)
-from sahc_risklens.data.sahc_demo_cohort import (
-    get_demo_percentiles as get_sahc_demo_percentiles,
-)
 from sahc_risklens.data.strata_tables import get_strata_table
 
 # Minimum non-missing cohort values for a biomarker to be benchmarked.
@@ -68,8 +58,9 @@ MIN_COHORT_N = 30
 
 _PERCENTILE_POINTS = (10, 25, 50, 75, 90)
 
-# Cohorts the benchmark layer knows how to build.
-SUPPORTED_COHORTS = (COHORT_NHANES, COHORT_SAHC)
+# Cohorts the benchmark layer knows how to build. One entry today; the tuple
+# shape is the extension point (see module docstring).
+SUPPORTED_COHORTS = (COHORT_NHANES,)
 
 
 def _percentiles_from_frame(frame) -> dict[str, dict[str, float]]:
@@ -109,14 +100,7 @@ def get_cohort_percentiles(cohort: str = DEFAULT_COHORT) -> dict[str, dict[str, 
     for the process lifetime (the underlying data does not change at runtime).
     """
     _validate_cohort(cohort)
-    if cohort == COHORT_SAHC:
-        if sahc_file_available():
-            table = _percentiles_from_frame(load_sahc_biomarker_frame())
-            if table:
-                return table
-        return get_sahc_demo_percentiles()
-
-    # NHANES (default)
+    # NHANES (default and, today, only registered cohort)
     if nhanes_files_available():
         table = _percentiles_from_frame(load_biomarker_frame())
         if table:
@@ -139,16 +123,22 @@ def get_matched_percentiles(data, cohort: str = DEFAULT_COHORT) -> dict | None:
     if not strata.can_match:
         return None
 
-    if cohort == COHORT_SAHC:
-        if sahc_file_available():
-            return stratified_from_frame(load_sahc_matching_frame(), strata, BIOMARKER_KEYS)
-        return stratified_from_table(get_strata_table(COHORT_SAHC), strata, BIOMARKER_KEYS)
+    # A cohort can supply peer matching two ways: a live matching frame
+    # (stratified_from_frame) or a frozen aggregate strata table
+    # (stratified_from_table, keyed by cohort id in data/strata_tables.py).
+    table = get_strata_table(cohort)
+    if table:
+        return stratified_from_table(table, strata, BIOMARKER_KEYS)
 
     # NHANES: peer matching is not offered. The Non-Hispanic Asian cohort
     # (n ~= 382-1055 per biomarker) is too small to stratify by sex x age x
     # medication and stay above MIN_COHORT_N, and the raw files needed to do it
     # live are not shipped. match=True therefore falls back to the whole-cohort
     # distribution, disclosed at the call site (matched=False everywhere).
+    #
+    # No cohort currently ships a strata table, so this returns None for every
+    # cohort. The path above is live and tested (tests/test_peer_matching.py)
+    # and is what a newly registered cohort would use.
     return None
 
 

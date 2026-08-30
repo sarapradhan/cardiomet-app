@@ -145,45 +145,43 @@ def test_example_data_loads_and_submits(page, base_url):
     expect(page.get_by_text("Each number, on its guideline range")).to_be_visible()
 
 
-def test_cohort_selector_switches_to_sahc(page, base_url):
+def test_benchmark_states_the_cohort_it_uses(page, base_url):
     """
-    Regression coverage for a gap external review found: the cohort selector
-    and peer-matching toggle existed at the API level but were never exposed
-    in the form, so every submission silently used the NHANES default.
+    Regression coverage for a gap external review found: the benchmark cohort was
+    invisible in the UI, so a user could not tell what they were compared against.
+
+    A selector used to live here. It was removed on 2026-08-30 with the second
+    cohort, whose provenance could not be established (docs/SAHC_COHORT.md) - a
+    one-option selector is not a choice. The requirement it was added for stands:
+    the page must say which population the numbers come from.
     """
     page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    expect(page.get_by_test_id("cohort-name")).to_be_visible()
+    expect(page.get_by_test_id("cohort-name")).to_have_text("NHANES Non-Hispanic Asian")
+
+
+def test_removed_cohort_controls_are_not_present(page, base_url):
+    """
+    Guards the 2026-08-30 removal. The cohort selector and the "Match to peers"
+    toggle both depended on a cohort that no longer exists; peer matching is not
+    available for any registered cohort, so a toggle here would be a control that
+    silently does nothing. Neither may reappear without a sourced cohort behind it.
+    """
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    assert page.locator("#cohort-select").count() == 0
+    assert page.get_by_text("Match to peers", exact=False).count() == 0
+    assert page.get_by_text("South Asian Heart Center", exact=False).count() == 0
+
+
+def test_results_carry_the_cohort_label(page, base_url):
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
     page.get_by_placeholder("e.g. 100").fill("168")
-    page.get_by_label("Compare against:").select_option("sahc")
     page.get_by_role("button", name="See My Results").click()
     page.wait_for_url("**/results/**")
     page.wait_for_load_state("networkidle")
-    expect(page.get_by_text("South Asian Heart Center clinical cohort").first).to_be_visible()
-    # Scoped to the result's own cohort chip, not the whole page: the
-    # site-wide footer legitimately names both benchmark options generically
-    # (see frontend/src/app/layout.tsx), so a page-wide text search for
-    # "NHANES" would now always find a hit regardless of which cohort was
-    # actually used. The safety invariant this guards - the *result's* cohort
-    # label is never mislabeled - is about that specific chip.
-    assert page.locator(".chip.chip-primary", has_text="NHANES Non-Hispanic Asian").count() == 0
-
-
-def test_peer_matching_toggle_reflected_in_results(page, base_url):
-    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
-    page.get_by_placeholder("e.g. 100").fill("168")
-    page.get_by_label("Age (years)").fill("52")
-    # exact=True: get_by_label does substring matching by default, and "Sex"
-    # is also a substring of the peer-matching checkbox's label ("Match to
-    # peers (sex, age, medications)"), which made this resolve to 2 elements.
-    page.get_by_label("Sex", exact=True).select_option("M")
-    page.get_by_label("Compare against:").select_option("sahc")
-    page.get_by_text("Match to peers (sex, age, medications)").click()
-    page.get_by_role("button", name="See My Results").click()
-    page.wait_for_url("**/results/**")
-    page.wait_for_load_state("networkidle")
-    # Either a "Matched: ..." badge (cell large enough) or the page still renders
-    # cleanly with the whole-cohort fallback — either way, no crash, and the
-    # cohort badge is still the SAHC one, never silently reverted to NHANES.
-    expect(page.get_by_text("South Asian Heart Center clinical cohort").first).to_be_visible()
+    # The result's own cohort chip, scoped rather than page-wide: the site-wide
+    # footer legitimately names the benchmark population too.
+    expect(page.locator(".chip.chip-primary", has_text="NHANES Non-Hispanic Asian").first).to_be_visible()
 
 
 def test_advanced_markers_render_when_provided(page, base_url):

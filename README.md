@@ -2,7 +2,7 @@
 
 > An educational cardiometabolic lab interpreter that gives you **descriptive context** for your own values — never a diagnosis, an individual risk score, or treatment advice.
 
-CardioMet Lens is the safety-engineered successor to the South Asian Heart Center's original SCORE tool. You enter your own lab values (lipids, glucose, HbA1c, blood pressure, BMI, and optionally ApoB / Lp(a)) and it returns layered, guideline-backed context about where each value sits — against absolute clinical thresholds and against real population cohorts, with particular attention to South Asian cardiometabolic risk.
+CardioMet Lens is an independently built, safety-engineered cardiometabolic benchmarking tool, inspired by the peer-comparison approach of the South Asian Heart Center's SCORE tool. It is not affiliated with, endorsed by, or derived from that center. You enter your own lab values (lipids, glucose, HbA1c, blood pressure, BMI, and optionally ApoB / Lp(a)) and it returns layered, guideline-backed context about where each value sits — against absolute clinical thresholds and against real population cohorts, with particular attention to South Asian cardiometabolic risk.
 
 The safety boundaries are enforced **structurally in code and tests**, not just written into the copy. It is explicitly *not* a medical device: no diagnosis, no individual risk prediction, no treatment recommendation, and no server-side storage of patient values.
 
@@ -13,8 +13,8 @@ The safety boundaries are enforced **structurally in code and tests**, not just 
 For each value you enter, CardioMet Lens returns:
 
 - **Guideline classification** — an absolute, population-independent category (e.g. *"LDL 168 → High, ACC/AHA 2018"*).
-- **Population benchmark** — where the value sits (p10–p90) against a selectable cohort: **NHANES Non-Hispanic Asian** (a public proxy) or the **South Asian Heart Center's own clinical cohort** (a genuine South Asian population). These are currently **unweighted analytic-sample comparisons**, not population-representative estimates — NHANES's `WTMEC2YR` (and biomarker-specific subsample) survey weights are not yet applied, so percentiles reflect the people sampled, not the general population after correcting for NHANES's complex survey design. See [`docs/CLINICAL_LOGIC_APPENDIX.md`](./docs/CLINICAL_LOGIC_APPENDIX.md).
-- **Peer matching** *(optional)* — narrows the benchmark to a matched subgroup (sex + age band + medication use), with small-cell suppression and transparent fallback. This is an improved version of the original SCORE tool's peer comparison.
+- **Population benchmark** — where the value sits (p10–p90) against **NHANES Non-Hispanic Asian**, a public U.S. survey population used as a deliberately-labeled proxy (NHANES has no South Asian–specific sample). A second cohort was removed on 2026-08-30 because its provenance could not be established — see [`docs/SAHC_COHORT.md`](./docs/SAHC_COHORT.md). These are currently **unweighted analytic-sample comparisons**, not population-representative estimates — NHANES's `WTMEC2YR` (and biomarker-specific subsample) survey weights are not yet applied, so percentiles reflect the people sampled, not the general population after correcting for NHANES's complex survey design. See [`docs/CLINICAL_LOGIC_APPENDIX.md`](./docs/CLINICAL_LOGIC_APPENDIX.md).
+- **Peer matching** *(engine present, no cohort supplies it today)* — narrows the benchmark to a matched subgroup (sex + age band + medication use), with small-cell suppression and transparent fallback: an improved version of SCORE's peer comparison. The only cohort that supplied a stratified table was removed on 2026-08-30, so `?match=true` currently falls back to the whole-cohort distribution and reports `matched: false`. The engine is retained and tested ([`docs/SAHC_COHORT.md`](./docs/SAHC_COHORT.md) §5).
 - **Advanced lipid markers** — ApoB and Lp(a), classified as AHA/ACC risk-enhancing factors (classification only; not cohort-benchmarked).
 - **South Asian context** — qualitative, guideline-backed notes (ancestry as a risk-enhancer, lower BMI action points, elevated Lp(a) prevalence), shown when relevant.
 - **Longitudinal trajectory** — descriptive trends across dated draws, stored only in a user-exported file, never on the server.
@@ -35,7 +35,7 @@ FastAPI (api/) — thin routers, no clinical logic
 │ in-process calls
 sahc_risklens/ — framework-free Python clinical core
 ├─ clinical/ thresholds, biomarkers, South Asian context, disclaimers, care navigation
-├─ data/ NHANES + SAHC loaders, cohort filters, frozen aggregate tables
+├─ data/ NHANES loader, cohort filters, frozen aggregate tables
 ├─ benchmark/ percentile engine + peer matching
 └─ trajectory/ dated series, health file, descriptive analytics
 ```
@@ -49,7 +49,7 @@ Highest priority wins on conflict:
 1. **Medical safety is structural, not procedural.** Invariants live in the type system (e.g. `disclaimer` is a required, min-length field; `cohort_label` is a constrained union) — not in prose that could be forgotten.
 2. **One source of truth per fact.** Thresholds live only in `thresholds.py`; the API contract lives only in `results.py`, mirrored to `types.ts`.
 3. **Clinical logic is framework-free.** `sahc_risklens/` imports no web framework.
-4. **Demo and live modes are output-identical.** Frozen aggregate tables are verified equal to live computation.
+4. **Demo mode is what ships.** The frozen aggregate tables were computed once from the source data and are the tables the app serves. They are **not** re-verified against live computation by the test suite, and for the `sahc` cohort the source data no longer exists (see [`docs/SAHC_COHORT.md`](./docs/SAHC_COHORT.md)).
 5. **The frontend never does clinical work.** It renders exactly what the API returns, in a fixed order.
 
 ---
@@ -61,16 +61,16 @@ cardiomet-app/
 ├── sahc_risklens/ # clinical core (framework-free Python)
 │ ├── config.py
 │ ├── clinical/ biomarkers, thresholds, south_asian_context, care_navigation, disclaimers
-│ ├── data/ nhanes_loader, sahc_cohort_loader, cohort_filters, missingness,
-│ │ demo_cohort, sahc_demo_cohort, strata_tables
+│ ├── data/ nhanes_loader, cohort_filters, missingness, demo_cohort,
+│ │ strata_tables (reader; no table ships today)
 │ ├── benchmark/ percentile.py, matching.py
 │ └── trajectory/ series.py, health_file.py, analytics.py
 ├── api/ FastAPI app (main.py, models/, routers/)
 ├── frontend/src/ Next.js 14 UI (app/, components/, lib/)
 ├── cardiosafebench/ AI-safety benchmark (see below)
 ├── tests/ 307 backend tests: smoke → unit → integration → e2e
-├── scripts/ setup_env.sh, download_nhanes.py, build_strata_tables.py, run_validation_gate.sh
-├── data/ raw/ (NHANES, gitignored) · sahc/ (CSV, gitignored)
+├── scripts/ setup_env.sh, download_nhanes.py, run_validation_gate.sh
+├── data/ raw/ (NHANES, gitignored)
 └── docs/ architecture, API reference, clinical logic, features, roadmap
 ```
 
@@ -86,7 +86,6 @@ bash scripts/setup_env.sh
 
 # 2. (Optional) download NHANES public data and build the frozen strata tables
 python scripts/download_nhanes.py
-python scripts/build_strata_tables.py
 
 # 3. Run the API (FastAPI)
 uvicorn api.main:app --reload --port 8000
@@ -105,7 +104,7 @@ Thin FastAPI routers validate input and delegate to the clinical core — no cli
 
 | Method | Path | Purpose |
 |---|---|---|
-| `POST` | `/api/v1/benchmark` | Classify + benchmark a panel. Query: `?cohort=nhanes_asian\|sahc`, `?match=true` |
+| `POST` | `/api/v1/benchmark` | Classify + benchmark a panel. Query: `?cohort=nhanes_asian`, `?match=true` |
 | `POST` | `/api/v1/trajectory` | Stateless descriptive trend analysis over a dated series |
 | `GET` | `/api/v1/thresholds` | Full guideline threshold reference |
 | `GET` | `/health` | Liveness + demo/live mode indicator |
@@ -127,7 +126,7 @@ The gate runs all test tiers, a TypeScript type-check, a **diagnostic-language s
 **Enforced safety invariants:**
 
 - Disclaimer is always required and rendered first.
-- Cohort labels are honest — NHANES is never mislabeled "South Asian" (`test_sahc_cohort.py`).
+- Cohort labels are honest — NHANES is never mislabeled "South Asian", and no cohort label claims an institutional origin (`test_cohort_registry.py`).
 - The limitations panel is unconditional and never collapsible.
 - No LLM anywhere in the patient-facing path — all copy is fixed templates.
 - Medication flags add a note but never change a classification.

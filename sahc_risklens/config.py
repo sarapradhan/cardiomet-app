@@ -22,23 +22,20 @@ FASTING_HOURS_MINIMUM    = 8   # PHAFSTHR >= 8 for valid fasting glucose
 # The benchmark distribution a patient is compared against is a selectable
 # dimension. Each cohort has a stable id (used in API params and cache keys) and
 # an honest display label. The NHANES cohort is a population proxy and is NEVER
-# labeled "South Asian"; the SAHC cohort is a genuine South Asian clinical
-# cohort and carries its own proper-noun label. Keeping them as two distinct,
-# separately-labeled cohorts preserves the proxy-vs-actual distinction that is
-# the intellectual core of this project (see docs/SAHC_COHORT.md).
+# labeled "South Asian".
+#
+# Exactly one cohort is registered today. A second cohort ("sahc") was removed
+# on 2026-08-30 because its provenance could not be established; see
+# docs/SAHC_COHORT.md for the full record. The multi-cohort machinery is
+# deliberately retained — SUPPORTED_COHORTS, get_cohort_percentiles(cohort),
+# the ?cohort= query parameter, and the peer-matching engine all still take a
+# cohort id — so a properly sourced South Asian reference distribution can be
+# registered here without reopening the architecture.
 COHORT_NHANES = "nhanes_asian"
-COHORT_SAHC   = "sahc"
-DEFAULT_COHORT = COHORT_NHANES   # default preserves existing behavior/contract
-
-# SAHC clinic cohort: South Asian patients only (RIDRETH3 == 1 in the source file).
-SAHC_COHORT_RIDRETH3_VALUE = 1
-SAHC_COHORT_LABEL = "South Asian Heart Center clinical cohort"
-SAHC_DATA_DIR  = Path(os.getenv("SAHC_DATA_DIR", str(ROOT_DIR / "data" / "sahc")))
-SAHC_DATA_FILE = SAHC_DATA_DIR / "sahc_cohort_noPID.csv"
+DEFAULT_COHORT = COHORT_NHANES
 
 COHORT_LABELS: dict[str, str] = {
     COHORT_NHANES: NHANES_COHORT_LABEL,
-    COHORT_SAHC:   SAHC_COHORT_LABEL,
 }
 
 

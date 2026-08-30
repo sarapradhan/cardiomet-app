@@ -1,16 +1,19 @@
 """
 sahc_risklens/data/strata_tables.py
 
-Frozen, aggregate-only stratified percentile tables for peer matching, used when
-the raw cohort file is not present (the default deployment). Mirrors how
-demo_cohort.py relates to the live loader: the numbers here are the REAL matched
-percentiles computed once from the cohort and frozen for reproducibility.
+Reader for frozen, aggregate-only stratified percentile tables used by peer
+matching. Tables are keyed by cohort id.
 
-Contents are aggregates ONLY — per-stratum percentiles and counts. No patient
-rows. Cells below MIN_MATCH_N people, and individual biomarkers below MIN_MATCH_N
-values, are suppressed at generation time (so absence == "too small to report").
+NO TABLE SHIPS TODAY. strata_tables.json was removed on 2026-08-30 along with the
+"sahc" cohort, whose provenance could not be established (docs/SAHC_COHORT.md).
+This reader is retained deliberately: it is the seam a properly sourced cohort
+plugs into, and get_strata_table() already returns {} when no table is present,
+so peer matching degrades to the whole-cohort distribution with matched=False.
 
-Regenerate with scripts/build_strata_tables.py when the cohort data changes.
+The contract for any future table: aggregates ONLY — per-stratum percentiles and
+counts, never patient rows — with cells below MIN_MATCH_N people, and individual
+biomarkers below MIN_MATCH_N values, suppressed at generation time (so absence
+means "too small to report").
 """
 from __future__ import annotations
 

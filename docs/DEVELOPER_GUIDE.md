@@ -23,10 +23,10 @@ Data is optional — the app runs in **demo mode** using frozen aggregate tables
 - **NHANES:** `python scripts/download_nhanes.py` fetches + validates the XPT
   files into `data/raw/` (gitignored). Without them, the frozen NH-Asian
   percentiles in `data/demo_cohort.py` are used.
-- **SAHC cohort:** place the de-identified CSV at `data/sahc/sahc_cohort_noPID.csv`
-  (gitignored). Without it, `data/sahc_demo_cohort.py` + `data/strata_tables.json`
+- **Second cohort:** removed on 2026-08-30 (see `SAHC_COHORT.md`). Nothing to
+  place. What the setup used to say: without the raw CSV, frozen aggregate tables
   are used. Regenerate the frozen tables with
-  `python scripts/build_strata_tables.py` when the CSV changes.
+  were used instead. Both the tables and their generator are now removed.
 
 ## Run
 
@@ -40,8 +40,7 @@ docker compose up --build              # → http://localhost:8000
 ```
 
 Environment variables: `NEXT_PUBLIC_API_URL` (frontend → backend, empty string
-when co-hosted), `ALLOWED_ORIGINS` (backend CORS), `SAHC_MODE`, `NHANES_DATA_DIR`,
-`SAHC_DATA_DIR`/`SAHC_DATA_FILE`.
+when co-hosted), `ALLOWED_ORIGINS` (backend CORS), `SAHC_MODE`, `NHANES_DATA_DIR`.
 
 ## Test
 
@@ -86,7 +85,8 @@ fasting filter, trajectory descriptive-only).
 3. **API contract:** `api/models/results.py` ↔ `frontend/src/lib/types.ts` in the
    same commit. `npm run type-check` enforces it.
 4. **Cohort labels:** each cohort keeps its own honest label; the NHANES cohort is
-   never "South Asian". `tests/test_sahc_cohort.py` enforces it.
+   never "South Asian", and no cohort label names an institution.
+   `tests/test_cohort_registry.py` enforces both.
 5. **Descriptive only:** no diagnosis/prediction/treatment language anywhere in
    the served payload or source (scanned by the gate).
 6. **Stateless:** no server-side persistence; never commit raw patient rows.
@@ -101,16 +101,17 @@ boundary tests in `tests/test_thresholds.py` → run the gate.
 
 ### Add a benchmark cohort
 1. Loader in `data/` (biomarker frame + matching frame), filtered to the cohort.
-2. Frozen aggregate table (`*_demo_cohort.py`) verified equal to live.
+2. Frozen aggregate table (`*_demo_cohort.py`), computed once from the source data; not re-verified by tests.
 3. A `COHORT_*` id + label in `config.py` and `COHORT_LABELS`.
 4. Register it in `benchmark/percentile.py` (`SUPPORTED_COHORTS`, source
    resolution) and, for matching, generate a strata table.
-5. Extend `tests/test_sahc_cohort.py` (incl. the no-crossed-labels invariant) and
-   document provenance in `SAHC_COHORT.md`.
+5. Extend `tests/test_cohort_registry.py` (incl. the no-crossed-labels invariant)
+   and document written provenance in `SAHC_COHORT.md` — see §6 for the four
+   conditions any new cohort must satisfy.
 
 ### Add a peer-matching dimension
 Extend `benchmark/matching.py` (strata key, level predicates, description),
-regenerate `strata_tables.json` via `scripts/build_strata_tables.py` (keep the
+supply a frozen strata table for `data/strata_tables.py` to read (keep the
 small-cell suppression), and add tests in `tests/test_peer_matching.py`.
 
 ### Add a classification-only marker (like ApoB/Lp(a))

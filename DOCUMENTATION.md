@@ -57,7 +57,7 @@ The server is **stateless**. Results live in browser `sessionStorage`; longitudi
 1. **Medical safety is structural, not procedural.** Safety invariants live in the type system — `disclaimer` is a required, minimum-length field on every result; `cohort_label` is a constrained union that cannot take an arbitrary string. A developer cannot forget to add a disclaimer, because the result object will not validate without one.
 2. **One source of truth per fact.** Guideline thresholds exist only in `thresholds.py`. The API response contract exists only in `results.py`, mirrored into the frontend's `types.ts`. There is no second place to update.
 3. **Clinical logic is framework-free.** Nothing under `sahc_risklens/` imports FastAPI, Next.js, or any web framework. The core can be unit-tested and reasoned about in isolation.
-4. **Demo and live modes are output-identical.** The frozen aggregate tables used in demo mode are verified equal to live computation over the raw data, so a demo deployment behaves exactly like a data-backed one.
+4. **Demo mode is what ships.** The frozen aggregate tables were computed once from the source data; they are NOT re-verified by the test suite against live computation over the raw data, so a demo deployment behaves exactly like a data-backed one.
 5. **The frontend never does clinical work.** It renders precisely what the API returns and computes nothing clinical of its own.
 
 ---
@@ -92,13 +92,12 @@ Non-prescriptive navigation only: pointers to family/cascade screening and preve
 The data layer loads and filters the population cohorts that back the percentile benchmarks.
 
 - **`nhanes_loader`** — loads the NHANES Non-Hispanic Asian subset, a *public proxy* cohort. It is always labeled as NHANES, never as "South Asian."
-- **`sahc_cohort_loader`** — loads the South Asian Heart Center's own clinical cohort, a genuine South Asian population.
 - **`cohort_filters`** — applies the fasting filter, sex/age filtering, and other cohort constraints used by peer matching.
 - **`missingness`** — handles missing values in the source data.
-- **`demo_cohort` / `sahc_demo_cohort`** — the demo-mode data path.
+- **`demo_cohort`** — the demo-mode data path. (`sahc_demo_cohort` and `strata_tables.json` were removed with the `sahc` cohort on 2026-08-30; `strata_tables.py` remains as the reader a future stratified table plugs into.)
 - **`strata_tables`** — the frozen aggregate tables (percentiles per stratum) that let the app run without raw data files present.
 
-Raw data (`data/raw/` for NHANES, `data/sahc/` for the SAHC CSV) is gitignored and never committed. `scripts/download_nhanes.py` fetches NHANES; `scripts/build_strata_tables.py` regenerates the frozen tables.
+Raw data (`data/raw/` for NHANES) is gitignored and never committed. `scripts/download_nhanes.py` fetches NHANES.
 
 ---
 
@@ -147,7 +146,7 @@ api/
 
 | Method | Path | Purpose | Notable params |
 |---|---|---|---|
-| `POST` | `/api/v1/benchmark` | Classify + benchmark a panel | `?cohort=nhanes_asian\|sahc`, `?match=true` |
+| `POST` | `/api/v1/benchmark` | Classify + benchmark a panel | `?cohort=nhanes_asian`, `?match=true` |
 | `POST` | `/api/v1/trajectory` | Stateless descriptive trend analysis over a dated series | — |
 | `GET`  | `/api/v1/thresholds` | Full guideline threshold reference | — |
 | `GET`  | `/health` | Liveness + demo/live mode indicator | — |
@@ -210,7 +209,7 @@ This is the one pre-release gate. It runs:
 These are guaranteed by tests and/or types, not by reviewer diligence alone:
 
 - The disclaimer is always required and rendered first (enforced by the required `disclaimer` field).
-- Cohort labels are honest — NHANES is never mislabeled "South Asian" (`test_sahc_cohort.py`).
+- Cohort labels are honest — NHANES is never mislabeled "South Asian", and no cohort label claims an institutional origin (`test_cohort_registry.py`).
 - The limitations panel is unconditional and non-collapsible.
 - No LLM exists anywhere in the patient-facing path — all copy is fixed templates.
 - A medication flag adds a note but never changes a classification.
@@ -252,15 +251,15 @@ Fully offline and reproducible. Stated limitations: it is a single-model-family 
 
 - **Development:** run the FastAPI app (`uvicorn api.main:app`) and the Next.js dev server separately.
 - **Single-container:** the Next.js static export is served by FastAPI on port 7860, matching the Hugging Face Spaces deployment target, from the existing `Dockerfile`.
-- **Demo mode:** runs with no raw data files present, backed by the frozen strata tables (verified equal to live computation), so a public demo behaves identically to a data-backed instance without exposing any cohort data.
+- **Demo mode:** runs with no raw data files present, backed by the frozen strata tables (computed once from the source data; not re-verified by tests), so a public demo behaves identically to a data-backed instance without exposing any cohort data.
 
 ---
 
 ## 12. Glossary
 
 - **NHANES Non-Hispanic Asian** — a public national health survey cohort used as a *proxy* population benchmark. Always labeled as NHANES.
-- **SAHC cohort** — the South Asian Heart Center's own clinical cohort; a genuine South Asian population benchmark.
+- **SAHC cohort** — a second cohort, removed 2026-08-30; provenance could not be established (`docs/SAHC_COHORT.md`).
 - **Risk-enhancing factor** — an AHA/ACC term for a marker (e.g. ApoB, Lp(a), South Asian ancestry) that elevates concern without itself being a diagnosis.
 - **`MIN_COHORT_N`** — the minimum cell size (30) below which a peer-matched stratum is suppressed.
-- **Frozen strata tables** — precomputed aggregate percentiles that let the app run without raw data, verified equal to live computation.
+- **Frozen strata tables** — precomputed aggregate percentiles that let the app run without raw data. Computed once from the source data; not re-verified by the test suite.
 - **Demo mode** — running against frozen tables with no raw data files present.

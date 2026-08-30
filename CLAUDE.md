@@ -26,15 +26,16 @@ both ethically and as the project's design thesis — and must never be weakened
   factor*, as qualitative discussion context. Conflating the two is a
   correctness bug and a credibility problem. This distinction is the
   intellectual core of the project.
-  - There is now a **second, opt-in cohort** — the *South Asian Heart Center
-    clinical cohort* (`config.COHORT_SAHC`, id `sahc`) — a genuine South Asian
-    clinical population. It is honestly labeled "South Asian Heart Center
-    clinical cohort" and is a *distinct* cohort from NHANES, not a relabeling of
-    it. The invariant is: each cohort carries its own honest label, the NHANES
-    cohort is never called "South Asian", and the SAHC label is a proper-noun
-    cohort name (not the bare phrase "South Asian"). Default cohort is NHANES;
-    see `docs/SAHC_COHORT.md`. Tests in `tests/test_sahc_cohort.py` enforce the
-    no-crossed-labels invariant.
+  - **One cohort is registered.** A second cohort (`sahc`) was removed on
+    2026-08-30 because its provenance could not be established — the source file
+    no longer exists and the one written provenance claim was demonstrably false.
+    Read `docs/SAHC_COHORT.md` before adding any cohort; §6 lists the four
+    conditions. The multi-cohort machinery is retained on purpose and is the
+    seam a sourced cohort plugs into — do not simplify it away.
+  - The invariants that outlive any cohort: each cohort carries its own honest
+    label, no cohort inherits another's, NHANES is never called "South Asian",
+    and **no cohort label names an institution** without written permission.
+    `tests/test_cohort_registry.py` enforces all of these.
 - **Disclaimers and limitations are always visible and cannot be dismissed.**
 - **The server is stateless.** No accounts, no database. Longitudinal data is
   user-owned: exported as a "health file" JSON the user keeps, with an optional

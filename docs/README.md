@@ -20,7 +20,7 @@ project root [`README.md`](../README.md) has the quick start.
 **Clinical & data**
 - [`CLINICAL_LOGIC_APPENDIX.md`](CLINICAL_LOGIC_APPENDIX.md) — every threshold + citation (source of truth)
 - [`DATA_DICTIONARY.md`](DATA_DICTIONARY.md) — NHANES variables and real-data gotchas
-- [`SAHC_COHORT.md`](SAHC_COHORT.md) — SAHC cohort provenance, peer matching, governance
+- [`SAHC_COHORT.md`](SAHC_COHORT.md) — record of the removed `sahc` cohort, the retained peer-matching seam, and the conditions for registering any future cohort
 
 **Safety, validation, release**
 - [`SAFETY_AND_LIMITATIONS.md`](SAFETY_AND_LIMITATIONS.md) — boundaries and known limits
@@ -42,10 +42,11 @@ project root [`README.md`](../README.md) has the quick start.
 ## Current state
 
 Educational demonstration. Implemented: guideline classification,
-dual-cohort benchmarking (NHANES + SAHC), SCORE-style peer matching, ApoB/Lp(a)
+benchmarking against NHANES (a second cohort was removed 2026-08-30), the
+SCORE-style peer-matching engine, ApoB/Lp(a)
 risk-enhancing markers, South Asian context, longitudinal trajectory, physician
 guide + clinician pre-visit brief + care navigation. **307 backend tests pass;
 the validation gate passes.** Pending clinician sign-off: the ApoB/Lp(a)
-thresholds and the SAHC cohort. Data-blocked follow-ups (response-to-intervention,
+thresholds. Data-blocked follow-ups (response-to-intervention,
 velocity benchmarking) require a linked, date-stamped extract — see
 [`SAHC_COHORT.md`](SAHC_COHORT.md) and [`PR_feat_sahc_cohort.md`](PR_feat_sahc_cohort.md).

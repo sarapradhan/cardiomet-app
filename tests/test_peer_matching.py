@@ -3,12 +3,21 @@ tests/test_peer_matching.py
 
 Tests for SCORE-style peer matching in the benchmark:
   - sahc_risklens/benchmark/matching.py (pure helpers + stratified computation)
-  - get_benchmark_data(..., match=True) integration
+  - get_benchmark_data(..., match=True) integration and graceful fallback
   - api/routers/benchmark.py ?match=true
   - the improvement over SCORE: small-cell suppression + transparent fallback
 
-Default (match=False) behavior is covered by test_percentile.py / test_sahc_cohort.py
-and must remain unchanged.
+NOTE ON SCOPE (2026-08-30). These tests previously drove the matching engine
+through the "sahc" cohort, which shipped a frozen strata table. That cohort was
+removed because its provenance could not be established (docs/SAHC_COHORT.md),
+so no cohort ships a strata table today and every live call to
+get_matched_percentiles() returns None.
+
+The engine itself is deliberately retained — it is the seam a properly sourced
+cohort plugs into — so it is still tested here, directly, against synthetic
+tables in exactly the shape data/strata_tables.py would supply. That keeps the
+suppression, fallback and description logic covered rather than deleting the
+coverage along with the data.
 """
 from __future__ import annotations
 
@@ -22,18 +31,30 @@ from sahc_risklens.benchmark.matching import (
     describe_strata,
     resolve_patient_strata,
     stratified_from_table,
+    stratum_key,
 )
 from sahc_risklens.benchmark.percentile import get_benchmark_data, get_matched_percentiles
-from sahc_risklens.config import COHORT_NHANES, COHORT_SAHC, SAHC_COHORT_LABEL
+from sahc_risklens.config import COHORT_NHANES, NHANES_COHORT_LABEL
 
 client = TestClient(app)
 
-# A 55-year-old woman, no medications — a well-populated SAHC stratum.
+# A 55-year-old woman, no medications.
 WOMAN_55 = {
     "LDL_mgdl": 130, "HDL_mgdl": 45, "TG_mgdl": 150, "BMI_kgm2": 27,
     "age_yr": 55, "sex": "F", "chol_med": False, "bp_med": False,
     "insulin": False, "dm_pills": False,
 }
+
+STRATA_55 = PatientStrata("F", 49, False, False, False)
+
+
+def _cell(n_people: int, hdl_n: int, median: float = 50.0) -> dict:
+    """One strata-table entry in the shape data/strata_tables.py supplies."""
+    return {
+        "_n": n_people,
+        "HDL": {"p10": 34.0, "p25": 41.0, "median": median,
+                "p75": 59.0, "p90": 68.0, "n": hdl_n},
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -70,75 +91,97 @@ def test_describe_strata_reads_naturally():
 
 
 # ---------------------------------------------------------------------------
-# Matched computation
+# Matched computation, driven directly against a strata table
 # ---------------------------------------------------------------------------
 
-def test_matched_percentiles_returns_peer_group():
-    m = get_matched_percentiles(WOMAN_55, COHORT_SAHC)
+def test_matched_percentiles_returns_narrowest_adequate_peer_group():
+    table = {
+        stratum_key("F", 49, False, False, False): _cell(400, 380, median=53.0),
+        stratum_key("F", 49): _cell(2000, 1900, median=50.0),
+    }
+    m = stratified_from_table(table, STRATA_55, ["HDL"])
     assert m is not None
-    assert m["level"] in ("full", "sexage")
+    assert m["level"] == "full"          # narrowest level that clears the floor
     assert m["n"] >= MIN_MATCH_N
-    assert "HDL" in m["per_biomarker"]
+    assert m["per_biomarker"]["HDL"]["median"] == 53.0
+    assert m["description"]
 
 
-def test_matching_changes_the_distribution():
-    """The whole point: matched peers differ from the whole cohort."""
-    whole = {p["biomarker"]: p for p in get_benchmark_data(WOMAN_55, cohort=COHORT_SAHC)}
-    matched = {p["biomarker"]: p for p in get_benchmark_data(WOMAN_55, cohort=COHORT_SAHC, match=True)}
-    # HDL median for women 49-64 is higher than the whole-cohort median.
-    assert matched["HDL"]["matched"] is True
-    assert matched["HDL"]["cohort_median"] != whole["HDL"]["cohort_median"]
-    assert matched["HDL"]["match_n"] is not None
-    assert matched["HDL"]["match_description"]
+def test_falls_back_to_broader_group_when_narrow_cell_is_small():
+    table = {
+        stratum_key("F", 49, False, False, False): _cell(12, 12),   # below floor
+        stratum_key("F", 49): _cell(2000, 1900, median=50.0),
+    }
+    m = stratified_from_table(table, STRATA_55, ["HDL"])
+    assert m is not None
+    assert m["level"] == "sexage"
+    assert m["per_biomarker"]["HDL"]["median"] == 50.0
 
 
-def test_match_off_is_unchanged_and_unmatched():
-    for p in get_benchmark_data(WOMAN_55, cohort=COHORT_SAHC, match=False):
+def test_small_cell_suppression_via_table():
+    """A stratum below MIN_MATCH_N must not be returned from the frozen table."""
+    tiny = {stratum_key("F", 49): _cell(5, 5)}
+    assert stratified_from_table(tiny, STRATA_55, ["HDL"]) is None
+
+
+def test_biomarker_below_floor_is_dropped_even_in_a_large_cell():
+    """Cell size is not enough — each biomarker must clear the floor itself."""
+    table = {stratum_key("F", 49): _cell(2000, hdl_n=9)}
+    assert stratified_from_table(table, STRATA_55, ["HDL"]) is None
+
+
+def test_unmatchable_patient_is_never_matched():
+    assert stratified_from_table({}, PatientStrata(None, 49, False, False, False), ["HDL"]) is None
+    assert stratified_from_table({}, PatientStrata("F", None, False, False, False), ["HDL"]) is None
+
+
+# ---------------------------------------------------------------------------
+# Integration: no cohort ships a strata table, so matching falls back cleanly
+# ---------------------------------------------------------------------------
+
+def test_no_registered_cohort_supplies_matching_today():
+    """Regression guard for the 2026-08-30 removal: match=True must never error,
+    and must never silently claim a match it cannot support."""
+    assert get_matched_percentiles(WOMAN_55, COHORT_NHANES) is None
+
+
+def test_match_true_falls_back_to_whole_cohort_and_discloses_it():
+    pts = get_benchmark_data(WOMAN_55, cohort=COHORT_NHANES, match=True)
+    assert pts
+    for p in pts:
         assert p["matched"] is False
         assert p["match_n"] is None
         assert p["match_description"] is None
 
 
+def test_match_off_is_unchanged_and_unmatched():
+    for p in get_benchmark_data(WOMAN_55, cohort=COHORT_NHANES, match=False):
+        assert p["matched"] is False
+
+
 def test_cannot_match_without_age_or_sex():
-    assert get_matched_percentiles({"LDL_mgdl": 130, "age_yr": 55}, COHORT_SAHC) is None
-    # match=True but unmatchable -> falls back to whole cohort, all unmatched
-    pts = get_benchmark_data({"LDL_mgdl": 130}, cohort=COHORT_SAHC, match=True)
+    assert get_matched_percentiles({"LDL_mgdl": 130, "age_yr": 55}, COHORT_NHANES) is None
+    pts = get_benchmark_data({"LDL_mgdl": 130}, cohort=COHORT_NHANES, match=True)
     assert pts and all(p["matched"] is False for p in pts)
-
-
-def test_nhanes_matching_falls_back_gracefully():
-    """NHANES has no stratified source; match=True must not error, just fall back."""
-    assert get_matched_percentiles(WOMAN_55, COHORT_NHANES) is None
-    pts = get_benchmark_data(WOMAN_55, cohort=COHORT_NHANES, match=True)
-    assert pts and all(p["matched"] is False for p in pts)
-
-
-def test_small_cell_suppression_via_table():
-    """A stratum below MIN_MATCH_N must not be returned from the frozen table."""
-    tiny = {"sex=F|age=49|chol=*|bp=*|dm=*": {"_n": 5, "HDL": {"p10": 1, "p25": 2,
-            "median": 3, "p75": 4, "p90": 5, "n": 5}}}
-    s = PatientStrata("F", 49, False, False, False)
-    assert stratified_from_table(tiny, s, ["HDL"]) is None
 
 
 # ---------------------------------------------------------------------------
 # API
 # ---------------------------------------------------------------------------
 
-def test_api_match_true_reports_matched():
-    r = client.post("/api/v1/benchmark?cohort=sahc&match=true", json=WOMAN_55)
+def test_api_match_true_is_accepted_and_honestly_unmatched():
+    r = client.post("/api/v1/benchmark?match=true", json=WOMAN_55)
     assert r.status_code == 200
     body = r.json()
-    assert body["matched"] is True
-    assert body["match_description"]
+    assert body["matched"] is False
+    assert body["match_description"] is None
     hdl = next(p for p in body["benchmark_data"] if p["biomarker"] == "HDL")
-    assert hdl["matched"] is True and hdl["match_n"]
-    # Label safety still holds under matching.
-    assert hdl["cohort_label"] == SAHC_COHORT_LABEL
+    assert hdl["matched"] is False and hdl["match_n"] is None
+    assert hdl["cohort_label"] == NHANES_COHORT_LABEL
 
 
 def test_api_match_default_off():
-    r = client.post("/api/v1/benchmark?cohort=sahc", json=WOMAN_55)
+    r = client.post("/api/v1/benchmark", json=WOMAN_55)
     body = r.json()
     assert body["matched"] is False
     assert body["match_description"] is None
