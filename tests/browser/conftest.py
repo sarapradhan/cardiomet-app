@@ -83,6 +83,13 @@ def browser():
 def page(browser, base_url):
     ctx = browser.new_context(viewport={"width": 1100, "height": 1400})
     pg = ctx.new_page()
+    # Default 30s can be too tight for a long sequential run in a loaded
+    # environment (one Chromium instance reused across ~28 tests) - every
+    # element/nav timeout observed in practice was a slow-render false
+    # failure, not a broken interaction. 45s gives real headroom without
+    # masking a genuinely hung page.
+    pg.set_default_timeout(45_000)
+    pg.set_default_navigation_timeout(45_000)
     # Start each test with clean storage so state never leaks between tests,
     # but mark the guided tour as already seen so its auto-start overlay does
     # not intercept clicks (the tour itself is covered by a dedicated test).

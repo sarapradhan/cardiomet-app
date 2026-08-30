@@ -124,7 +124,7 @@ def test_guided_tour_runs_and_dismisses(page, base_url):
     page.goto(f"{base_url}/", wait_until="networkidle")
     page.get_by_role("button", name="Take a tour").click()
     expect(page.get_by_role("dialog", name="Guided tour")).to_be_visible()
-    expect(page.get_by_text("Welcome to SAHC RiskLens")).to_be_visible()
+    expect(page.get_by_text("Welcome to CardioMet Lens")).to_be_visible()
     # Step forward through the tour
     page.get_by_role("button", name="Next").click()
     expect(page.get_by_text("The color legend")).to_be_visible()
@@ -143,6 +143,106 @@ def test_example_data_loads_and_submits(page, base_url):
     page.wait_for_url("**/results/**")
     page.wait_for_load_state("networkidle")
     expect(page.get_by_text("Each number, on its guideline range")).to_be_visible()
+
+
+def test_cohort_selector_switches_to_sahc(page, base_url):
+    """
+    Regression coverage for a gap external review found: the cohort selector
+    and peer-matching toggle existed at the API level but were never exposed
+    in the form, so every submission silently used the NHANES default.
+    """
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_placeholder("e.g. 100").fill("168")
+    page.get_by_label("Compare against:").select_option("sahc")
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    # .first: with ClinicianBrief now wired into results, its copyable <pre>
+    # summary quotes the cohort label verbatim too, so this text also matches
+    # the "Reference: ..." line and the <pre> block. The chip badge is the
+    # first DOM occurrence and the one actually being asserted here.
+    expect(page.get_by_text("South Asian Heart Center clinical cohort").first).to_be_visible()
+    # Scoped to the result's own cohort chip, not the whole page: the
+    # site-wide footer legitimately names both benchmark options generically
+    # (see frontend/src/app/layout.tsx), so a page-wide text search for
+    # "NHANES" would now always find a hit regardless of which cohort was
+    # actually used. The safety invariant this guards - the *result's* cohort
+    # label is never mislabeled - is about that specific chip.
+    assert page.locator(".chip.chip-primary", has_text="NHANES Non-Hispanic Asian").count() == 0
+
+
+def test_peer_matching_toggle_reflected_in_results(page, base_url):
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_placeholder("e.g. 100").fill("168")
+    page.get_by_label("Age (years)").fill("52")
+    # exact=True: get_by_label does substring matching by default, and "Sex"
+    # is also a substring of the peer-matching checkbox's label ("Match to
+    # peers (sex, age, medications)"), which made this resolve to 2 elements.
+    page.get_by_label("Sex", exact=True).select_option("M")
+    page.get_by_label("Compare against:").select_option("sahc")
+    page.get_by_text("Match to peers (sex, age, medications)").click()
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    # Either a "Matched: ..." badge (cell large enough) or the page still renders
+    # cleanly with the whole-cohort fallback — either way, no crash, and the
+    # cohort badge is still the SAHC one, never silently reverted to NHANES.
+    # .first: with ClinicianBrief now wired into results, its copyable <pre>
+    # summary quotes the cohort label verbatim too, so this text also matches
+    # the "Reference: ..." line and the <pre> block. The chip badge is the
+    # first DOM occurrence and the one actually being asserted here.
+    expect(page.get_by_text("South Asian Heart Center clinical cohort").first).to_be_visible()
+
+
+def test_advanced_markers_render_when_provided(page, base_url):
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_placeholder("e.g. 100").fill("168")
+    page.get_by_placeholder("e.g. 90").first.fill("140")   # ApoB
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    # get_by_role("heading", ...), not get_by_text: the ClinicianBrief's
+    # copyable <pre> summary quotes every section title verbatim, so a plain
+    # text match resolves to both the section heading and that quoted line.
+    expect(page.get_by_role("heading", name="Advanced lipid markers")).to_be_visible()
+    expect(page.get_by_text("High (risk-enhancing)").first).to_be_visible()
+
+
+def test_clinician_brief_copy_button_present(page, base_url):
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_role("button", name="Elevated-risk example").click()
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    # get_by_role("heading", ...): the copyable <pre> summary quotes its own
+    # section title ("PRE-VISIT SUMMARY") verbatim, so plain text matching
+    # "Pre-visit summary" is ambiguous between the heading and that text.
+    expect(page.get_by_role("heading", name="Pre-visit summary")).to_be_visible()
+    expect(page.get_by_role("button", name="Copy summary")).to_be_visible()
+    # The brief text itself is derived from the same response already asserted
+    # elsewhere (South Asian context, cohort label) — just confirm it rendered
+    # non-empty content, not the component silently no-op'ing. Scoped to the
+    # <pre> element itself (get_by_text also matches the "Pre-visit summary"
+    # heading, case-insensitively, by default).
+    expect(page.locator("pre")).to_contain_text("PRE-VISIT SUMMARY")
+
+
+def test_fpg_not_classified_without_confirmed_fasting_status(page, base_url):
+    """
+    Regression coverage for a gap external review found: FPG was classified
+    against fasting-glucose thresholds regardless of whether the draw was
+    actually fasting. Leaving the fasting-status question unanswered must not
+    produce a fasting-glucose category label.
+    """
+    page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
+    page.get_by_placeholder("e.g. 90").last.fill("140")   # Glucose
+    # Do NOT answer the fasting-status question — leave it at the default.
+    page.get_by_role("button", name="See My Results").click()
+    page.wait_for_url("**/results/**")
+    page.wait_for_load_state("networkidle")
+    expect(page.get_by_text("Not classified")).to_be_visible()
+    body = page.inner_text("body").lower()
+    assert "diabetes" not in body
 
 
 def test_daylight_snapshot_and_benchmark_bars(page, base_url):
