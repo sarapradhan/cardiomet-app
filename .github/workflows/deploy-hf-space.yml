@@ -1,0 +1,82 @@
+name: Deploy Hugging Face Space
+
+# Optional, opt-in: publishes the static frontend to a Hugging Face Static
+# Space, built against a separately hosted API (e.g. Render — see the
+# existing "Trigger host deploy" job in deploy.yml). Gated on the same
+# workflow_run trigger as deploy.yml, so it only runs after CI passes.
+#
+# Requires three repo secrets to actually do anything:
+#   HF_TOKEN        - Hugging Face access token with write access to the Space
+#                      (huggingface.co -> Settings -> Access Tokens)
+#   HF_SPACE         - "your-hf-username/your-space-name"
+#   RENDER_API_URL   - the live API host, e.g. https://cardiomet-api.onrender.com
+#                      (no trailing slash)
+#
+# None of these secrets are required for the rest of the pipeline (CI, the
+# GHCR image, or the Render deploy hook) to work — this job is entirely
+# additive. If any secret is missing, this skips with a loud warning rather
+# than silently no-op'ing (same principle as the "Report deploy status" step
+# in deploy.yml: a deploy step that quietly does nothing is worse than one
+# that visibly says so).
+on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  hf-space:
+    name: Publish static export to Hugging Face Space
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      HF_SPACE: ${{ secrets.HF_SPACE }}
+      RENDER_API_URL: ${{ secrets.RENDER_API_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required secrets are configured
+        id: check
+        run: |
+          if [[ -z "$HF_TOKEN" || -z "$HF_SPACE" || -z "$RENDER_API_URL" ]]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            missing=()
+            [[ -z "$HF_TOKEN" ]] && missing+=("HF_TOKEN")
+            [[ -z "$HF_SPACE" ]] && missing+=("HF_SPACE")
+            [[ -z "$RENDER_API_URL" ]] && missing+=("RENDER_API_URL")
+            echo "::warning title=Hugging Face Space deploy skipped::Missing repo secret(s): ${missing[*]}. Nothing was published to the Space. Add these under Settings -> Secrets and variables -> Actions to enable it."
+            {
+              echo "### Hugging Face Space: NOT deployed"
+              echo "Missing secret(s): \`${missing[*]}\`. No Space was updated."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.check.outputs.configured == 'true'
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend deps
+        if: steps.check.outputs.configured == 'true'
+        working-directory: frontend
+        run: npm ci || npm install
+
+      - name: Build + publish
+        if: steps.check.outputs.configured == 'true'
+        env:
+          API_URL: ${{ secrets.RENDER_API_URL }}
+        run: bash scripts/deploy_hf_space.sh
+
+      - name: Report deploy status
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          {
+            echo "### Hugging Face Space: deployed"
+            echo "Published to https://huggingface.co/spaces/${HF_SPACE}, built against ${RENDER_API_URL}."
+          } >> "$GITHUB_STEP_SUMMARY"

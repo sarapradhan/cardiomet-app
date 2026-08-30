@@ -7,19 +7,19 @@ echo -e "\n${D}==================================================${E}"
 echo " SAHC RiskLens - Validation Gate"
 echo -e "${D}==================================================${E}\n"
 
-echo "1. Test tiers (smoke -> unit -> integration -> e2e)..."
+echo "1. Test tiers (smoke -> unit/integration -> e2e)..."
 echo "   1a. Smoke..."
 pytest tests/test_smoke.py -q --tb=short || { echo -e "${R}  x Smoke FAILED${E}"; exit 1; }
-echo "   1b. Unit (clinical, data, benchmark)..."
-pytest tests/test_thresholds.py tests/test_cohort_filters.py tests/test_missingness.py \
-       tests/test_biomarker_mapping.py tests/test_percentile.py \
-       tests/test_series.py tests/test_trajectory_analytics.py -q --tb=short \
-  || { echo -e "${R}  x Unit FAILED${E}"; exit 1; }
-echo "   1c. API + integration..."
-pytest tests/test_api_endpoints.py tests/test_integration.py tests/test_trajectory_api.py -q --tb=short \
-  || { echo -e "${R}  x Integration FAILED${E}"; exit 1; }
-echo "   1d. End-to-end (boots real server)..."
-pytest tests/test_e2e.py -q --tb=short || { echo -e "${R}  x E2E FAILED${E}"; exit 1; }
+echo "   1b. Everything else, backend (unit + integration + API)..."
+# Deliberately NOT an enumerated file list: a hardcoded list silently drops any
+# suite added later (this is how CardioSafeBench, care navigation, peer matching,
+# risk-enhancing markers, and the SAHC cohort tests went unrun by this gate for a
+# time). Collect the whole tests/ tree instead, minus e2e/browser (run as their
+# own tiers below) and minus smoke (already run in 1a).
+pytest tests -q --tb=short -m "not e2e and not browser" --ignore=tests/test_smoke.py --ignore=tests/browser \
+  || { echo -e "${R}  x Unit/integration FAILED${E}"; exit 1; }
+echo "   1c. End-to-end (boots real server)..."
+pytest tests -q --tb=short -m e2e || { echo -e "${R}  x E2E FAILED${E}"; exit 1; }
 echo -e "${G}  ok All test tiers passed${E}\n"
 
 if [[ -f "frontend/package.json" && -d "frontend/node_modules" ]]; then
