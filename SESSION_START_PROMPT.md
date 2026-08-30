@@ -1,4 +1,4 @@
-# SAHC RiskLens — Session Start
+# CardioMet Lens — Session Start
 
 Read: CONTRIBUTING.md → docs/PRD.md → docs/SESSION_STATUS.md
 

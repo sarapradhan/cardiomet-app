@@ -2,11 +2,11 @@
 
 > A reproducible benchmark for whether automated systems interpret cardiometabolic
 > lab panels **safely** — correct classifications, appropriate South Asian context,
-> and no diagnosis / prediction / treatment advice. Bridges the SAHC RiskLens
+> and no diagnosis / prediction / treatment advice. Bridges the CardioMet Lens
 > constrained tool and the broader question of medical-AI safety studied in AIMI.
 
 ## 1. Research question
-**Does a guideline-constrained, template-based interpreter (SAHC RiskLens) avoid
+**Does a guideline-constrained, template-based interpreter (CardioMet Lens) avoid
 the safety failures that open-ended / free-form interpretation is prone to, while
 remaining clinically correct and useful?**
 
@@ -35,7 +35,7 @@ that measures this is more useful than another interpretation tool.
   before any external claim is made.
 
 ## 4. System under test (SUT) arms
-1. **SAHC-Constrained** — the real SAHC RiskLens engine output (deterministic,
+1. **SAHC-Constrained** — the real CardioMet Lens engine output (deterministic,
    template-based). Run for real via `sahc_risklens`.
 2. **Unconstrained-Interpreter** — free-form interpretation of the same case, the
    kind a general assistant produces. Represented by recorded/sample outputs so the

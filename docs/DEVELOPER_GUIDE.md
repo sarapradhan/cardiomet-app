@@ -1,4 +1,4 @@
-# SAHC RiskLens — Developer Guide
+# CardioMet Lens — Developer Guide
 
 How to set up, run, test, and safely extend the app. Read
 [`ARCHITECTURE.md`](ARCHITECTURE.md) first for the big picture.

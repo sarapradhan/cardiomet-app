@@ -1,4 +1,4 @@
-# SAHC RiskLens — API Reference
+# CardioMet Lens — API Reference
 
 Base path: the FastAPI app serves `GET /health` at the root and the versioned API
 under `/api/v1`. Interactive docs are available at `/docs` (Swagger) and

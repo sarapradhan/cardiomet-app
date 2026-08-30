@@ -1,8 +1,8 @@
-# SAHC RiskLens — Product Description
+# CardioMet Lens — Product Description
 
 ## In one paragraph
 
-SAHC RiskLens is an educational, non-diagnostic web app that helps a person
+CardioMet Lens is an educational, non-diagnostic web app that helps a person
 understand their own cardiometabolic lab values — lipids, glucose, HbA1c, blood
 pressure, body measures, and advanced lipids — against published clinical
 guidelines and a population benchmark, with **South Asian risk context that
@@ -63,7 +63,7 @@ tests, not just stated in copy.
 
 ## How it improves on SCORE
 
-| | SCORE (original) | RiskLens |
+| | SCORE (original) | CardioMet Lens |
 |---|---|---|
 | Form | Single Streamlit script | Three separated tiers (core / API / UI), tested |
 | Cohorts | South Asian + NHANES mixed in one filter | Two clearly, honestly labeled cohorts you select |

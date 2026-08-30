@@ -83,7 +83,7 @@ lipids. These are exactly the differences the second cohort exists to surface.
 ## Peer matching (parity with SCORE, then better)
 
 The original SCORE tool compared a patient against a *matched* subgroup — same
-sex, age band, and medication use — not the whole cohort. RiskLens now does the
+sex, age band, and medication use — not the whole cohort. CardioMet Lens now does the
 same, and improves on it.
 
 **How to use it:** pass `?match=true` to `/api/v1/benchmark` (or tick "Match to
@@ -106,7 +106,7 @@ the whole-cohort distribution for that biomarker and is flagged `matched=false`.
 
 **Why this is better than SCORE:** SCORE computed a percentile on whatever matched
 cell resulted, however small (a handful of people can give a meaningless
-percentile). RiskLens **suppresses cells below 30**, **falls back transparently**
+percentile). CardioMet Lens **suppresses cells below 30**, **falls back transparently**
 to a broader peer group, and **discloses** the peer group actually used
 (`match_description`, e.g. "Women, 49–64, on cholesterol medication") and its size
 (`match_n`) on every point. Matching is applied when it is statistically

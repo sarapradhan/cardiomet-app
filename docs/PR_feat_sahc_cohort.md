@@ -4,7 +4,7 @@
 
 ## Summary
 
-This branch closes the capability gap between RiskLens and the original SCORE
+This branch closes the capability gap between CardioMet Lens and the original SCORE
 tool, and then extends past it — while keeping every existing safety and
 labeling invariant intact. It lands in three coherent batches:
 

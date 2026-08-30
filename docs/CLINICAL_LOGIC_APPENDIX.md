@@ -1,4 +1,4 @@
-# SAHC RiskLens — Clinical Logic Appendix
+# CardioMet Lens — Clinical Logic Appendix
 # Authoritative threshold values. Auto-loaded via CONTRIBUTING.md @import.
 # All values in sahc_risklens/clinical/thresholds.py must match this exactly.
 

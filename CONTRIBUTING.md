@@ -1,10 +1,10 @@
-# Contributing to SAHC RiskLens
+# Contributing to CardioMet Lens
 
-Thanks for your interest in contributing. SAHC RiskLens is a clinical-safety-first project, so the contribution workflow is built around a single rule: **safety is enforced by code and tests, not by reviewer memory.** Please read this before opening a pull request.
+Thanks for your interest in contributing. CardioMet Lens is a clinical-safety-first project, so the contribution workflow is built around a single rule: **safety is enforced by code and tests, not by reviewer memory.** Please read this before opening a pull request.
 
 ## Ground rules
 
-RiskLens is an educational tool, not a medical device. Any contribution must preserve these boundaries:
+CardioMet Lens is an educational tool, not a medical device. Any contribution must preserve these boundaries:
 
 - **No diagnosis, no individual risk prediction, no treatment advice** in any patient-facing output.
 - **No server-side storage** of patient values — the API stays stateless.

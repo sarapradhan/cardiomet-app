@@ -1,4 +1,4 @@
-# SAHC RiskLens — Feature Guide
+# CardioMet Lens — Feature Guide
 
 A feature-by-feature description of what the app does, how each piece works, and
 where it lives in the code. For exact thresholds see

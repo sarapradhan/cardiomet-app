@@ -1,5 +1,5 @@
-# SAHC RiskLens — Incremental Value Specification
-## Longitudinal Trajectory Tracking ("RiskLens Timeline")
+# CardioMet Lens — Incremental Value Specification
+## Longitudinal Trajectory Tracking ("CardioMet Lens Timeline")
 
 > **The strategic problem this solves:** a savvy patient with a general-purpose AI assistant can already get a one-time interpretation of a single lab panel. A single-snapshot tool is therefore commoditized. This document specifies the capability that is structurally hard for a stateless chat session to replicate — and that is also the most clinically meaningful: tracking cardiometabolic values *over time*.
 

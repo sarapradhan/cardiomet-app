@@ -1,4 +1,4 @@
-# SAHC RiskLens — Architecture
+# CardioMet Lens — Architecture
 
 > **Responsible cardiometabolic benchmarking for South Asian heart health.**
 > Educational only. Not a diagnostic tool, not a medical device, not a substitute
