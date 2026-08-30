@@ -35,7 +35,7 @@ jobs:
       HF_SPACE: ${{ secrets.HF_SPACE }}
       RENDER_API_URL: ${{ secrets.RENDER_API_URL }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Check required secrets are configured
         id: check
