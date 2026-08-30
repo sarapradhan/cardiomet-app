@@ -6,7 +6,7 @@ import './globals.css';
 export const viewport = { width: 'device-width', initialScale: 1 };
 
 export const metadata: Metadata = {
-  title: 'SAHC RiskLens — Cardiometabolic lab context',
+  title: 'CardioMet Lens — Cardiometabolic lab context',
   description: 'Understand your cardiometabolic labs against clinical guidelines and a population benchmark. Educational use only — not a diagnosis.',
 };
 
@@ -34,14 +34,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 11, textDecoration: 'none' }}>
             <span aria-hidden="true" style={{
               width: 30, height: 30, borderRadius: 10,
-              background: 'linear-gradient(145deg, #16A5B5, #0E7C90)',
+              background: 'linear-gradient(145deg, var(--primary), var(--accent))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 11px -5px rgba(14,124,144,0.7)',
+              boxShadow: '0 4px 11px -5px rgba(15,110,120,0.7)',
             }}>
               <span style={{ width: 12, height: 12, borderRadius: 999, border: '2.5px solid rgba(255,255,255,0.94)' }} />
             </span>
-            <span style={{ fontFamily: "'Space Grotesk', system-ui, sans-serif", fontWeight: 600, fontSize: 16, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
-              SAHC RiskLens
+            <span style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: '-0.01em', color: 'var(--ink)' }}>
+              CardioMet Lens
             </span>
           </a>
           <NavBar />
@@ -50,8 +50,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main" role="main" style={{ minHeight: 'calc(100vh - 140px)' }}>{children}</main>
 
         <footer role="contentinfo" style={{ borderTop: '1px solid var(--hairline)', padding: '24px 20px', textAlign: 'center', background: 'var(--surface)' }}>
+          {/* This is static, site-wide chrome with no access to a session's chosen
+              cohort — it used to hardcode "NHANES Non-Hispanic Asian" here, which
+              was only ever accurate because the cohort selector didn't exist in the
+              UI yet. Now that SAHC is a selectable benchmark, that specific claim
+              would be wrong whenever a visitor picks SAHC. Guideline thresholds are
+              population-independent (see README), so those are still safe to state
+              unconditionally; the cohort itself is stated per-result on the page. */}
           <p className="caption" style={{ margin: 0 }}>
-            Reference: NHANES Non-Hispanic Asian (2017–2018) · Thresholds: ACC/AHA · ADA · NCEP · WHO
+            Population benchmarks: NHANES Non-Hispanic Asian or South Asian Heart
+            Center cohort (selected per comparison) · Classification thresholds:
+            ACC/AHA · ADA · NCEP · WHO
           </p>
           <p className="caption" style={{ marginTop: 4 }}>Educational tool · not a medical device</p>
         </footer>
