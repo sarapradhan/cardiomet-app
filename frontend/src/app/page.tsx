@@ -4,7 +4,7 @@ import { Legend } from '@/components/Legend';
 import { GuidedTour, TourButton, type TourStep } from '@/components/GuidedTour';
 
 const TOUR: TourStep[] = [
-  { anchor: '', title: 'Welcome to SAHC RiskLens',
+  { anchor: '', title: 'Welcome to CardioMet Lens',
     body: 'A quick 4-step tour. This tool puts your cardiometabolic labs in clinical and population context — educational only, never a diagnosis.' },
   { anchor: 'legend', title: 'The color legend',
     body: 'Every value is coded by status (in range / elevated / high) and grouped by panel (lipids, glucose, blood pressure, body). You will see this language throughout.' },
@@ -26,7 +26,7 @@ export default function Home() {
       <p className="body" style={{ fontSize: 16, maxWidth: 560, marginBottom: 28 }}>
         Enter your cardiometabolic labs to see each value against clinical guidelines
         and a population benchmark — with the South Asian risk context generic tools
-        leave out. Nothing is stored; this is context for a conversation, not a diagnosis.
+        leave out. Nothing is stored on our servers; this is context for a conversation, not a diagnosis.
       </p>
       <div data-tour="cta" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16, alignItems: 'center' }}>
         <Link href="/benchmark" className="btn btn-primary">Check my labs</Link>

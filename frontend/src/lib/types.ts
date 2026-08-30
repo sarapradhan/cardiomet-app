@@ -5,12 +5,21 @@
  * Run `npm run type-check` after any change.
  */
 
+// Fasting status for FPG_mgdl. "unknown" (and omitted, the default) is treated
+// the same as "not_fasting" server-side — FPG is only classified against
+// fasting-glucose categories when this is exactly "confirmed". See
+// docs/CLINICAL_LOGIC_APPENDIX.md ("Requires PHAFSTHR >= 8. Do not classify
+// non-fasting values.") and sahc_risklens/clinical/thresholds.py.
+export type FastingStatus = 'confirmed' | 'not_fasting' | 'unknown';
+
 export interface BiomarkerInput {
   LDL_mgdl?:  number | null;
   HDL_mgdl?:  number | null;
   TG_mgdl?:   number | null;
   TC_mgdl?:   number | null;
   FPG_mgdl?:  number | null;
+  fasting_status?: FastingStatus | null;
+  fasting_hours?:  number | null;
   HbA1c_pct?: number | null;
   SBP_mmhg?:  number | null;
   DBP_mmhg?:  number | null;
