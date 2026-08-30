@@ -112,6 +112,15 @@ body {
   .nav-link:hover { background: var(--primary-tint); color: var(--primary); }
   .nav-link[data-active="true"] { background: var(--primary-tint); color: var(--primary); }
 
+  /* Mobile: at the reskin's desktop padding the wordmark + three nav links
+     measure ~391px, overflowing a 375px viewport. Because the header is
+     site-wide chrome this overflowed EVERY page, which is what broke all four
+     responsive checks. Tighten only below 420px; desktop is unchanged.
+     Covered by tests/browser/test_browser_responsive.py. */
+  @media (max-width: 420px) {
+    .nav-link { padding: 0 8px; font-size: 13px; }
+  }
+
   .input { @apply w-full; height: 44px; padding: 0 14px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-sm); font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; transition: border-color .16s ease, box-shadow .16s ease; }
   .input::placeholder { color: var(--ink-faint); }
   .input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-tint); }
