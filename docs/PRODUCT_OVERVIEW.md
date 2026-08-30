@@ -64,7 +64,7 @@ The benchmark uses NHANES, the large U.S. public health survey. NHANES groups So
 2. The values are sent to a backend service that holds all the clinical logic.
 3. The service classifies each value against published thresholds, positions it against the NHANES benchmark, assembles the South Asian context (if applicable) and the discussion guide, and returns a structured result.
 4. The browser renders the result: a disclaimer first, classification cards, a distribution chart showing where the person sits, the context panels, the discussion guide, and an always-visible limitations panel.
-5. Nothing is stored. The result lives only in the browser tab and disappears when it closes.
+5. Nothing is stored on the server. The single-check result lives only in the browser tab and disappears when it closes; the separate timeline/trajectory feature optionally caches the user's own health file in browser `localStorage` for convenience, cleared at any time via the "Clear all" control.
 
 ### How accuracy and safety are built in
 - **Every threshold value is sourced from a named guideline** (ACC/AHA, ADA, NCEP, WHO) and lives in a single authoritative document, mirrored exactly in the code.
