@@ -19,29 +19,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div style={{
           background: 'var(--surface)', borderBottom: '1px solid var(--hairline)',
           color: 'var(--ink-soft)', padding: '7px 20px', textAlign: 'center',
-          fontSize: 11.5, letterSpacing: '0.02em', fontFamily: "'Space Mono', ui-monospace, monospace",
+          fontSize: 11.5, letterSpacing: '0.02em', fontFamily: "'DM Mono', monospace",
         }}>
           Educational tool · not a diagnosis · discuss results with your clinician
         </div>
 
         {/* App bar */}
         <header role="banner" style={{
-          background: 'rgba(255,255,255,0.82)', backdropFilter: 'saturate(180%) blur(12px)',
+          background: 'rgba(255,253,250,0.85)', backdropFilter: 'saturate(180%) blur(12px)',
           borderBottom: '1px solid var(--hairline)', padding: '12px 20px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           position: 'sticky', top: 0, zIndex: 20,
         }}>
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 11, textDecoration: 'none' }}>
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+            {/* Brand mark — recreated from the marketing site's .brand-mark
+                (three rotated bars over a solid pine circle), not a gradient. */}
             <span aria-hidden="true" style={{
-              width: 30, height: 30, borderRadius: 10,
-              background: 'linear-gradient(145deg, #16A5B5, #0E7C90)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 11px -5px rgba(14,124,144,0.7)',
+              position: 'relative', width: 28, height: 28, flex: '0 0 auto',
+              borderRadius: '50% 50% 48% 52%', background: 'var(--pine)',
+              overflow: 'hidden',
             }}>
-              <span style={{ width: 12, height: 12, borderRadius: 999, border: '2.5px solid rgba(255,255,255,0.94)' }} />
+              <span style={{ position: 'absolute', display: 'block', width: 3, height: 8, left: 8, top: 10, borderRadius: 5, background: 'var(--teal-light)', transform: 'rotate(38deg)' }} />
+              <span style={{ position: 'absolute', display: 'block', width: 3, height: 15, left: 13, top: 7, borderRadius: 5, background: 'var(--teal-light)', transform: 'rotate(38deg)' }} />
+              <span style={{ position: 'absolute', display: 'block', width: 3, height: 10, left: 18, top: 10, borderRadius: 5, background: 'var(--teal-light)', transform: 'rotate(38deg)' }} />
             </span>
-            <span style={{ fontFamily: "'Space Grotesk', system-ui, sans-serif", fontWeight: 600, fontSize: 16, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
-              CardioMet Lens
+            <span style={{ fontFamily: "'Manrope', Arial, sans-serif", fontWeight: 800, fontSize: 17, letterSpacing: '-0.045em', color: 'var(--ink)' }}>
+              CardioMet<span style={{ color: 'var(--teal)' }}>Lens</span>
             </span>
           </a>
           <NavBar />
