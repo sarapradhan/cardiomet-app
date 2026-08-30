@@ -21,3 +21,6 @@ frontend/tsconfig.tsbuildinfo
 htmlcov/
 .pytest_cache/
 .DS_Store
+.vercel
+frontend/.vercel
+/package-lock.json
