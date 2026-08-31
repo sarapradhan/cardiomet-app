@@ -28,12 +28,12 @@ so "high" becomes "high relative to whom, and by how much."
 
 - **Cohorts:**
   - `nhanes_asian` — NHANES 2017–2018 Non-Hispanic Asian (a public proxy).
-  - `sahc` — South Asian Heart Center clinical cohort (a genuine South Asian
-    population).
+  - (A second cohort, `sahc`, was removed on 2026-08-30 — provenance could not
+    be established. See `docs/SAHC_COHORT.md`.)
 - **Honest labeling:** each cohort carries its own true label; the NHANES cohort
   is never called "South Asian" (enforced by tests).
 - **Source resolution:** live computation from raw data when present; otherwise a
-  frozen aggregate table verified identical to the live numbers.
+  frozen aggregate table computed once from the source data (not re-verified by tests).
 - **Code:** `benchmark/percentile.py`; `data/*_loader.py`, `data/*demo_cohort.py`.
 - **API:** `?cohort=`. **UI:** the "Compare against" selector.
 
@@ -47,10 +47,12 @@ sex, age band, and medication use — like the original SCORE tool.
 - **Improvement over SCORE:** cells below 30 people are suppressed; the engine
   falls back transparently and discloses the peer group used (`match_description`,
   e.g. "Women, 49–64, on cholesterol medication") and its size (`match_n`).
-- **Availability:** offered for the SAHC cohort; NHANES falls back to whole-cohort
+- **Availability:** no registered cohort supplies a stratified table today, so every
+  request falls back to whole-cohort with `matched: false`. NHANES falls back to whole-cohort
   with `matched=false` (too small to stratify; raw files not shipped).
-- **Code:** `benchmark/matching.py`; frozen `data/strata_tables.json`
-  (regenerate via `scripts/build_strata_tables.py`).
+- **Code:** `benchmark/matching.py` (engine, retained and tested);
+  `data/strata_tables.py` is the reader a frozen stratified table plugs into.
+  No table ships today — see `docs/SAHC_COHORT.md` §5.
 - **API:** `?match=true`. **UI:** the "Match to people like me" toggle.
 
 ## 4. Advanced lipid markers (ApoB, Lp(a))

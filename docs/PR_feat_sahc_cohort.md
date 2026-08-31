@@ -1,5 +1,10 @@
 # Add South Asian cohort, SCORE-style peer matching, and advanced-marker / clinician-brief layers
 
+> **Historical record.** This describes the PR as merged in June 2026. The South
+> Asian cohort it introduced was **removed on 2026-08-30** because its provenance
+> could not be established; see [`SAHC_COHORT.md`](SAHC_COHORT.md). Left unedited
+> below as the record of what was built and claimed at the time.
+
 `feat/sahc-cohort` → `main`
 
 ## Summary
@@ -8,7 +13,7 @@ This branch closes the capability gap between CardioMet Lens and the original SC
 tool, and then extends past it — while keeping every existing safety and
 labeling invariant intact. It lands in three coherent batches:
 
-1. **A genuine South Asian benchmark cohort** (selectable alongside NHANES).
+1. **A second, South Asian-typed benchmark cohort** (selectable alongside NHANES; provenance later found to be unverified — see `docs/SAHC_COHORT.md`).
 2. **SCORE-style peer matching** (sex / age / medication), with small-cell
    suppression and transparent fallback — an improvement over SCORE, not just
    parity.
@@ -24,7 +29,7 @@ type-check is clean, and the validation gate passes.**
 ## What changed, by batch
 
 ### 1. South Asian Heart Center cohort (`952e7ad`)
-- Added the SAHC clinical cohort (de-identified South Asian patients) as a
+- Added the SAHC reference cohort (South Asian-typed distribution; provenance unverified) as a
   **second, separately-labeled, opt-in** benchmark — the real South Asian
   population the product's thesis said was missing (NHANES NH-Asian is only a
   proxy).

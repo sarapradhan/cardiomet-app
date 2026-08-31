@@ -1,161 +1,122 @@
-# SAHC clinical cohort — provenance, governance, and method
+# The removed "sahc" cohort — provenance record
 
-This document covers the **South Asian Heart Center (SAHC) clinical cohort**, a
-second, separately-labeled benchmark added alongside the NHANES Non-Hispanic
-Asian reference. It is the source-of-truth for that cohort's provenance, the
-filters and computed columns used, and the caveats that must be surfaced wherever
-its numbers appear.
+**Status: removed on 2026-08-30. This document is the record of why.**
 
-## Why a second cohort
+CardioMet Lens shipped a second benchmark cohort, id `sahc`, alongside the NHANES
+Non-Hispanic Asian reference. It was removed because its provenance could not be
+established. This document replaces the previous one, which described the cohort
+as current and attributed it to a named clinical program.
 
-NHANES has no South Asian–specific sample, so the original benchmark uses
-**NHANES Non-Hispanic Asian** as a deliberately-labeled *proxy* and surfaces
-South Asian ancestry only as a qualitative risk-enhancing factor. The SAHC cohort
-is a **genuine South Asian population** (the South Asian Heart Center's
-de-identified patients), which lets the app show a real South Asian distribution
-*in addition to* — not instead of — the NHANES proxy.
+---
 
-The two cohorts are kept distinct and **honestly labeled**:
+## 1. What was removed
 
-| Cohort id (`config.COHORT_*`) | Label (`config.COHORT_LABELS`) | Nature |
-|---|---|---|
-| `nhanes_asian` | `NHANES Non-Hispanic Asian` | Public population proxy |
-| `sahc` | `South Asian Heart Center clinical cohort` | Real South Asian clinic cohort |
+| Artifact | Was |
+|---|---|
+| `sahc_risklens/data/sahc_demo_cohort.py` | Frozen whole-cohort percentiles for 9 biomarkers |
+| `sahc_risklens/data/strata_tables.json` | 23 strata × 197 biomarker cells of stratified percentiles |
+| `sahc_risklens/data/sahc_cohort_loader.py` | Loader for the source CSV |
+| `scripts/build_strata_tables.py` | Generator for the stratified table |
+| `COHORT_SAHC`, `SAHC_COHORT_LABEL`, `SAHC_DATA_FILE` | Cohort registration in `config.py` |
+| Cohort selector, "Match to peers" toggle | Frontend controls that depended on it |
 
-**Labeling invariant (enforced by tests):** the NHANES cohort is never labeled
-"South Asian"; the SAHC cohort never inherits the NHANES label. This preserves
-the proxy-vs-actual distinction that is the project's intellectual core
-(CLAUDE.md). The SAHC label is a proper-noun cohort name, not the bare phrase
-"South Asian".
+`?cohort=sahc` now returns **422**, the same as any other unknown cohort id.
 
-## Provenance
+## 2. Why
 
-- **Source:** El Camino Health — South Asian Heart Center (SCORE program),
-  de-identified clinical records (`renamed_merged_data_noPID.csv` in the upstream
-  `sahc-tool` repository), imported here as `data/sahc/sahc_cohort_noPID.csv`.
-- **Size:** 18,809 rows; the South Asian sub-cohort used here is
-  `RIDRETH3 == 1` (n ≈ 9,700 for lipids; smaller for HbA1c/FPG/BP/BMI by
-  available measurements).
-- **De-identification:** the source carries no patient identifiers ("noPID").
+The frozen aggregates were computed in June 2026 from a CSV at
+`data/sahc/sahc_cohort_noPID.csv`. That file no longer exists and was not
+recovered, so its contents cannot be inspected.
 
-> ⚠️ **Governance gate.** Unlike NHANES (public domain), this is clinic-derived
-> data. Before any non-internal deployment, confirm the data-use agreement / IRB
-> terms permit aggregate redistribution. As a safeguard the **raw patient CSV is
-> never committed** (`.gitignore: data/sahc/*.csv`); only the frozen *aggregate*
-> percentiles in `sahc_risklens/data/sahc_demo_cohort.py` are tracked.
+The previous version of this document attributed it to El Camino Health's South
+Asian Heart Center (SCORE program) and cited `renamed_merged_data_noPID.csv` in
+the upstream `sahc-tool` repository as the source. **That citation is false.** The
+upstream repository was checked across its complete history: no such file exists
+there or in any commit. It contains only public NHANES data, with an incompatible
+schema and a different row count (15,560 vs the 18,809 claimed here).
 
-## Method (how percentiles are computed)
+With the source gone and the one written provenance claim demonstrably wrong,
+there was no basis on which to keep publishing the numbers or the attribution.
 
-Mirrors the NHANES pipeline so the two cohorts are comparable:
+## 3. What the artifacts did establish, before removal
 
-- Filter to the South Asian sub-cohort (`RIDRETH3 == 1`).
-- Map the source's NHANES-style columns to internal biomarker keys
-  (`sahc_cohort_loader._BIOMARKER_SOURCE`).
-- For each biomarker, drop missing values and compute p10/p25/median/p75/p90 and
-  n; biomarkers with fewer than `MIN_COHORT_N` (30) values are omitted.
-- **Source resolution:** if `data/sahc/sahc_cohort_noPID.csv` is present,
-  percentiles are computed live; otherwise the frozen table in
-  `sahc_demo_cohort.py` is used. The frozen numbers are verified to match the
-  live computation exactly, so demo and live modes display identical benchmarks.
+Recorded here because it is the only surviving evidence about the source, and a
+future decision may need it.
 
-## Known differences vs the NHANES pipeline (intentional, must stay visible)
+The two frozen tables were generated on different days by different code paths
+(`sahc_demo_cohort.py` 2026-06-22; `strata_tables.json` 2026-06-23) and reconciled
+with each other to a structured, per-panel missingness pattern — the sum of each
+biomarker's counts across the eight mutually exclusive sex × age strata fell short
+of the whole-cohort count by a fixed amount per clinical panel (−52 for all four
+lipids, −299 for both blood-pressure measures, −27 HbA1c, −24 glucose, −289 BMI).
+That pattern is produced by computing quantiles over a real tabular dataset with
+differential missingness, not by generating plausible numbers.
 
-These are documented limitations of the SAHC extract, not bugs:
+From that reconciliation alone:
 
-1. **Fasting glucose (FPG):** the extract has no fasting-hours field, so the
-   `PHAFSTHR >= 8` fasting filter applied to NHANES FPG cannot be applied here.
-   SAHC FPG percentiles therefore include non-fasting draws and should be read as
-   "glucose" rather than strictly "fasting glucose".
-2. **Blood pressure:** the extract carries a single oscillometric reading per
-   patient (`BPXOSY1` / `BPXODI1`); there is no three-reading mean to compute as
-   in NHANES.
-3. **Clinic vs survey population:** SAHC is an adult cardiometabolic-clinic
-   population, so its distributions (notably a much tighter low-BMI tail) differ
-   structurally from NHANES's general survey sample.
+- ~18,255 records carried a usable sex and age; ~9,750 a full lipid panel; ~8,800
+  blood pressure and BMI; 6,046 HbA1c; 4,497 glucose.
+- The source carried columns named `RIDRETH3, RIAGENDR, RIDAGEYR, LBDLDL, LBDHDD,
+  LBXTR, LBXTC, LBXGH, LBXGLU, BPXOSY1, BPXODI1, BMXBMI` (NHANES variable naming)
+  plus `cholMeds`, `bpMeds`, `diabMeds` (not NHANES).
+- The `RIDRETH3 == 1` filter selected essentially the whole file, so the ethnicity
+  field was near-constant.
+- The distribution was lean with low HDL and high triglycerides (median BMI 25.2,
+  HDL 45, TG 118) — a South Asian cardiometabolic phenotype, not a US
+  general-population profile.
 
-## Observed cohort differences (illustrative)
+**What was never established:** the institution, study, or system the records came
+from; whether they were clinical, research, or survey records; whether any
+permission covered their use; and the exact row count.
 
-The South Asian cohort shows the expected dyslipidemia pattern relative to NHANES
-Non-Hispanic Asian — e.g. lower HDL (median 45 vs 52 mg/dL) and higher
-triglycerides (median 118 vs 91 mg/dL) — at roughly 10–25× the sample size for
-lipids. These are exactly the differences the second cohort exists to surface.
+## 4. What was never at risk
 
-## Peer matching (parity with SCORE, then better)
+No patient rows were ever committed. `.gitignore` excluded `data/sahc/*.csv`, and
+every commit on every branch was checked for any `.csv`, `.xlsx`, or `noPID` file
+— there are none. Only aggregates were tracked, with a minimum cell size of 30
+enforced at generation time. The exposure here was a claim about provenance, not
+a disclosure of data.
 
-The original SCORE tool compared a patient against a *matched* subgroup — same
-sex, age band, and medication use — not the whole cohort. CardioMet Lens now does the
-same, and improves on it.
+## 5. The seam that was deliberately kept
 
-**How to use it:** pass `?match=true` to `/api/v1/benchmark` (or tick "Match to
-people like me" in the UI). Requires `sex` and `age_yr` in the input. Matching is
-offered for the SAHC cohort; see the NHANES note below.
+The cohort is gone; the architecture that hosted it is not. Still present and
+still tested:
 
-**Matching dimensions** (mirror SCORE's `ui_choose`): sex (M/F), age band — 18–33,
-34–48, 49–64, 65–78, 79+ — and cholesterol / blood-pressure / diabetes medication
-use (`insulin` or `dm_pills` both count as diabetes medication).
+- `SUPPORTED_COHORTS`, `get_cohort_percentiles(cohort)`,
+  `get_matched_percentiles(data, cohort)` in `benchmark/percentile.py`
+- `COHORT_LABELS` and `cohort_label()` in `config.py`, and the `CohortLabel`
+  Literal in `api/models/results.py`
+- the `?cohort=` and `?match=` query parameters
+- the peer-matching engine in `benchmark/matching.py` — level selection,
+  small-cell suppression, transparent fallback, plain-language descriptions —
+  tested directly against synthetic strata tables in `tests/test_peer_matching.py`
+- `data/strata_tables.py`, the reader a frozen stratified table plugs into
 
-**Match levels, narrowest first** (`benchmark/matching.py`):
+Registering a properly sourced cohort is therefore additive: supply a percentile
+table and (optionally) a strata table, add the id and label, restore the two
+frontend controls. No architectural change is required.
 
-1. `full` — sex + age band + all three medication flags
-2. `sexage` — sex + age band
-3. `cohort` — whole cohort (no matching; `matched=false`)
+## 6. Conditions for registering any future cohort
 
-The narrowest level whose peer group has at least `MIN_MATCH_N` (30) people is
-used; within it, any individual biomarker with fewer than 30 values falls back to
-the whole-cohort distribution for that biomarker and is flagged `matched=false`.
+1. **Written provenance in this document** — who collected the data, under what
+   study or program, and the citation or agreement that permits its use.
+2. **A label that names a population, not an institution**, unless that
+   institution has given written permission to be named. Enforced by
+   `test_no_cohort_label_claims_an_institutional_origin`.
+3. **Aggregates only in the repository**, minimum cell size 30, patient rows never
+   committed.
+4. **Caveats stated where the numbers appear**, not only here — any deviation
+   from the NHANES pipeline (fasting status, BP measurement method, clinic vs
+   survey sampling) must be visible to whoever reads the percentile.
 
-**Why this is better than SCORE:** SCORE computed a percentile on whatever matched
-cell resulted, however small (a handful of people can give a meaningless
-percentile). CardioMet Lens **suppresses cells below 30**, **falls back transparently**
-to a broader peer group, and **discloses** the peer group actually used
-(`match_description`, e.g. "Women, 49–64, on cholesterol medication") and its size
-(`match_n`) on every point. Matching is applied when it is statistically
-reliable and labeled when it is not.
+The intended next step is a published-literature reference distribution (for
+example MASALA, or another South Asian cohort study with published percentiles),
+which satisfies all four by construction: every number is citable.
 
-**Source resolution:** matched percentiles are computed live from the raw cohort
-when present, otherwise from a frozen, aggregate-only stratified table
-(`sahc_risklens/data/strata_tables.json`, regenerated by
-`scripts/build_strata_tables.py`). As with the whole-cohort numbers, the frozen
-values are verified to equal the live computation. The frozen table contains only
-per-stratum percentiles and counts (minimum cell size 30) — never patient rows.
+## 7. Invariant that outlives every cohort
 
-**NHANES note:** peer matching is intentionally *not* offered for the NHANES
-Non-Hispanic Asian cohort. With ~382–1,055 people per biomarker, slicing by sex ×
-age × medication drops most cells below the reliability floor, and the raw files
-needed to compute it live are not shipped. `match=true` against NHANES therefore
-returns the whole-cohort distribution with `matched=false` (an honest fallback,
-not an error). This is itself a reason the SAHC cohort matters: it is large enough
-to support the matched comparison SCORE users expect.
-
-## What did NOT change
-
-- **Classification thresholds** (`clinical/thresholds.py`) are guideline-based
-  and cohort-independent — selecting a cohort changes only the *benchmark
-  distribution*, never the clinical category.
-- The product remains **educational, non-diagnostic**; disclaimers are unchanged
-  and always rendered.
-- **Default behavior** is unchanged: with no `cohort` parameter the API returns
-  the NHANES cohort, so all prior contracts and tests hold.
-
-## Where this is wired
-
-- `sahc_risklens/config.py` — cohort ids, labels, `cohort_label()`.
-- `sahc_risklens/data/sahc_cohort_loader.py` — live loader.
-- `sahc_risklens/data/sahc_demo_cohort.py` — frozen aggregate percentiles.
-- `sahc_risklens/benchmark/percentile.py` — `get_cohort_percentiles(cohort)`,
-  `get_benchmark_data(data, cohort, match)`, `get_matched_percentiles(data, cohort)`,
-  `percentile_rank(value, key, cohort)`.
-- `sahc_risklens/benchmark/matching.py` — peer-matching helpers + stratified
-  computation (live frame and frozen table).
-- `sahc_risklens/data/strata_tables.py` / `strata_tables.json` — frozen
-  aggregate-only stratified percentiles; `scripts/build_strata_tables.py` regenerates.
-- `sahc_risklens/data/sahc_cohort_loader.py` — `load_matching_frame()`.
-- `api/routers/benchmark.py` — `?cohort=` and `?match=` query parameters (validated).
-- `api/models/results.py` — `cohort`, widened `cohort_label` (CohortLabel), and
-  matching fields (`matched`, `match_n`, `match_description`).
-- `frontend/src/lib/types.ts` / `api.ts` — `CohortId`, `COHORT_LABELS`,
-  `submitBiomarkers(input, cohort, match)`.
-- `frontend/src/app/benchmark/page.tsx` — "Compare against" cohort selector and
-  "Match to people like me" toggle; `results/page.tsx` shows the matched-peers chip.
-- `tests/test_sahc_cohort.py` — cohort + label-safety tests.
-- `tests/test_peer_matching.py` — matching, suppression/fallback, API tests.
+NHANES has no South Asian–specific sample. The NHANES cohort is therefore labeled
+as what it is, is never labeled "South Asian", and South Asian ancestry is
+surfaced only as a qualitative risk-enhancing factor. That proxy-vs-actual
+distinction is the intellectual core of the project and is enforced by
+`tests/test_cohort_registry.py`.

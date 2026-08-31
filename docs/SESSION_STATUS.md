@@ -20,7 +20,7 @@ _Last updated: 2026-08-09 - test inventory reconciled against a live run of the 
 | test_missingness.py | 6 | Counts/pct, no imputation |
 | test_biomarker_mapping.py | 9 | BP averaging, renaming + real-file checks (5 skip without local NHANES XPT files) |
 | test_percentile.py | 16 | Benchmark structure, demo determinism, rank |
-| test_sahc_cohort.py | 17 | SAHC cohort loading, no-crossed-labels invariant |
+| test_cohort_registry.py | 10 | Cohort registry, label invariants, removal guards |
 | test_peer_matching.py | 12 | Stratified matching, suppression, fallback |
 | test_risk_enhancing_markers.py | 9 | ApoB/Lp(a) classification-only behavior |
 | test_care_navigation.py | 6 | Non-prescriptive navigation language safety |

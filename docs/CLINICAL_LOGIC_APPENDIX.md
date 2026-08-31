@@ -120,7 +120,7 @@ are simply the fuller citation form.
 ## Risk-Enhancing Markers (ApoB, Lp(a)) — classification-only
 
 > **PENDING CLINICAL REVIEW.** These advanced lipid markers are **not**
-> cohort-benchmarked (the NHANES and SAHC cohorts do not measure them); they are
+> cohort-benchmarked (NHANES does not measure them); they are
 > classified against guideline cut-points only and presented as guideline-
 > recognized *risk-enhancing factors* (2018 AHA/ACC Cholesterol Guideline),
 > especially relevant to South Asian risk. Source of truth:

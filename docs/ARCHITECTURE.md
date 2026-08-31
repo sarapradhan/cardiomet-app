@@ -8,8 +8,8 @@ This is the authoritative description of how the system is built and why, curren
 as of the cohort-selection, peer-matching, and advanced-marker work. For product
 scope see [`PRODUCT_DESCRIPTION.md`](PRODUCT_DESCRIPTION.md) and [`PRD.md`](PRD.md);
 for exact clinical values see [`CLINICAL_LOGIC_APPENDIX.md`](CLINICAL_LOGIC_APPENDIX.md);
-for NHANES variables see [`DATA_DICTIONARY.md`](DATA_DICTIONARY.md); for the SAHC
-cohort and peer matching see [`SAHC_COHORT.md`](SAHC_COHORT.md); for the HTTP
+for NHANES variables see [`DATA_DICTIONARY.md`](DATA_DICTIONARY.md); for the removed
+`sahc` cohort and the retained peer-matching seam see [`SAHC_COHORT.md`](SAHC_COHORT.md); for the HTTP
 surface see [`API_REFERENCE.md`](API_REFERENCE.md).
 
 ---
@@ -25,7 +25,8 @@ and medication flags. The system returns several layers of context:
    NCEP, WHO.
 2. **Population benchmark** — the value positioned (p10–p90) against a
    **selectable reference cohort**: NHANES Non-Hispanic Asian (default proxy) or
-   the South Asian Heart Center clinical cohort (genuine South Asian population).
+   NHANES Non-Hispanic Asian is the only registered cohort (a second was removed
+   on 2026-08-30 — see SAHC_COHORT.md).
 3. **Peer matching (optional)** — the benchmark narrowed to the patient's matched
    subgroup (sex + age band + medication use), with small-cell suppression.
 4. **Advanced lipid markers** — ApoB and Lp(a), classified as guideline risk-
@@ -57,7 +58,7 @@ In priority order; the higher wins on conflict.
 3. **Clinical logic is framework-free.** All rules live in `sahc_risklens/`, which
    imports no web framework. Routers are thin adapters.
 4. **Demo and live are output-identical.** Frozen aggregate tables (cohort
-   percentiles and stratified peer tables) are verified equal to the live
+   percentiles and stratified peer tables) were computed once from the source data, not re-verified against the live
    computation, so toggling data presence never changes what a user sees.
 5. **The frontend never does clinical work.** It renders exactly what the API
    returns — disclaimer, cohort label, and categories verbatim.
@@ -86,7 +87,7 @@ In priority order; the higher wins on conflict.
                    │   clinical/   thresholds, biomarkers,    │
                    │               SA context, disclaimers,   │
                    │               care navigation            │
-                   │   data/       NHANES + SAHC loaders,     │
+                   │   data/       NHANES loader,             │
                    │               filters, frozen tables     │
                    │   benchmark/  percentile + peer matching │
                    │   trajectory/ series, health file,       │
@@ -94,7 +95,7 @@ In priority order; the higher wins on conflict.
                    └─────────┬───────────────────────────────┘
                              │ (live mode only)
                    ┌─────────▼─────────────────────────┐
-                   │  NHANES XPT files / SAHC CSV       │  absent in demo;
+                   │  NHANES XPT files                  │  absent in demo;
                    │  (gitignored, local)              │  frozen tables used
                    └────────────────────────────────────┘
 ```
@@ -111,18 +112,17 @@ user-exported health file. This minimizes the privacy/regulatory surface (§9).
 
 | Module | Responsibility |
 |---|---|
-| `config.py` | Canonical constants; `NHANES_COHORT_LABEL`, `SAHC_COHORT_LABEL`, `COHORT_*` ids, `COHORT_LABELS`, `cohort_label()`; demo/live detection; data paths |
+| `config.py` | Canonical constants; `NHANES_COHORT_LABEL`, `COHORT_*` ids, `COHORT_LABELS`, `cohort_label()`; demo/live detection; data paths |
 | `clinical/biomarkers.py` | Registry mapping input fields → output labels/units; the canonical 9-biomarker set; missing-biomarker detection |
 | `clinical/thresholds.py` | Threshold classification engine (core 9) **and** the advanced risk-enhancing markers (ApoB, Lp(a)); every cut-point mirrored to the appendix |
 | `clinical/south_asian_context.py` | Qualitative SA context items (ancestry, BMI, elevated Lp(a)); never quantifies risk |
 | `clinical/care_navigation.py` | Non-prescriptive next-steps: family/cascade screening, prevention-program pointer |
 | `clinical/disclaimers.py` | Template physician guide + medication notes — **no LLM** |
 | `data/nhanes_loader.py` | Reads XPT, joins on `SEQN`, applies cohort + fasting filters, BP means, renames to internal keys |
-| `data/sahc_cohort_loader.py` | Reads the SAHC CSV; biomarker frame and matching frame (sex/age band/meds) |
 | `data/cohort_filters.py` | `RIDRETH3` cohort filter; `PHAFSTHR >= 8` fasting filter |
 | `data/missingness.py` | Reports missing values; never imputes |
-| `data/demo_cohort.py` / `sahc_demo_cohort.py` | Frozen real percentiles for each cohort (demo mode) |
-| `data/strata_tables.py` (+ `.json`) | Frozen, aggregate-only stratified percentiles for peer matching |
+| `data/demo_cohort.py` | Frozen real percentiles for the NHANES cohort (demo mode) |
+| `data/strata_tables.py` | Reader for frozen, aggregate-only stratified percentiles. No table ships today (removed with the `sahc` cohort); the reader is the seam a future one plugs into |
 | `benchmark/percentile.py` | Resolves data source (live vs frozen) per cohort; whole-cohort + matched benchmark points; percentile rank |
 | `benchmark/matching.py` | Peer-matching helpers + stratified computation (live frame and frozen table); suppression + fallback |
 | `trajectory/series.py` | Dated-draw/series model + validation (no future dates), sorting, immutability |
@@ -166,7 +166,7 @@ and validating/passing the `cohort` and `match` selectors.
 | Path | Role |
 |---|---|
 | `src/app/layout.tsx` | Always-visible disclaimer, nav, attribution |
-| `src/app/benchmark/page.tsx` | Input flow; **cohort selector** + **"Match to people like me"** toggle; posts to API |
+| `src/app/benchmark/page.tsx` | Input flow; states the benchmark cohort; posts to API. The selector and matching toggle were removed on 2026-08-30 with the `sahc` cohort |
 | `src/app/results/page.tsx` | Renders results in order; disclaimer first, limitations last |
 | `src/app/timeline/page.tsx` | Multi-draw entry, analyze, export/import |
 | `src/components/ThresholdCards.tsx` | Per-biomarker classification cards |
@@ -214,11 +214,13 @@ percentiles. Frozen to `demo_cohort.py` for demo mode. (Two real-data
 corrections are documented in the dictionary: auscultatory BP variable names,
 and fasting duration living in `FASTQX_J`.)
 
-**SAHC (opt-in cohort).** De-identified clinic CSV at `data/sahc/` (gitignored):
+**Second cohort — removed 2026-08-30.** Its source CSV, loader, frozen
+percentiles and stratified tables are gone; see [`SAHC_COHORT.md`](SAHC_COHORT.md)
+for the full record. What it was, for reference:
 filter `RIDRETH3 == 1` (South Asian), rename to internal keys, compute
-percentiles; frozen to `sahc_demo_cohort.py`. Stratified peer tables (sex × age ×
-medication, suppressed below 30) frozen to `strata_tables.json` via
-`scripts/build_strata_tables.py`. Documented caveats: glucose has no fasting
+percentiles frozen to a demo module, and stratified peer tables (sex × age ×
+medication, suppressed below 30) frozen to a JSON table. All of it is deleted.
+Documented caveats at the time: glucose had no fasting
 field; BP is a single reading. See [`SAHC_COHORT.md`](SAHC_COHORT.md).
 
 **Advanced markers.** ApoB and Lp(a) are *not* in either cohort, so they are
@@ -246,7 +248,7 @@ The output shape is defined once in `api/models/results.py` and mirrored in
 | Tier | Representative files | Proves |
 |---|---|---|
 | Smoke | `test_smoke.py` | Every module imports; entry points run on minimal input |
-| Unit | `test_thresholds.py`, `test_percentile.py`, `test_sahc_cohort.py`, `test_peer_matching.py`, `test_risk_enhancing_markers.py`, `test_care_navigation.py`, `test_cohort_filters.py`, `test_missingness.py`, `test_series.py`, `test_trajectory_analytics.py`, `test_biomarker_mapping.py` | Each function correct in isolation: thresholds at every boundary; cohort + peer-matching correctness, suppression/fallback, and the no-crossed-labels invariant; advanced-marker classification; care-navigation language safety; trajectory analytics |
+| Unit | `test_thresholds.py`, `test_percentile.py`, `test_cohort_registry.py`, `test_peer_matching.py`, `test_risk_enhancing_markers.py`, `test_care_navigation.py`, `test_cohort_filters.py`, `test_missingness.py`, `test_series.py`, `test_trajectory_analytics.py`, `test_biomarker_mapping.py` | Each function correct in isolation: thresholds at every boundary; cohort + peer-matching correctness, suppression/fallback, and the no-crossed-labels invariant; advanced-marker classification; care-navigation language safety; trajectory analytics |
 | Integration | `test_api_endpoints.py`, `test_integration.py`, `test_trajectory_api.py` | Components agree through the API; cohort/match/markers/navigation round-trip |
 | E2E | `test_e2e.py` | Real server over HTTP: contract, safety invariants, CORS, validation |
 
@@ -264,8 +266,8 @@ descriptive-only). Real-data tests skip cleanly when files are absent.
 **Enforced invariants** (tested):
 - `disclaimer` is required (min length) and rendered first.
 - `cohort_label` is a constrained union; the NHANES cohort is never labeled
-  "South Asian" and the SAHC cohort never inherits the NHANES label
-  (`test_sahc_cohort.py`).
+  "South Asian", no cohort inherits another's label, and no cohort label names an
+  institution without written permission (`test_cohort_registry.py`).
 - The limitations panel renders unconditionally.
 - No LLM in the patient-facing path; physician guide and care navigation are
   fixed templates; their language is scanned for diagnostic/predictive phrasing.
@@ -274,7 +276,7 @@ descriptive-only). Real-data tests skip cleanly when files are absent.
 
 **Production readiness.** This is a complete, tested, demo-ready educational tool.
 Moving beyond a demo is gated on documented clinician review (including the
-ApoB/Lp(a) thresholds and SAHC cohort), a non-device CDS determination, a privacy
+ApoB/Lp(a) thresholds), a non-device CDS determination, a privacy
 policy, security hardening, and accessibility.
 
 ---
@@ -286,7 +288,7 @@ policy, security hardening, and accessibility.
 | Frontend | Next.js 14 (App Router), TypeScript (strict), static export |
 | Backend | FastAPI, Pydantic v2, Uvicorn |
 | Clinical core | Python ≥3.11, pandas, numpy |
-| Data | NHANES XPT + SAHC CSV (live) or frozen aggregate tables (demo) |
+| Data | NHANES XPT (live) or frozen aggregate tables (demo) |
 | Tests | pytest, httpx TestClient, real-server e2e, Playwright (browser tier) |
 
 ---
@@ -308,8 +310,8 @@ cardiomet-app/
 │   ├── config.py
 │   ├── clinical/   biomarkers, thresholds, south_asian_context,
 │   │               care_navigation, disclaimers
-│   ├── data/       nhanes_loader, sahc_cohort_loader, cohort_filters,
-│   │               missingness, demo_cohort, sahc_demo_cohort,
+│   ├── data/       nhanes_loader, cohort_filters,
+│   │               missingness, demo_cohort,
 │   │               strata_tables(.py/.json)
 │   ├── benchmark/  percentile, matching
 │   └── trajectory/ series, health_file, analytics
@@ -325,9 +327,9 @@ cardiomet-app/
 │   │               Timeline, TrajectorySummary, BiomarkerForm, NavBar, …
 │   └── lib/        types, api, categoryStyles, biomarkerMeta, healthFile
 ├── tests/          smoke → unit → integration → e2e (+ tests/browser)
-├── scripts/        setup_env.sh, download_nhanes.py, build_strata_tables.py,
+├── scripts/        setup_env.sh, download_nhanes.py,
 │                   run_validation_gate.sh
-├── data/           raw/ (NHANES XPT, gitignored) · sahc/ (CSV, gitignored)
+├── data/           raw/ (NHANES XPT, gitignored)
 └── docs/           this file + the documents linked at the top
 ```
 
@@ -338,7 +340,8 @@ cardiomet-app/
 - **Threshold change** → edit `CLINICAL_LOGIC_APPENDIX.md` and `thresholds.py`
   together, add boundary tests, run the gate.
 - **New cohort** → add a loader + frozen table + a `COHORT_*` id/label; keep the
-  no-crossed-labels invariant; extend `test_sahc_cohort.py`.
+  no-crossed-labels invariant; extend `test_cohort_registry.py`, and satisfy the
+  four conditions in `SAHC_COHORT.md` §6 before registering any cohort.
 - **New benchmark dimension (e.g. matching axis)** → extend `matching.py`,
   regenerate the frozen strata table, suppress small cells.
 - **API response change** → update `results.py` and `types.ts` in the same change.

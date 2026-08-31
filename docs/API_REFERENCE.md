@@ -18,7 +18,7 @@ Classify and benchmark a single panel of values.
 
 | Param | Type | Default | Notes |
 |---|---|---|---|
-| `cohort` | `nhanes_asian` \| `sahc` | `nhanes_asian` | Reference cohort. Unknown value → `422`. |
+| `cohort` | `nhanes_asian` | `nhanes_asian` | Reference cohort. Unknown value → `422` (this includes the removed `sahc` id). |
 | `match` | boolean | `false` | Benchmark against the patient's matched peer subgroup (sex + age band + medication). Requires `sex` and `age_yr`; offered for the SAHC cohort (NHANES falls back to whole-cohort with `matched=false`). |
 
 ### Request body — `BiomarkerInput`
@@ -59,7 +59,7 @@ validated; out-of-range → `422`.
 | `missing_biomarkers` | `string[]` | input field names left blank (core 9 only) |
 | `medication_notes` | `string[]` | medication caveats |
 | `cohort` | `string` | selected cohort id |
-| `cohort_label` | `"NHANES Non-Hispanic Asian"` \| `"South Asian Heart Center clinical cohort"` | honest label |
+| `cohort_label` | `"NHANES Non-Hispanic Asian"` | honest label; never claims an institutional origin |
 | `matched` | bool | true if peer matching applied to ≥1 biomarker |
 | `match_description` | string? | peer group used, e.g. "Women, 49–64" |
 | `disclaimer` | string | always present, always rendered |
@@ -80,8 +80,9 @@ curl -s -X POST localhost:8000/api/v1/benchmark \
   -H 'Content-Type: application/json' \
   -d '{"LDL_mgdl":142,"HDL_mgdl":40,"south_asian":true}'
 
-# SAHC cohort + peer matching + advanced markers
-curl -s -X POST 'localhost:8000/api/v1/benchmark?cohort=sahc&match=true' \
+# Peer matching + advanced markers. NOTE: no cohort supplies a stratified table
+# today, so match=true falls back to whole-cohort and reports matched:false.
+curl -s -X POST 'localhost:8000/api/v1/benchmark?match=true' \
   -H 'Content-Type: application/json' \
   -d '{"LDL_mgdl":150,"HDL_mgdl":42,"ApoB_mgdl":135,"Lpa_mgdl":60,
        "age_yr":55,"sex":"F","south_asian":true,"chol_med":true,"BMI_kgm2":27}'

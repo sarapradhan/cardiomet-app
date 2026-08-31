@@ -1,12 +1,16 @@
 # Building on SCORE: How CardioMet Lens Extends the South Asian Heart Center's Work
 
+> *This document credits the SCORE tool as the conceptual origin of this
+> project's approach. It does not describe any data-sharing, affiliation, or
+> endorsement relationship, and none exists.*
+
 ## Credit where it's due
 
 CardioMet Lens exists because of **SCORE**, the South Asian Heart Center's original
 cardiometabolic comparison tool. SCORE pioneered the core idea this whole project
 rests on: that a South Asian patient is best understood not against a generic
 population, but against **peers like them** — matched on age, sex, ethnicity, and
-medication use — using the center's own real South Asian patient data. SCORE put
+medication use. SCORE put
 that idea in front of patients first, established the clinical framing, and proved
 there was genuine value in helping people see where their numbers stand before an
 appointment. CardioMet Lens does not replace that insight; it builds directly on it.
@@ -17,8 +21,6 @@ appointment. CardioMet Lens does not replace that insight; it builds directly on
   average.
 - **The peer-matching capability:** benchmarking against people of the same sex,
   age band, and medication use.
-- **The data asset:** the center's de-identified South Asian clinical cohort —
-  the same population behind SCORE now powers CardioMet Lens's South Asian benchmark.
 - **The mission and tone:** educational, prevention-focused, culturally aware, and
   routed back to the clinician.
 
@@ -27,8 +29,10 @@ appointment. CardioMet Lens does not replace that insight; it builds directly on
 The most important conceptual advance is how CardioMet Lens handles *who you are compared
 against*. It offers **two clearly and separately labeled cohorts**, never blended:
 
-1. **South Asian Heart Center clinical cohort** — a genuine South Asian
-   population (the SCORE data), large enough to support real peer matching.
+1. *(Removed 2026-08-30.)* A second, South Asian-typed cohort shipped here. It
+   was withdrawn because its provenance could not be established — see
+   [`SAHC_COHORT.md`](SAHC_COHORT.md). What remains below describes the design
+   intent, not a shipped comparison.
 2. **NHANES Non-Hispanic Asian** — a public, reproducible U.S. survey population,
    honestly labeled as a *proxy* (NHANES has no South Asian–specific sample).
 

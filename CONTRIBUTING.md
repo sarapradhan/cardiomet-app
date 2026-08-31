@@ -28,7 +28,6 @@ If you find yourself adding a threshold or a clinical rule outside `sahc_risklen
 ```bash
 bash scripts/setup_env.sh            # backend env + dependencies
 python scripts/download_nhanes.py    # optional: public NHANES data
-python scripts/build_strata_tables.py# optional: regenerate frozen strata tables
 uvicorn api.main:app --reload        # run the API
 cd frontend && npm install && npm run dev   # run the frontend
 ```

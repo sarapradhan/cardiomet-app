@@ -11,8 +11,9 @@ shows where it sits within a chosen reference population (optionally matched to
 the person's own age, sex, and medication use), tracks values over time, and
 produces plain-language prompts and a clinician-ready summary to bring to an
 appointment. It stores nothing on a server, diagnoses nothing, and recommends no
-treatment. It is the safety-engineered successor to the South Asian Heart
-Center's original **SCORE** comparison tool.
+treatment. It is an independent tool, inspired by the peer-comparison approach
+of the South Asian Heart Center's **SCORE** tool, and is not affiliated with or
+endorsed by that center.
 
 ## The problem
 
@@ -27,8 +28,8 @@ risk calculators.
 
 - **Explains each value** in a named guideline category (ACC/AHA, ADA, NCEP, WHO).
 - **Benchmarks** the value against a reference population — choosing between a
-  public proxy (NHANES Non-Hispanic Asian) and a genuine South Asian clinical
-  cohort (South Asian Heart Center) — and can **match** the comparison group to
+  public proxy (NHANES Non-Hispanic Asian; a second cohort was removed on
+  2026-08-30, see docs/SAHC_COHORT.md) — and is built to **match** the comparison group to
   the person's own sex, age range, and medication use.
 - **Surfaces South Asian context** as guideline-recognized, qualitative risk-
   enhancing factors (ancestry; lower BMI action points; elevated Lp(a)).
@@ -79,7 +80,7 @@ tests, not just stated in copy.
 
 - The NHANES cohort is Non-Hispanic Asian (a proxy), labeled as such — not South
   Asian specific.
-- The SAHC cohort's fasting glucose includes non-fasting draws (no fasting field
+- (Removed 2026-08-30 with the `sahc` cohort.) Its fasting glucose included non-fasting draws (no fasting field
   in the extract), and its blood pressure is a single reading.
 - ApoB/Lp(a) are classified against guideline cut-points but not population-
   benchmarked (the cohorts don't measure them); those thresholds are pending

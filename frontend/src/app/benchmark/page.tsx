@@ -37,8 +37,12 @@ export default function BenchmarkPage() {
   const [error, setError] = useState<string | null>(null);
   const [seed, setSeed] = useState<Partial<BiomarkerInput> | undefined>(undefined);
   const [formKey, setFormKey] = useState(0);
-  const [cohort, setCohort] = useState<CohortId>('nhanes_asian');
-  const [match, setMatch] = useState(false);
+  // Held as state rather than inlined at the call site: the cohort selector and
+  // peer-matching toggle were removed on 2026-08-30 (see the panel below), but
+  // both remain live API parameters, so this is where a restored control would
+  // reattach.
+  const [cohort] = useState<CohortId>('nhanes_asian');
+  const [match] = useState(false);
 
   // Re-seed the form when returning from results via "Adjust".
   useEffect(() => {
@@ -82,31 +86,32 @@ export default function BenchmarkPage() {
         </p>
       </div>
 
-      {/* Cohort + peer-matching controls. Both flow straight through to the API
-          (?cohort=&match=) — see frontend/src/lib/api.ts submitBiomarkers. */}
+      {/* Benchmark cohort.
+
+          Two controls used to live here: a cohort selector and a "Match to
+          peers" toggle. Both were removed on 2026-08-30.
+
+          - The selector offered a second cohort ("sahc") whose provenance could
+            not be established; that cohort was removed (docs/SAHC_COHORT.md).
+            With one registered cohort a selector would be a control with one
+            option, so the cohort is stated instead of chosen.
+          - Peer matching was only ever available on that cohort. Leaving the
+            toggle would render a control that silently does nothing, which is
+            the class of problem this cleanup exists to remove.
+
+          Both still flow through the API (?cohort=&match= in
+          frontend/src/lib/api.ts), and the engine behind them is intact, so
+          restoring these controls when a sourced cohort is registered is a UI
+          change only. */}
       <div className="panel-sunken" style={{
-        display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 20,
+        display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 20,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', minWidth: 0 }}>
-          {/* htmlFor/id, not a nested <label>: nesting pulls the select's option
-              text into the computed accessible name (e.g. "Compare
-              against:NHANES...South Asian..."), which breaks screen readers
-              and exact-name test locators alike. flexWrap + width:100% on the
-              select: at narrow (mobile) widths the caption + a fixed-width
-              select together overflowed the viewport — this lets the select
-              drop to its own line instead. */}
-          <label htmlFor="cohort-select" className="caption" style={{ fontWeight: 600 }}>Compare against:</label>
-          <select id="cohort-select" className="input" style={{ maxWidth: 280, width: '100%' }} value={cohort}
-            onChange={(e) => setCohort(e.target.value as CohortId)}>
-            <option value="nhanes_asian">{COHORT_LABELS.nhanes_asian}</option>
-            <option value="sahc">{COHORT_LABELS.sahc}</option>
-          </select>
-        </div>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
-          title="Narrow the benchmark to a matched peer subgroup (sex + age band + medication use). Small cells are suppressed and disclosed. NHANES falls back to the whole-cohort distribution — peer matching is only available on the SAHC cohort.">
-          <input type="checkbox" checked={match} onChange={(e) => setMatch(e.target.checked)} />
-          <span className="caption">Match to peers (sex, age, medications)</span>
-        </label>
+        <span className="caption" style={{ fontWeight: 600 }}>Compared against:</span>
+        <span className="caption" data-testid="cohort-name">{COHORT_LABELS.nhanes_asian}</span>
+        <span className="caption" style={{ opacity: 0.85 }}>
+          &mdash; a public U.S. survey population, used as a proxy. NHANES has no
+          South Asian&ndash;specific sample.
+        </span>
       </div>
 
       {/* Example data — for demos and first-time visitors */}

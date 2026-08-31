@@ -46,16 +46,16 @@ export interface ThresholdResult {
 }
 
 // Selectable benchmark cohorts. Mirror of sahc_risklens/config.py COHORT_* ids
-// and COHORT_LABELS. Each label is honest to its cohort; the NHANES label is
-// never applied to the SAHC cohort or vice versa.
-export type CohortId = 'nhanes_asian' | 'sahc';
+// and COHORT_LABELS. One cohort is registered today: the 'sahc' cohort was
+// removed on 2026-08-30 because its provenance could not be established (see
+// docs/SAHC_COHORT.md). These stay unions rather than plain strings so a newly
+// registered cohort has to be added here deliberately.
+export type CohortId = 'nhanes_asian';
 export type CohortLabel =
-  | 'NHANES Non-Hispanic Asian'
-  | 'South Asian Heart Center clinical cohort';
+  | 'NHANES Non-Hispanic Asian';
 
 export const COHORT_LABELS: Record<CohortId, CohortLabel> = {
   nhanes_asian: 'NHANES Non-Hispanic Asian',
-  sahc: 'South Asian Heart Center clinical cohort',
 };
 
 export interface BenchmarkPoint {

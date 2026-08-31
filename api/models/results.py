@@ -16,12 +16,13 @@ from sahc_risklens.config import (
     PRODUCT_DISCLAIMER,
 )
 
-# The set of honest cohort labels a benchmark response may carry. Each is tied to
-# a real, separately-documented cohort; the NHANES label is never applied to the
-# SAHC cohort or vice versa (see sahc_risklens/benchmark/percentile.py).
+# The set of honest cohort labels a benchmark response may carry. One entry
+# today: the "sahc" cohort was removed on 2026-08-30 because its provenance
+# could not be established (docs/SAHC_COHORT.md). This stays a Literal union so
+# a newly registered cohort must add its label here deliberately, and so no
+# cohort can ever emit another cohort's label.
 CohortLabel = Literal[
     "NHANES Non-Hispanic Asian",
-    "South Asian Heart Center clinical cohort",
 ]
 
 

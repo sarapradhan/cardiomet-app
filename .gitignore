@@ -9,8 +9,9 @@ build/
 data/raw/*.XPT
 data/raw/*.xpt
 data/processed/
-# SAHC clinic cohort: de-identified patient rows are NOT committed (see docs/SAHC_COHORT.md).
-# Only frozen aggregate percentiles in sahc_risklens/data/sahc_demo_cohort.py are tracked.
+# The 'sahc' cohort was removed on 2026-08-30 (docs/SAHC_COHORT.md). This ignore
+# is kept deliberately: it costs nothing and it means a stray copy of the old
+# source CSV, or any successor placed at this path, still cannot be committed.
 data/sahc/*.csv
 node_modules/
 frontend/.next/
