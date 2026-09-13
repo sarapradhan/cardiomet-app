@@ -13,12 +13,47 @@ pytestmark = pytest.mark.browser
 def test_home_loads(page, base_url):
     page.goto(f"{base_url}/", wait_until="networkidle")
     assert "CardioMet Lens" in page.content()
-    expect(page.get_by_text("Understand your lab numbers")).to_be_visible()
+    expect(page.get_by_role("heading", name="Context before conclusions.")).to_be_visible()
 
 
 def test_disclaimer_always_present(page, base_url):
     page.goto(f"{base_url}/", wait_until="networkidle")
     assert page.get_by_text("not a diagnosis").first.is_visible()
+
+
+def test_home_sections_present(page, base_url):
+    """The ported home page's argument, section by section."""
+    page.goto(f"{base_url}/", wait_until="networkidle")
+    for heading in [
+        "A lab report gives you numbers. It rarely gives you a place to begin.",
+        "From lab panel to better prepared.",
+        "The difference is in the detail it refuses to hide.",
+        "One tool. Two perspectives that belong in the same conversation.",
+        "A complete picture. Deliberate limits.",
+    ]:
+        expect(page.get_by_role("heading", name=heading)).to_be_visible()
+
+
+def test_home_states_its_limits(page, base_url):
+    """The out-of-scope list is a load-bearing claim, not decoration."""
+    page.goto(f"{base_url}/", wait_until="networkidle")
+    body = page.inner_text("body").lower()
+    for phrase in ["diagnosis", "individual risk", "treatment recommendation"]:
+        assert phrase in body, f"home page no longer states it avoids {phrase!r}"
+
+
+def test_home_names_only_registered_cohorts(page, base_url):
+    """The 'sahc' cohort was removed as unsourced; the home page must not sell it.
+
+    Guards the port: the standalone marketing page this came from named a
+    'South Asian Heart Center clinical cohort' as a second selectable cohort,
+    which no longer exists. South Asian *guideline context* is a separate thing
+    and is still legitimately described.
+    """
+    page.goto(f"{base_url}/", wait_until="networkidle")
+    body = page.inner_text("body")
+    assert "South Asian Heart Center" not in body
+    assert "NHANES Non-Hispanic Asian" in body
 
 
 def test_legend_renders(page, base_url):
