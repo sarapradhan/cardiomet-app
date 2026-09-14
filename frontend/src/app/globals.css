@@ -15,13 +15,16 @@
      fidelity/traceability rather than renamed. Clinical semantic colors
      (in-range/elevated/high/missing, biomarker-group colors) are
      intentionally untouched — they encode risk classification, not brand. */
-  --bg:               #F7F5F0;
-  --surface:          #FFFDFA;
-  --surface-sunken:   #EEE9E2;
+  /* Ground is pure white. The cream that used to separate --bg from --surface
+     is gone, so section rhythm now comes from cool tints (--surface-sunken,
+     the audience band) and the navy block rather than from paper warmth. */
+  --bg:               #FFFFFF;
+  --surface:          #FFFFFF;
+  --surface-sunken:   #F4F6F8;
   --ink:              #151B2A;
   --ink-soft:         #575D6B;
   --ink-faint:        #7A7D89;
-  --hairline:         #D8D2CA;
+  --hairline:         #E3E6EA;
 
   --pine:             #151B2A;
   --pine-deep:        #0E1320;
@@ -227,9 +230,9 @@ body {
   .home .art-halo { position: absolute; border-radius: 50%; pointer-events: none; }
   .home .halo-one { width: 430px; height: 430px; background: #DCEAF0; }
   .home .halo-two { width: 315px; height: 315px; border: 1px solid #CBA8B5; transform: translate(60px, -34px); }
-  .home .lens-card { position: relative; z-index: 1; width: min(100%, 460px); padding: 26px; border: 1px solid rgba(199,191,184,.9); background: rgba(255,253,250,.96); border-radius: 10px; box-shadow: var(--home-shadow); transform: rotate(2.1deg); }
+  .home .lens-card { position: relative; z-index: 1; width: min(100%, 460px); padding: 26px; border: 1px solid #E3E6EA; background: #FFFFFF; border-radius: 10px; box-shadow: var(--home-shadow); transform: rotate(2.1deg); }
   .home .lens-card-top, .home .lens-card-title-row, .home .guide-row, .home .range-labels { display: flex; justify-content: space-between; gap: 18px; }
-  .home .lens-card-top { align-items: center; padding-bottom: 22px; border-bottom: 1px solid #E3DFD9; }
+  .home .lens-card-top { align-items: center; padding-bottom: 22px; border-bottom: 1px solid #EDEFF2; }
   .home .lens-caption, .home .mini-label, .home .card-kicker, .home .step-number { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .065em; text-transform: uppercase; }
   .home .lens-caption { color: var(--teal); }
   .home .secure-note { color: #6B6E7C; font-size: 10px; }
@@ -245,7 +248,7 @@ body {
   .home .range-fill { position: absolute; inset: 0 auto 0 0; width: 74%; border-right: 1px solid rgba(0,0,0,.17); }
   .home .value-pin { position: absolute; top: -5px; left: 74%; width: 17px; height: 17px; border: 3px solid #fff; border-radius: 50%; background: var(--coral); box-shadow: 0 1px 5px rgba(0,0,0,.18); transform: translateX(-50%); }
   .home .range-block p { margin: 11px 0 0; color: #5C6270; font-size: 10px; line-height: 1.45; }
-  .home .context-row { display: flex; gap: 10px; align-items: center; margin-top: 16px; padding: 14px 0; border-bottom: 1px solid #E3DFD9; }
+  .home .context-row { display: flex; gap: 10px; align-items: center; margin-top: 16px; padding: 14px 0; border-bottom: 1px solid #EDEFF2; }
   .home .context-orb { display: grid; flex: 0 0 auto; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: #E6F0F4; color: var(--teal); font-family: 'DM Mono', monospace; font-size: 8px; }
   .home .context-row b { display: block; font-size: 11px; letter-spacing: -.02em; }
   .home .context-row small { display: block; color: #6B6E7C; font-size: 9px; }
@@ -318,7 +321,7 @@ body {
   .home .source-pills span { padding: 4px 7px; border: 1px solid #B9D4E1; border-radius: 20px; color: #3A4E5E; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: .04em; }
 
   /* ---------- Audiences ---------- */
-  .home .audience-shell { background: var(--surface); border-top: 1px solid var(--hairline); }
+  .home .audience-shell { background: #F7F9FB; border-top: 1px solid var(--hairline); }
   .home .audiences { padding: 132px 0; }
   .home .audience-intro { display: grid; grid-template-columns: .78fr 1.22fr; gap: 40px; align-items: start; }
   .home .audience-intro h2 { max-width: 700px; margin: 0; font-size: clamp(39px, 5vw, 66px); line-height: 1.02; }
