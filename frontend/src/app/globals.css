@@ -5,19 +5,26 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap');
 
 :root {
-  /* Aligned with the actual deployed marketing site (CardioMetLens Website/
-     website/styles.css, live via Vercel) — cream/navy/maroon editorial
-     palette with a serif display face, not the earlier teal/clay system-font
-     attempt. Token names below mirror the marketing site's own variable
-     names where they map directly (--pine, --teal, --teal-light, --coral)
-     so the two stylesheets stay easy to cross-reference. Note: "--teal" on
-     the marketing site is actually a deep maroon, not teal — kept as-is for
-     fidelity/traceability rather than renamed. Clinical semantic colors
-     (in-range/elevated/high/missing, biomarker-group colors) are
-     intentionally untouched — they encode risk classification, not brand. */
-  /* Ground is pure white. The cream that used to separate --bg from --surface
-     is gone, so section rhythm now comes from cool tints (--surface-sunken,
-     the audience band) and the navy block rather than from paper warmth. */
+  /* One palette for the whole app: white ground, near-black navy, indigo accent.
+     It replaced the cream/maroon editorial scheme this file was originally
+     aligned to (CardioMetLens Website/website/styles.css, which deployed
+     separately before the marketing page moved in-repo). That scheme read as a
+     journal rather than a product; the culprits were the heritage maroon, the
+     warm paper ground and 4px corners, so all three changed together.
+
+     Token names --pine / --teal / --teal-light / --coral are inherited from
+     that original stylesheet and deliberately NOT renamed, so history and any
+     remaining cross-references stay legible. None of them has ever been the
+     colour its name suggests: --teal is the accent (was maroon, now indigo),
+     --pine is the near-black.
+
+     Section rhythm no longer comes from paper warmth, since --bg and --surface
+     are both white. It comes from cool tints (--surface-sunken, the audience
+     and guardrails bands), the near-black block, and the hero's accent wash.
+
+     Clinical semantic colours (in-range / elevated / high / missing and the
+     biomarker-group colours) are intentionally untouched by every reskin —
+     they encode risk classification, not brand, and must not follow the accent. */
   --bg:               #FFFFFF;
   --surface:          #FFFFFF;
   --surface-sunken:   #F4F6F8;
@@ -26,20 +33,28 @@
   --ink-faint:        #7A7D89;
   --hairline:         #E3E6EA;
 
-  --pine:             #151B2A;
-  --pine-deep:        #0E1320;
-  --teal:             #6D2741;
-  --teal-light:       #B9D9EB;
-  --coral:            #B6503F;
+  /* Brand accent is indigo. It replaced a heritage maroon (#6D2741), which
+     together with 4px corners and hairline rules was what made the page read
+     as a journal rather than a product. The token names --teal/--teal-light
+     are inherited from the original marketing stylesheet and kept so the two
+     stay cross-referenceable; neither has ever actually been teal. */
+  --pine:             #101425;
+  --pine-deep:        #080B16;
+  --teal:             #2E3BD4;   /* indigo — brand accent */
+  --teal-light:       #C7CCFF;   /* accent on dark: eyebrows/labels on --pine */
+  /* Two corals on purpose. The vivid one fails AA at text size on white
+     (2.82:1), so it is restricted to graphics; anything set in type uses the
+     darker one. Both read as the same accent. */
+  --coral:            #BE3E1D;   /* text-sized: numerals, arrows, link hover, focus ring */
+  --coral-graphic:    #E8552F;   /* graphics only: the illustrative value pin */
 
-  /* Primary = the marketing site's dominant interactive/brand color (used
-     for eyebrows, text links, nav hover, chip accents). Solid buttons are a
-     deliberate exception — the marketing site's .button-primary uses pine
-     as its base with teal only on hover, so .btn-primary below references
+  /* Primary = the dominant interactive/brand color (eyebrows, text links, nav
+     hover, chip accents). Solid buttons are a deliberate exception — they use
+     pine as the base with the accent on hover, so .btn-primary below references
      --pine/--teal directly rather than --primary. */
-  --primary:          #6D2741;
-  --primary-hover:    #B6503F;
-  --primary-tint:     #F1E6E9;
+  --primary:          #2E3BD4;
+  --primary-hover:    #1F2AA8;
+  --primary-tint:     #EEF0FF;
   --on-primary:       #FFFFFF;
 
   --in-range:         #2F8F66;
@@ -59,10 +74,10 @@
   --shadow-1: 0 1px 2px rgba(21,27,42,0.06), 0 10px 24px -16px rgba(21,27,42,0.25);
   --shadow-2: 0 17px 30px -18px rgba(14,19,32,0.55);
 
-  /* Sharper, more editorial radius than the earlier "daylight" attempt —
-     matches the marketing site's .lens-card (10px) and .benefit-card (5px). */
-  --radius:    10px;
-  --radius-sm: 6px;
+  /* Softer than the 10px/6px editorial radius this replaced. Corner radius was
+     carrying as much of the "staid" read as the palette was. */
+  --radius:    14px;
+  --radius-sm: 10px;
 
   /* User-adjustable page width, controlled by <DisplaySettings> */
   --content-w: 880px;
@@ -102,7 +117,7 @@ body {
      class exactly (a deliberate departure from the earlier rounded-pill
      attempt). Status chips below stay pill-shaped, matching the marketing
      site's .status-chip, which is the one pill-radius element it uses. */
-  .btn { @apply inline-flex items-center justify-center gap-2 select-none; height: 42px; padding: 0 20px; border-radius: 4px; font-size: 13px; font-weight: 800; letter-spacing: -0.005em; text-decoration: none; text-align: center; transition: background-color .16s ease, box-shadow .16s ease, opacity .16s ease, transform .16s ease; cursor: pointer; }
+  .btn { @apply inline-flex items-center justify-center gap-2 select-none; height: 44px; padding: 0 22px; border-radius: 999px; font-size: 13px; font-weight: 800; letter-spacing: -0.005em; text-decoration: none; text-align: center; transition: background-color .16s ease, box-shadow .16s ease, opacity .16s ease, transform .16s ease; cursor: pointer; }
   .btn-primary { background: var(--pine); color: var(--on-primary); border: none; box-shadow: var(--shadow-2); }
   .btn-primary:hover { background: var(--teal); box-shadow: 0 17px 26px -17px rgba(14,19,32,0.85); transform: translateY(-1px); }
   .btn-primary:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; transform: none; }
@@ -111,7 +126,7 @@ body {
   .btn-text { background: transparent; color: var(--primary); border: none; padding: 0 12px; }
   .btn-text:hover { color: var(--coral); }
 
-  .nav-link { @apply inline-flex items-center; height: 36px; padding: 0 14px; border-radius: 4px; font-size: 13.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; transition: background-color .16s ease, color .16s ease; }
+  .nav-link { @apply inline-flex items-center; height: 36px; padding: 0 14px; border-radius: 999px; font-size: 13.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; transition: background-color .16s ease, color .16s ease; }
   .nav-link:hover { background: var(--primary-tint); color: var(--primary); }
   .nav-link[data-active="true"] { background: var(--primary-tint); color: var(--primary); }
 
@@ -188,7 +203,10 @@ body {
    re-declaring --paper/--white/--line.
    ========================================================================== */
 @layer components {
-  .home { --home-shadow: 0 28px 70px -38px rgba(21, 27, 42, .45); }
+  /* overflow-x: clip (not hidden) so the hero glow can bleed past the container
+     without widening the page — hidden would make this a scroll container and
+     break position: sticky for anything inside it. */
+  .home { --home-shadow: 0 28px 70px -38px rgba(16, 20, 37, .45); overflow-x: clip; }
   .home h1, .home h2, .home h3, .home h4, .home p { margin-top: 0; }
   .home h1, .home h2 { font-family: 'Newsreader', Georgia, serif; font-weight: 600; letter-spacing: -.05em; }
 
@@ -205,7 +223,7 @@ body {
 
   .home .button {
     display: inline-flex; align-items: center; justify-content: center; gap: 14px;
-    min-height: 51px; padding: 14px 21px; border-radius: 4px; font-size: 13px;
+    min-height: 51px; padding: 14px 26px; border-radius: 999px; font-size: 13px;
     font-weight: 800; text-decoration: none;
     transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
   }
@@ -214,13 +232,25 @@ body {
   .home .text-link { display: inline-flex; align-items: center; gap: 8px; color: var(--teal); font-size: 13px; font-weight: 800; text-decoration: none; }
   /* The shared TourButton ships as a pill .btn; square it off so it sits with
      the editorial buttons on this page instead of next to them. */
-  .home .hero-actions .btn { height: 38px; padding: 0 16px; border-radius: 4px; font-size: 13px; font-weight: 800; color: var(--teal); border-color: var(--hairline); background: transparent; }
+  .home .hero-actions .btn { height: 40px; padding: 0 18px; border-radius: 999px; font-size: 13px; font-weight: 800; color: var(--teal); border-color: var(--hairline); background: transparent; }
   .home .hero-actions .btn:hover { background: var(--primary-tint); border-color: var(--teal); color: var(--teal); }
   .home .text-link:hover { color: var(--coral); }
   .home .text-link span { font-size: 17px; line-height: 0; }
 
   /* ---------- Hero ---------- */
-  .home .hero { display: grid; grid-template-columns: minmax(0, .9fr) minmax(420px, 1.1fr); align-items: center; gap: clamp(45px, 7vw, 100px); min-height: 640px; padding: 62px 0 78px; }
+  /* Soft accent wash behind the hero. Pure white with no atmosphere reads as
+     an unstyled document; this is the one place the brand colour is allowed to
+     bloom rather than sit in a rule or a label. */
+  .home .hero::before {
+    content: ''; position: absolute; z-index: 0; pointer-events: none;
+    inset: -10% -6% -18% -6%;
+    background:
+      radial-gradient(52% 54% at 68% 38%, rgba(46,59,212,.16), transparent 70%),
+      radial-gradient(38% 40% at 22% 72%, rgba(255,107,74,.08), transparent 72%);
+    filter: blur(8px);
+  }
+  .home .hero > * { position: relative; z-index: 1; }
+  .home .hero { position: relative; display: grid; grid-template-columns: minmax(0, .9fr) minmax(420px, 1.1fr); align-items: center; gap: clamp(45px, 7vw, 100px); min-height: 640px; padding: 62px 0 78px; }
   .home .hero h1 { max-width: 600px; margin-bottom: 25px; font-size: clamp(52px, 6.2vw, 86px); line-height: .93; }
   .home .hero-intro { max-width: 580px; margin-bottom: 29px; color: var(--ink-soft); font-size: 17px; line-height: 1.7; }
   .home .hero-actions { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
@@ -228,9 +258,9 @@ body {
 
   .home .hero-art { position: relative; min-height: 490px; display: flex; align-items: center; justify-content: center; }
   .home .art-halo { position: absolute; border-radius: 50%; pointer-events: none; }
-  .home .halo-one { width: 430px; height: 430px; background: #DCEAF0; }
-  .home .halo-two { width: 315px; height: 315px; border: 1px solid #CBA8B5; transform: translate(60px, -34px); }
-  .home .lens-card { position: relative; z-index: 1; width: min(100%, 460px); padding: 26px; border: 1px solid #E3E6EA; background: #FFFFFF; border-radius: 10px; box-shadow: var(--home-shadow); transform: rotate(2.1deg); }
+  .home .halo-one { width: 430px; height: 430px; background: #E7E9FF; }
+  .home .halo-two { width: 315px; height: 315px; border: 1px solid #C3C9F5; transform: translate(60px, -34px); }
+  .home .lens-card { position: relative; z-index: 1; width: min(100%, 460px); padding: 26px; border: 1px solid #E3E6EA; background: #FFFFFF; border-radius: var(--radius); box-shadow: var(--home-shadow); transform: rotate(2.1deg); }
   .home .lens-card-top, .home .lens-card-title-row, .home .guide-row, .home .range-labels { display: flex; justify-content: space-between; gap: 18px; }
   .home .lens-card-top { align-items: center; padding-bottom: 22px; border-bottom: 1px solid #EDEFF2; }
   .home .lens-caption, .home .mini-label, .home .card-kicker, .home .step-number { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .065em; text-transform: uppercase; }
@@ -242,14 +272,14 @@ body {
   .home .mini-label { color: #6B6E7C; }
   .home .status-chip { display: inline-flex; padding: 4px 9px; border-radius: 99px; background: #F7E3DC; color: #8E3227; font-size: 11px; font-weight: 800; }
   .home .source-line { margin: 5px 0 21px; color: #6B6E7C; font-size: 10px; }
-  .home .range-block { padding: 15px; border-radius: 6px; background: #F0F2F4; }
+  .home .range-block { padding: 15px; border-radius: var(--radius-sm); background: #F5F6FA; }
   .home .range-labels { margin-bottom: 10px; color: #5C6270; font-size: 9px; }
   .home .range-track { position: relative; height: 8px; border-radius: 20px; background: linear-gradient(90deg, #9BC8DD 0 33%, #D7D1C7 33% 68%, #E67858 68%); }
   .home .range-fill { position: absolute; inset: 0 auto 0 0; width: 74%; border-right: 1px solid rgba(0,0,0,.17); }
-  .home .value-pin { position: absolute; top: -5px; left: 74%; width: 17px; height: 17px; border: 3px solid #fff; border-radius: 50%; background: var(--coral); box-shadow: 0 1px 5px rgba(0,0,0,.18); transform: translateX(-50%); }
+  .home .value-pin { position: absolute; top: -5px; left: 74%; width: 17px; height: 17px; border: 3px solid #fff; border-radius: 50%; background: var(--coral-graphic); box-shadow: 0 1px 5px rgba(0,0,0,.18); transform: translateX(-50%); }
   .home .range-block p { margin: 11px 0 0; color: #5C6270; font-size: 10px; line-height: 1.45; }
   .home .context-row { display: flex; gap: 10px; align-items: center; margin-top: 16px; padding: 14px 0; border-bottom: 1px solid #EDEFF2; }
-  .home .context-orb { display: grid; flex: 0 0 auto; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: #E6F0F4; color: var(--teal); font-family: 'DM Mono', monospace; font-size: 8px; }
+  .home .context-orb { display: grid; flex: 0 0 auto; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: var(--primary-tint); color: var(--teal); font-family: 'DM Mono', monospace; font-size: 8px; }
   .home .context-row b { display: block; font-size: 11px; letter-spacing: -.02em; }
   .home .context-row small { display: block; color: #6B6E7C; font-size: 9px; }
   .home .guide-row { align-items: center; padding-top: 14px; color: #6B6E7C; font-size: 10px; }
@@ -312,23 +342,23 @@ body {
   .home .benefits-lead h2 { margin-bottom: 24px; }
   .home .benefits-lead > p { max-width: 330px; color: var(--ink-soft); font-size: 15px; line-height: 1.7; }
   .home .benefit-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .home .benefit-card { min-height: 259px; padding: 27px; border: 1px solid var(--hairline); border-radius: 5px; background: var(--surface); }
-  .home .benefit-featured { background: #E7F0F4; border-color: #D0E0E8; }
+  .home .benefit-card { min-height: 259px; padding: 27px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface); }
+  .home .benefit-featured { background: var(--primary-tint); border-color: #DCE0FB; }
   .home .card-kicker { margin-bottom: 43px; color: var(--teal); }
   .home .benefit-card h3 { max-width: 260px; margin-bottom: 11px; font-size: 18px; line-height: 1.22; letter-spacing: -.045em; }
   .home .benefit-card > p:not(.card-kicker) { margin-bottom: 0; color: var(--ink-soft); font-size: 12.5px; line-height: 1.65; }
   .home .source-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
-  .home .source-pills span { padding: 4px 7px; border: 1px solid #B9D4E1; border-radius: 20px; color: #3A4E5E; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: .04em; }
+  .home .source-pills span { padding: 4px 7px; border: 1px solid #C3C9F5; border-radius: 999px; color: #2B3160; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: .04em; }
 
   /* ---------- Audiences ---------- */
-  .home .audience-shell { background: #F7F9FB; border-top: 1px solid var(--hairline); }
+  .home .audience-shell { background: #F8F8FC; border-top: 1px solid var(--hairline); }
   .home .audiences { padding: 132px 0; }
   .home .audience-intro { display: grid; grid-template-columns: .78fr 1.22fr; gap: 40px; align-items: start; }
   .home .audience-intro h2 { max-width: 700px; margin: 0; font-size: clamp(39px, 5vw, 66px); line-height: 1.02; }
   .home .audience-intro > p:not(.eyebrow) { grid-column: 2; max-width: 520px; margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.7; }
   .home .audience-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 60px; }
-  .home .audience-panel { min-height: 380px; padding: 35px; border-radius: 5px; }
-  .home .audience-person { background: #E7F0F4; color: var(--pine); }
+  .home .audience-panel { min-height: 380px; padding: 35px; border-radius: var(--radius); }
+  .home .audience-person { background: var(--primary-tint); color: var(--pine); }
   .home .audience-clinician { background: var(--pine); color: #fff; }
   .home .audience-label { margin-bottom: 60px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
   .home .audience-person .audience-label { color: var(--teal); }
@@ -341,12 +371,12 @@ body {
   .home .audience-note { max-width: 640px; margin: 24px 0 0; color: #63677A; font-size: 11px; line-height: 1.6; }
 
   /* ---------- Guardrails ---------- */
-  .home .guardrails-shell { background: #E8EDF1; }
+  .home .guardrails-shell { background: #EFF0F7; }
   .home .guardrails { display: grid; grid-template-columns: .88fr 1.12fr; gap: clamp(50px, 9vw, 140px); padding: 130px 0; }
   .home .guardrails-copy > p:not(.eyebrow) { max-width: 450px; margin: 25px 0 0; color: var(--ink-soft); font-size: 16px; line-height: 1.7; }
   .home .guardrail-list { margin: 0; }
-  .home .guardrail-list div { display: grid; grid-template-columns: 145px 1fr; gap: 20px; padding: 20px 0; border-top: 1px solid #C8D1D9; }
-  .home .guardrail-list div:last-child { border-bottom: 1px solid #C8D1D9; }
+  .home .guardrail-list div { display: grid; grid-template-columns: 145px 1fr; gap: 20px; padding: 20px 0; border-top: 1px solid #D6D9E8; }
+  .home .guardrail-list div:last-child { border-bottom: 1px solid #D6D9E8; }
   .home .guardrail-list dt { color: var(--teal); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
   .home .guardrail-list dd { margin: 0; color: #39424F; font-size: 13px; line-height: 1.65; }
 
