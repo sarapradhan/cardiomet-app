@@ -5,38 +5,60 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap');
 
 :root {
-  /* Aligned with the actual deployed marketing site (CardioMetLens Website/
-     website/styles.css, live via Vercel) — cream/navy/maroon editorial
-     palette with a serif display face, not the earlier teal/clay system-font
-     attempt. Token names below mirror the marketing site's own variable
-     names where they map directly (--pine, --teal, --teal-light, --coral)
-     so the two stylesheets stay easy to cross-reference. Note: "--teal" on
-     the marketing site is actually a deep maroon, not teal — kept as-is for
-     fidelity/traceability rather than renamed. Clinical semantic colors
-     (in-range/elevated/high/missing, biomarker-group colors) are
-     intentionally untouched — they encode risk classification, not brand. */
-  --bg:               #F7F5F0;
-  --surface:          #FFFDFA;
-  --surface-sunken:   #EEE9E2;
+  /* One palette for the whole app: white ground, near-black navy, indigo accent.
+     It replaced the cream/maroon editorial scheme this file was originally
+     aligned to (CardioMetLens Website/website/styles.css, which deployed
+     separately before the marketing page moved in-repo). That scheme read as a
+     journal rather than a product; the culprits were the heritage maroon, the
+     warm paper ground and 4px corners, so all three changed together.
+
+     Token names --pine / --teal / --teal-light / --coral are inherited from
+     that original stylesheet and deliberately NOT renamed, so history and any
+     remaining cross-references stay legible. None of them has ever been the
+     colour its name suggests: --teal is the accent (was maroon, now indigo),
+     --pine is the near-black.
+
+     Section rhythm no longer comes from paper warmth, since --bg and --surface
+     are both white. It comes from cool tints (--surface-sunken, the audience
+     and guardrails bands), the near-black block, and the hero's accent wash.
+
+     Clinical semantic colours (in-range / elevated / high / missing and the
+     biomarker-group colours) are intentionally untouched by every reskin —
+     they encode risk classification, not brand, and must not follow the accent. */
+  --bg:               #FFFFFF;
+  --surface:          #FFFFFF;
+  --surface-sunken:   #F4F6F8;
   --ink:              #151B2A;
   --ink-soft:         #575D6B;
-  --ink-faint:        #7A7D89;
-  --hairline:         #D8D2CA;
+  --ink-faint:        #686B79;   /* AA at caption size: 5.29:1 on white,
+                                    4.89:1 on --surface-sunken, 4.67:1 on
+                                    --primary-tint. The previous #7A7D89 was
+                                    4.10 / 3.78 / 3.62 — under the 4.5:1 floor
+                                    for the 12px .caption text it carries. */
+  --hairline:         #E3E6EA;
 
-  --pine:             #151B2A;
-  --pine-deep:        #0E1320;
-  --teal:             #6D2741;
-  --teal-light:       #B9D9EB;
-  --coral:            #B6503F;
+  /* Brand accent is indigo. It replaced a heritage maroon (#6D2741), which
+     together with 4px corners and hairline rules was what made the page read
+     as a journal rather than a product. The token names --teal/--teal-light
+     are inherited from the original marketing stylesheet and kept so the two
+     stay cross-referenceable; neither has ever actually been teal. */
+  --pine:             #101425;
+  --pine-deep:        #080B16;
+  --teal:             #2E3BD4;   /* indigo — brand accent */
+  --teal-light:       #C7CCFF;   /* accent on dark: eyebrows/labels on --pine */
+  /* Two corals on purpose. The vivid one fails AA at text size on white
+     (2.82:1), so it is restricted to graphics; anything set in type uses the
+     darker one. Both read as the same accent. */
+  --coral:            #BE3E1D;   /* text-sized: numerals, arrows, link hover, focus ring */
+  --coral-graphic:    #E8552F;   /* graphics only: the illustrative value pin */
 
-  /* Primary = the marketing site's dominant interactive/brand color (used
-     for eyebrows, text links, nav hover, chip accents). Solid buttons are a
-     deliberate exception — the marketing site's .button-primary uses pine
-     as its base with teal only on hover, so .btn-primary below references
+  /* Primary = the dominant interactive/brand color (eyebrows, text links, nav
+     hover, chip accents). Solid buttons are a deliberate exception — they use
+     pine as the base with the accent on hover, so .btn-primary below references
      --pine/--teal directly rather than --primary. */
-  --primary:          #6D2741;
-  --primary-hover:    #B6503F;
-  --primary-tint:     #F1E6E9;
+  --primary:          #2E3BD4;
+  --primary-hover:    #1F2AA8;
+  --primary-tint:     #EEF0FF;
   --on-primary:       #FFFFFF;
 
   --in-range:         #2F8F66;
@@ -56,10 +78,10 @@
   --shadow-1: 0 1px 2px rgba(21,27,42,0.06), 0 10px 24px -16px rgba(21,27,42,0.25);
   --shadow-2: 0 17px 30px -18px rgba(14,19,32,0.55);
 
-  /* Sharper, more editorial radius than the earlier "daylight" attempt —
-     matches the marketing site's .lens-card (10px) and .benefit-card (5px). */
-  --radius:    10px;
-  --radius-sm: 6px;
+  /* Softer than the 10px/6px editorial radius this replaced. Corner radius was
+     carrying as much of the "staid" read as the palette was. */
+  --radius:    14px;
+  --radius-sm: 10px;
 
   /* User-adjustable page width, controlled by <DisplaySettings> */
   --content-w: 880px;
@@ -99,7 +121,7 @@ body {
      class exactly (a deliberate departure from the earlier rounded-pill
      attempt). Status chips below stay pill-shaped, matching the marketing
      site's .status-chip, which is the one pill-radius element it uses. */
-  .btn { @apply inline-flex items-center justify-center gap-2 select-none; height: 42px; padding: 0 20px; border-radius: 4px; font-size: 13px; font-weight: 800; letter-spacing: -0.005em; text-decoration: none; text-align: center; transition: background-color .16s ease, box-shadow .16s ease, opacity .16s ease, transform .16s ease; cursor: pointer; }
+  .btn { @apply inline-flex items-center justify-center gap-2 select-none; height: 44px; padding: 0 22px; border-radius: 999px; font-size: 13px; font-weight: 800; letter-spacing: -0.005em; text-decoration: none; text-align: center; transition: background-color .16s ease, box-shadow .16s ease, opacity .16s ease, transform .16s ease; cursor: pointer; }
   .btn-primary { background: var(--pine); color: var(--on-primary); border: none; box-shadow: var(--shadow-2); }
   .btn-primary:hover { background: var(--teal); box-shadow: 0 17px 26px -17px rgba(14,19,32,0.85); transform: translateY(-1px); }
   .btn-primary:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; transform: none; }
@@ -108,17 +130,37 @@ body {
   .btn-text { background: transparent; color: var(--primary); border: none; padding: 0 12px; }
   .btn-text:hover { color: var(--coral); }
 
-  .nav-link { @apply inline-flex items-center; height: 36px; padding: 0 14px; border-radius: 4px; font-size: 13.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; transition: background-color .16s ease, color .16s ease; }
+  .nav-link { @apply inline-flex items-center; height: 36px; padding: 0 14px; border-radius: 999px; font-size: 13.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; transition: background-color .16s ease, color .16s ease; }
   .nav-link:hover { background: var(--primary-tint); color: var(--primary); }
   .nav-link[data-active="true"] { background: var(--primary-tint); color: var(--primary); }
 
-  /* Mobile: at the reskin's desktop padding the wordmark + three nav links
-     measure ~391px, overflowing a 375px viewport. Because the header is
-     site-wide chrome this overflowed EVERY page, which is what broke all four
-     responsive checks. Tighten only below 420px; desktop is unchanged.
-     Covered by tests/browser/test_browser_responsive.py. */
+  /* App bar sizing lives here, not in layout.tsx's inline styles, so the
+     breakpoints below can actually override it (inline styles always win).
+     The bar is site-wide chrome, so anything that overflows here overflows
+     EVERY page. Desktop values are unchanged from the reskin. */
+  .app-bar     { padding: 12px 20px; }
+  .app-brand   { gap: 10px; }
+  .app-wordmark{ font-size: 17px; }
+
+  /* Below 420px the wordmark plus three nav links no longer fit: at 390px they
+     measured ~354px against ~350px of usable width, so "Check labs" wrapped and
+     the bar grew to two rows. Tighten the whole bar, not just the links. */
   @media (max-width: 420px) {
-    .nav-link { padding: 0 8px; font-size: 13px; }
+    .app-bar     { padding: 12px 14px; }
+    .app-brand   { gap: 8px; }
+    .app-wordmark{ font-size: 15.5px; }
+    .nav-link    { padding: 0 7px; font-size: 12.5px; white-space: nowrap; }
+  }
+
+  /* Below 360px it still overflowed — 351px of content in a 320px viewport,
+     31px over, on /, /benchmark and /timeline alike. 320px is the narrowest
+     phone width still in circulation, and the responsive suite only covered
+     375/390, so this went unnoticed. Covered now by
+     tests/browser/test_browser_responsive.py::*_narrow. */
+  @media (max-width: 360px) {
+    .app-bar     { padding: 10px 10px; }
+    .app-wordmark{ font-size: 14px; }
+    .nav-link    { padding: 0 4px; font-size: 11.5px; }
   }
 
   .input { @apply w-full; height: 44px; padding: 0 14px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-sm); font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; transition: border-color .16s ease, box-shadow .16s ease; }
@@ -167,5 +209,274 @@ body {
   .sr-only {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
     overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+}
+
+/* ==========================================================================
+   Home route (/) — ported from the standalone marketing page that used to
+   live in `CardioMetLens Website/website/` and deploy separately. Bringing it
+   in-repo means one codebase and one deploy; the page now sits inside the app
+   shell (layout.tsx supplies the disclaimer bar, app bar, brand mark and
+   footer), so the standalone page's own header, footer and skip-link are gone.
+
+   Everything is scoped under `.home` because the source stylesheet used
+   generic names — .section, .eyebrow, .button, .shell — that already mean
+   something else in the app. Its :root palette is dropped entirely: the tokens
+   above were deliberately aligned to it (see the note at the top of this file),
+   so these rules reference --bg/--surface/--pine/--teal directly instead of
+   re-declaring --paper/--white/--line.
+   ========================================================================== */
+@layer components {
+  /* overflow-x: clip (not hidden) so the hero glow can bleed past the container
+     without widening the page — hidden would make this a scroll container and
+     break position: sticky for anything inside it. */
+  .home { --home-shadow: 0 28px 70px -38px rgba(16, 20, 37, .45); overflow-x: clip; }
+  .home h1, .home h2, .home h3, .home h4, .home p { margin-top: 0; }
+  .home h1, .home h2 { font-family: 'Newsreader', Georgia, serif; font-weight: 600; letter-spacing: -.05em; }
+
+  .home .shell { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+  .home .section { padding: 138px 0; }
+
+  .home .eyebrow {
+    display: flex; align-items: center; gap: 9px; margin: 0 0 19px;
+    color: var(--teal); font-family: 'DM Mono', monospace; font-size: 10px;
+    font-weight: 500; letter-spacing: .075em; line-height: 1.4; text-transform: uppercase;
+  }
+  .home .eyebrow > span { width: 23px; height: 1px; background: currentColor; }
+  .home .eyebrow-light { color: var(--teal-light); }
+
+  .home .button {
+    display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+    min-height: 51px; padding: 14px 26px; border-radius: 999px; font-size: 13px;
+    font-weight: 800; text-decoration: none;
+    transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+  }
+  .home .button-primary { background: var(--pine); color: #fff; box-shadow: 0 12px 24px -17px var(--pine-deep); }
+  .home .button-primary:hover { background: var(--teal); transform: translateY(-2px); box-shadow: 0 17px 26px -17px var(--pine-deep); }
+  .home .text-link { display: inline-flex; align-items: center; gap: 8px; color: var(--teal); font-size: 13px; font-weight: 800; text-decoration: none; }
+  /* The shared TourButton ships as a pill .btn; square it off so it sits with
+     the editorial buttons on this page instead of next to them. */
+  .home .hero-actions .btn { height: 40px; padding: 0 18px; border-radius: 999px; font-size: 13px; font-weight: 800; color: var(--teal); border-color: var(--hairline); background: transparent; }
+  .home .hero-actions .btn:hover { background: var(--primary-tint); border-color: var(--teal); color: var(--teal); }
+  .home .text-link:hover { color: var(--coral); }
+  .home .text-link span { font-size: 17px; line-height: 0; }
+
+  /* ---------- Hero ---------- */
+  /* Soft accent wash behind the hero. Pure white with no atmosphere reads as
+     an unstyled document; this is the one place the brand colour is allowed to
+     bloom rather than sit in a rule or a label. */
+  .home .hero::before {
+    content: ''; position: absolute; z-index: 0; pointer-events: none;
+    inset: -10% -6% -18% -6%;
+    background:
+      radial-gradient(52% 54% at 68% 38%, rgba(46,59,212,.16), transparent 70%),
+      radial-gradient(38% 40% at 22% 72%, rgba(255,107,74,.08), transparent 72%);
+    filter: blur(8px);
+  }
+  .home .hero > * { position: relative; z-index: 1; }
+  .home .hero { position: relative; display: grid; grid-template-columns: minmax(0, .9fr) minmax(420px, 1.1fr); align-items: center; gap: clamp(45px, 7vw, 100px); min-height: 640px; padding: 62px 0 78px; }
+  .home .hero h1 { max-width: 600px; margin-bottom: 25px; font-size: clamp(52px, 6.2vw, 86px); line-height: .93; }
+  .home .hero-intro { max-width: 580px; margin-bottom: 29px; color: var(--ink-soft); font-size: 17px; line-height: 1.7; }
+  .home .hero-actions { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+  .home .disclaimer { max-width: 510px; margin: 30px 0 0; color: #6B6E7C; font-size: 11px; line-height: 1.5; }
+
+  .home .hero-art { position: relative; min-height: 490px; display: flex; align-items: center; justify-content: center; }
+  .home .art-halo { position: absolute; border-radius: 50%; pointer-events: none; }
+  .home .halo-one { width: 430px; height: 430px; background: #E7E9FF; }
+  .home .halo-two { width: 315px; height: 315px; border: 1px solid #C3C9F5; transform: translate(60px, -34px); }
+  .home .lens-card { position: relative; z-index: 1; width: min(100%, 460px); padding: 26px; border: 1px solid #E3E6EA; background: #FFFFFF; border-radius: var(--radius); box-shadow: var(--home-shadow); transform: rotate(2.1deg); }
+  .home .lens-card-top, .home .lens-card-title-row, .home .guide-row, .home .range-labels { display: flex; justify-content: space-between; gap: 18px; }
+  .home .lens-card-top { align-items: center; padding-bottom: 22px; border-bottom: 1px solid #EDEFF2; }
+  .home .lens-caption, .home .mini-label, .home .card-kicker, .home .step-number { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .065em; text-transform: uppercase; }
+  .home .lens-caption { color: var(--teal); }
+  .home .secure-note { color: #6B6E7C; font-size: 10px; }
+  .home .secure-note b { display: inline-block; width: 6px; height: 6px; margin-right: 4px; border-radius: 50%; background: var(--teal); }
+  .home .lens-card-title-row { align-items: end; padding-top: 20px; }
+  .home .lens-card-title-row strong { display: block; margin-top: 3px; font-size: 20px; letter-spacing: -.04em; }
+  .home .mini-label { color: #6B6E7C; }
+  .home .status-chip { display: inline-flex; padding: 4px 9px; border-radius: 99px; background: #F7E3DC; color: #8E3227; font-size: 11px; font-weight: 800; }
+  .home .source-line { margin: 5px 0 21px; color: #6B6E7C; font-size: 10px; }
+  .home .range-block { padding: 15px; border-radius: var(--radius-sm); background: #F5F6FA; }
+  .home .range-labels { margin-bottom: 10px; color: #5C6270; font-size: 9px; }
+  .home .range-track { position: relative; height: 8px; border-radius: 20px; background: linear-gradient(90deg, #9BC8DD 0 33%, #D7D1C7 33% 68%, #E67858 68%); }
+  .home .range-fill { position: absolute; inset: 0 auto 0 0; width: 74%; border-right: 1px solid rgba(0,0,0,.17); }
+  .home .value-pin { position: absolute; top: -5px; left: 74%; width: 17px; height: 17px; border: 3px solid #fff; border-radius: 50%; background: var(--coral-graphic); box-shadow: 0 1px 5px rgba(0,0,0,.18); transform: translateX(-50%); }
+  .home .range-block p { margin: 11px 0 0; color: #5C6270; font-size: 10px; line-height: 1.45; }
+  .home .context-row { display: flex; gap: 10px; align-items: center; margin-top: 16px; padding: 14px 0; border-bottom: 1px solid #EDEFF2; }
+  .home .context-orb { display: grid; flex: 0 0 auto; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: var(--primary-tint); color: var(--teal); font-family: 'DM Mono', monospace; font-size: 8px; }
+  .home .context-row b { display: block; font-size: 11px; letter-spacing: -.02em; }
+  .home .context-row small { display: block; color: #6B6E7C; font-size: 9px; }
+  .home .guide-row { align-items: center; padding-top: 14px; color: #6B6E7C; font-size: 10px; }
+  .home .guide-row b { color: var(--teal); }
+  .home .art-caption { position: absolute; z-index: 2; right: 0; bottom: 2px; max-width: 190px; margin: 0; color: #6B6E7C; font-size: 10px; line-height: 1.45; text-align: right; }
+
+  /* ---------- Proof strip ---------- */
+  .home .proof-strip { border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); background: var(--surface-sunken); }
+  .home .proof-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .home .proof-grid p { min-height: 66px; display: flex; align-items: center; margin: 0; padding: 14px 22px; border-left: 1px solid var(--hairline); color: #4C4F5C; font-family: 'DM Mono', monospace; font-size: 9px; line-height: 1.5; letter-spacing: .03em; text-transform: uppercase; }
+  .home .proof-grid p:last-child { border-right: 1px solid var(--hairline); }
+
+  /* ---------- Approach ---------- */
+  .home .section-intro { display: grid; grid-template-columns: .76fr 1.24fr; gap: 40px; align-items: start; }
+  .home .section-intro h2, .home .benefits-lead h2, .home .guardrails h2, .home .final-cta h2 { margin: 0; font-size: clamp(39px, 5vw, 66px); line-height: 1.02; }
+  .home .approach-layout { display: grid; grid-template-columns: .76fr 1.24fr; gap: 40px; margin-top: 65px; }
+  .home .approach-statement { padding-right: 42px; color: var(--ink-soft); font-size: 17px; line-height: 1.72; }
+  .home .approach-statement .text-link { margin-top: 10px; }
+  .home .approach-list { margin: 0; padding: 0; list-style: none; }
+  .home .approach-list li { display: grid; grid-template-columns: 60px 1fr; gap: 18px; padding: 0 0 28px; margin-bottom: 27px; border-bottom: 1px solid var(--hairline); }
+  .home .approach-list li:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+  .home .approach-list > li > span { color: var(--coral); font-family: 'DM Mono', monospace; font-size: 11px; }
+  .home .approach-list b { display: block; margin-bottom: 6px; font-size: 17px; letter-spacing: -.035em; }
+  .home .approach-list p { max-width: 630px; margin: 0; color: var(--ink-soft); font-size: 14px; }
+
+  /* ---------- Workflow (dark) ---------- */
+  .home .workflow-section { padding: 130px 0; background: var(--pine); color: #fff; }
+  .home .workflow-heading { display: flex; align-items: end; justify-content: space-between; gap: 60px; margin-bottom: 65px; }
+  .home .workflow-heading h2 { max-width: 610px; margin: 0; font-size: clamp(43px, 5.5vw, 72px); line-height: 1; }
+  .home .workflow-heading > p { max-width: 290px; margin: 0 0 5px; color: #C2CFDD; font-size: 14px; line-height: 1.6; }
+  .home .workflow-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(185,217,235,.24); }
+  .home .workflow-grid article { min-height: 255px; padding: 28px 34px 22px 0; }
+  .home .workflow-grid article + article { padding-left: 34px; border-left: 1px solid rgba(185,217,235,.24); }
+  .home .step-number { margin-bottom: 52px; color: var(--teal-light); }
+  .home .workflow-grid h3 { max-width: 240px; margin-bottom: 12px; font-size: 19px; letter-spacing: -.045em; }
+  .home .workflow-grid p:not(.step-number) { max-width: 300px; margin-bottom: 0; color: #CBD5E0; font-size: 13px; line-height: 1.65; }
+  .home .workflow-note { display: flex; align-items: flex-start; gap: 13px; max-width: 700px; padding-top: 25px; border-top: 1px solid rgba(185,217,235,.24); }
+  .home .workflow-note p { margin: 0; color: #CBD5E0; font-size: 12px; }
+  .home .workflow-note b { color: #fff; }
+  .home .note-mark { display: grid; flex: 0 0 auto; width: 18px; height: 18px; place-items: center; border: 1px solid #7899AD; border-radius: 50%; color: var(--teal-light); font-size: 13px; line-height: 1; }
+
+  .home .capability-deck { margin-top: 84px; padding-top: 26px; border-top: 1px solid rgba(185,217,235,.24); }
+  .home .capability-deck-head { display: grid; grid-template-columns: .9fr 1.1fr; gap: 30px; align-items: baseline; margin-bottom: 38px; }
+  .home .capability-deck-head .eyebrow { margin: 0; }
+  .home .capability-deck h3 { max-width: 445px; margin: 0; font-family: 'Newsreader', Georgia, serif; font-size: clamp(30px, 3.5vw, 46px); font-weight: 600; letter-spacing: -.045em; line-height: 1.04; }
+  .home .capability-rail { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid rgba(185,217,235,.24); }
+  .home .capability-rail article { min-height: 245px; padding: 24px 18px 0 0; }
+  .home .capability-rail article + article { padding-left: 18px; border-left: 1px solid rgba(185,217,235,.24); }
+  .home .capability-rail > article > span { color: var(--teal-light); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .06em; }
+  .home .capability-rail h4 { margin: 34px 0 10px; font-size: 15px; letter-spacing: -.035em; line-height: 1.2; }
+  .home .capability-rail p { margin: 0; color: #CBD5E0; font-size: 11px; line-height: 1.62; }
+
+  /* ---------- Colour language ---------- */
+  .home .legend-strip { padding: 62px 0; border-bottom: 1px solid var(--hairline); }
+  .home .legend-strip h2 { margin: 0 0 8px; font-size: clamp(24px, 2.6vw, 32px); line-height: 1.1; }
+  .home .legend-strip > .shell > p { max-width: 560px; margin: 0 0 22px; color: var(--ink-soft); font-size: 14px; line-height: 1.65; }
+
+  /* ---------- Benefits ---------- */
+  .home .benefits { display: grid; grid-template-columns: .78fr 1.22fr; gap: clamp(45px, 8vw, 135px); }
+  .home .benefits-lead h2 { margin-bottom: 24px; }
+  .home .benefits-lead > p { max-width: 330px; color: var(--ink-soft); font-size: 15px; line-height: 1.7; }
+  .home .benefit-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .home .benefit-card { min-height: 259px; padding: 27px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface); }
+  .home .benefit-featured { background: var(--primary-tint); border-color: #DCE0FB; }
+  .home .card-kicker { margin-bottom: 43px; color: var(--teal); }
+  .home .benefit-card h3 { max-width: 260px; margin-bottom: 11px; font-size: 18px; line-height: 1.22; letter-spacing: -.045em; }
+  .home .benefit-card > p:not(.card-kicker) { margin-bottom: 0; color: var(--ink-soft); font-size: 12.5px; line-height: 1.65; }
+  .home .source-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+  .home .source-pills span { padding: 4px 7px; border: 1px solid #C3C9F5; border-radius: 999px; color: #2B3160; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: .04em; }
+
+  /* ---------- Audiences ---------- */
+  .home .audience-shell { background: #F8F8FC; border-top: 1px solid var(--hairline); }
+  .home .audiences { padding: 132px 0; }
+  .home .audience-intro { display: grid; grid-template-columns: .78fr 1.22fr; gap: 40px; align-items: start; }
+  .home .audience-intro h2 { max-width: 700px; margin: 0; font-size: clamp(39px, 5vw, 66px); line-height: 1.02; }
+  .home .audience-intro > p:not(.eyebrow) { grid-column: 2; max-width: 520px; margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.7; }
+  .home .audience-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 60px; }
+  .home .audience-panel { min-height: 380px; padding: 35px; border-radius: var(--radius); }
+  .home .audience-person { background: var(--primary-tint); color: var(--pine); }
+  .home .audience-clinician { background: var(--pine); color: #fff; }
+  .home .audience-label { margin-bottom: 60px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
+  .home .audience-person .audience-label { color: var(--teal); }
+  .home .audience-clinician .audience-label { color: var(--teal-light); }
+  .home .audience-panel h3 { max-width: 330px; margin-bottom: 25px; font-family: 'Newsreader', Georgia, serif; font-size: 34px; font-weight: 600; letter-spacing: -.05em; line-height: 1.02; }
+  .home .audience-panel ul { margin: 0; padding: 0; list-style: none; }
+  .home .audience-panel li { position: relative; padding: 10px 0 10px 20px; border-top: 1px solid rgba(21,27,42,.16); font-size: 12px; line-height: 1.55; }
+  .home .audience-clinician li { border-color: rgba(185,217,235,.24); color: #D1DCE8; }
+  .home .audience-panel li::before { position: absolute; left: 0; top: 10px; color: var(--coral); content: "\2192"; }
+  .home .audience-note { max-width: 640px; margin: 24px 0 0; color: #63677A; font-size: 11px; line-height: 1.6; }
+
+  /* ---------- Guardrails ---------- */
+  .home .guardrails-shell { background: #EFF0F7; }
+  .home .guardrails { display: grid; grid-template-columns: .88fr 1.12fr; gap: clamp(50px, 9vw, 140px); padding: 130px 0; }
+  .home .guardrails-copy > p:not(.eyebrow) { max-width: 450px; margin: 25px 0 0; color: var(--ink-soft); font-size: 16px; line-height: 1.7; }
+  .home .guardrail-list { margin: 0; }
+  .home .guardrail-list div { display: grid; grid-template-columns: 145px 1fr; gap: 20px; padding: 20px 0; border-top: 1px solid #D6D9E8; }
+  .home .guardrail-list div:last-child { border-bottom: 1px solid #D6D9E8; }
+  .home .guardrail-list dt { color: var(--teal); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+  .home .guardrail-list dd { margin: 0; color: #39424F; font-size: 13px; line-height: 1.65; }
+
+  /* ---------- Final CTA ---------- */
+  .home .final-cta { padding-top: 130px; padding-bottom: 130px; text-align: center; }
+  .home .final-cta .eyebrow { justify-content: center; }
+  .home .final-cta h2 { max-width: 800px; margin: 0 auto 23px; }
+  .home .final-cta > p:not(.eyebrow) { max-width: 575px; margin: 0 auto 30px; color: var(--ink-soft); font-size: 15px; line-height: 1.7; }
+  .home .final-actions { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .home .hero { grid-template-columns: 1fr; gap: 15px; padding: 60px 0; min-height: auto; }
+    .home .hero-copy { max-width: 670px; }
+    .home .hero-art { min-height: 450px; max-width: 610px; width: 100%; justify-self: center; }
+    .home .approach-layout, .home .section-intro, .home .audience-intro { grid-template-columns: 1fr; gap: 26px; }
+    .home .approach-layout { margin-top: 42px; }
+    .home .approach-statement { padding: 0; max-width: 680px; }
+    .home .workflow-heading { align-items: start; flex-direction: column; gap: 20px; }
+    .home .workflow-grid article { padding-right: 22px; }
+    .home .workflow-grid article + article { padding-left: 22px; }
+    .home .capability-deck-head { grid-template-columns: 1fr; gap: 18px; }
+    .home .capability-rail { grid-template-columns: repeat(3, 1fr); }
+    .home .capability-rail article:nth-child(4) { border-left: 0; }
+    .home .capability-rail article:nth-child(4), .home .capability-rail article:nth-child(5) { border-top: 1px solid rgba(185,217,235,.24); padding-top: 24px; }
+    .home .benefits, .home .guardrails { grid-template-columns: 1fr; gap: 50px; }
+    .home .benefits-lead > p { max-width: 550px; }
+    .home .guardrails { padding: 105px 0; }
+    .home .audience-intro > p:not(.eyebrow) { grid-column: auto; }
+  }
+  @media (max-width: 620px) {
+    .home .shell { width: min(100% - 32px, 1180px); }
+    .home .hero { padding: 48px 0 44px; }
+    .home .hero h1 { font-size: clamp(40px, 11vw, 52px); }
+    .home .hero-intro { font-size: 15px; }
+    .home .hero-actions { gap: 16px; }
+    .home .hero-art { min-height: 378px; }
+    .home .halo-one { width: 330px; height: 330px; }
+    .home .halo-two { width: 250px; height: 250px; transform: translate(38px, -24px); }
+    .home .lens-card { width: calc(100% - 7px); padding: 20px; transform: rotate(1.4deg); }
+    .home .lens-card-title-row strong { font-size: 17px; }
+    /* Below 620px the absolutely-positioned caption collided with the card's
+       own bottom row. Drop it out of the overlay and let it sit under the art.
+       (This is the mobile case docs left unverified in the standalone site.) */
+    .home .hero-art { flex-direction: column; justify-content: center; }
+    .home .art-caption { position: static; max-width: none; margin-top: 14px; font-size: 9.5px; text-align: center; }
+    .home .proof-grid { grid-template-columns: repeat(2, 1fr); }
+    .home .proof-grid p { min-height: 58px; padding: 10px 13px; font-size: 8px; }
+    .home .proof-grid p:nth-child(2) { border-right: 1px solid var(--hairline); }
+    .home .section { padding: 82px 0; }
+    .home .section-intro h2, .home .benefits-lead h2, .home .guardrails h2, .home .final-cta h2, .home .audience-intro h2 { font-size: 40px; }
+    .home .approach-statement { font-size: 15px; }
+    .home .approach-list li { grid-template-columns: 42px 1fr; gap: 12px; }
+    .home .approach-list b { font-size: 15px; }
+    .home .workflow-section { padding: 78px 0; }
+    .home .workflow-heading h2 { font-size: 44px; }
+    .home .workflow-grid { grid-template-columns: 1fr; }
+    .home .workflow-grid article { min-height: auto; padding: 24px 0; }
+    .home .workflow-grid article + article { padding-left: 0; border-left: 0; border-top: 1px solid rgba(185,217,235,.24); }
+    .home .step-number { margin-bottom: 28px; }
+    .home .workflow-grid h3 { margin-bottom: 8px; }
+    .home .capability-deck { margin-top: 62px; }
+    .home .capability-rail { grid-template-columns: 1fr; }
+    .home .capability-rail article, .home .capability-rail article + article, .home .capability-rail article:nth-child(4) { min-height: auto; padding: 22px 0; border-left: 0; border-top: 1px solid rgba(185,217,235,.24); }
+    .home .capability-rail h4 { margin: 20px 0 8px; }
+    .home .legend-strip { padding: 44px 0; }
+    .home .benefit-cards { grid-template-columns: 1fr; }
+    .home .benefit-card { min-height: 0; }
+    .home .card-kicker { margin-bottom: 31px; }
+    .home .audiences { padding: 82px 0; }
+    .home .audience-panels { grid-template-columns: 1fr; margin-top: 42px; }
+    .home .audience-panel { min-height: 0; padding: 28px; }
+    .home .audience-label { margin-bottom: 42px; }
+    .home .audience-panel h3 { font-size: 31px; }
+    .home .guardrails { padding: 78px 0; }
+    .home .guardrail-list div { grid-template-columns: 1fr; gap: 7px; }
+    .home .final-cta { padding-top: 84px; padding-bottom: 84px; }
   }
 }

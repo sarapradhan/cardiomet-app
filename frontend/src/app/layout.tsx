@@ -25,13 +25,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* App bar */}
-        <header role="banner" style={{
+        <header role="banner" className="app-bar" style={{
           background: 'rgba(255,253,250,0.85)', backdropFilter: 'saturate(180%) blur(12px)',
-          borderBottom: '1px solid var(--hairline)', padding: '12px 20px',
+          borderBottom: '1px solid var(--hairline)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           position: 'sticky', top: 0, zIndex: 20,
         }}>
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <a href="/" className="app-brand" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             {/* Brand mark — recreated from the marketing site's .brand-mark
                 (three rotated bars over a solid pine circle), not a gradient. */}
             <span aria-hidden="true" style={{
@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span style={{ position: 'absolute', display: 'block', width: 3, height: 15, left: 13, top: 7, borderRadius: 5, background: 'var(--teal-light)', transform: 'rotate(38deg)' }} />
               <span style={{ position: 'absolute', display: 'block', width: 3, height: 10, left: 18, top: 10, borderRadius: 5, background: 'var(--teal-light)', transform: 'rotate(38deg)' }} />
             </span>
-            <span style={{ fontFamily: "'Manrope', Arial, sans-serif", fontWeight: 800, fontSize: 17, letterSpacing: '-0.045em', color: 'var(--ink)' }}>
+            <span className="app-wordmark" style={{ fontFamily: "'Manrope', Arial, sans-serif", fontWeight: 800, letterSpacing: '-0.045em', color: 'var(--ink)' }}>
               CardioMet<span style={{ color: 'var(--teal)' }}>Lens</span>
             </span>
           </a>

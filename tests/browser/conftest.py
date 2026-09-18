@@ -53,9 +53,15 @@ def base_url():
                        env={**os.environ, "NEXT_PUBLIC_API_URL": ""}, check=True)
 
     port = _free_port()
+    # stdout/stderr go to DEVNULL, NOT a PIPE. With a PIPE nothing ever drains
+    # it, so once uvicorn has written ~64KB of access logs (about 25 tests in) it
+    # blocks forever on its next write and stops serving. That presented as
+    # "flaky" 45s Page.goto/Page.reload timeouts in fixture setup, always after a
+    # batch of tests had already passed, and always worse under load.
     proc = subprocess.Popen(
-        ["python3", "-m", "uvicorn", "api.main:app", "--host", "127.0.0.1", "--port", str(port)],
-        cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        ["python3", "-m", "uvicorn", "api.main:app", "--host", "127.0.0.1",
+         "--port", str(port), "--no-access-log"],
+        cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
     url = f"http://127.0.0.1:{port}"
     try:

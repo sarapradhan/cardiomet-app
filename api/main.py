@@ -16,10 +16,19 @@ app = FastAPI(
     version="0.1.0",
 )
 
+# CORS. ALLOWED_ORIGINS is the exact-match allowlist. ALLOWED_ORIGIN_REGEX
+# exists because preview deployments get a freshly generated hostname on every
+# build (e.g. https://<project>-<hash>-<team>.vercel.app), so no static list can
+# ever cover them — without a regex every preview fails CORS preflight with
+# "Disallowed CORS origin" and the UI reports a bare "Failed to fetch".
+# Both are unset by default: a deployment that configures neither keeps the
+# local-dev origins only, which is the safe default.
 _origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001")
+_origin_regex = (os.getenv("ALLOWED_ORIGIN_REGEX") or "").strip() or None
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in _origins.split(",") if o.strip()],
+    allow_origin_regex=_origin_regex,
     allow_credentials=False,
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
