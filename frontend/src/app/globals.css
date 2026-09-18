@@ -30,7 +30,11 @@
   --surface-sunken:   #F4F6F8;
   --ink:              #151B2A;
   --ink-soft:         #575D6B;
-  --ink-faint:        #7A7D89;
+  --ink-faint:        #686B79;   /* AA at caption size: 5.29:1 on white,
+                                    4.89:1 on --surface-sunken, 4.67:1 on
+                                    --primary-tint. The previous #7A7D89 was
+                                    4.10 / 3.78 / 3.62 — under the 4.5:1 floor
+                                    for the 12px .caption text it carries. */
   --hairline:         #E3E6EA;
 
   /* Brand accent is indigo. It replaced a heritage maroon (#6D2741), which
@@ -130,13 +134,33 @@ body {
   .nav-link:hover { background: var(--primary-tint); color: var(--primary); }
   .nav-link[data-active="true"] { background: var(--primary-tint); color: var(--primary); }
 
-  /* Mobile: at the reskin's desktop padding the wordmark + three nav links
-     measure ~391px, overflowing a 375px viewport. Because the header is
-     site-wide chrome this overflowed EVERY page, which is what broke all four
-     responsive checks. Tighten only below 420px; desktop is unchanged.
-     Covered by tests/browser/test_browser_responsive.py. */
+  /* App bar sizing lives here, not in layout.tsx's inline styles, so the
+     breakpoints below can actually override it (inline styles always win).
+     The bar is site-wide chrome, so anything that overflows here overflows
+     EVERY page. Desktop values are unchanged from the reskin. */
+  .app-bar     { padding: 12px 20px; }
+  .app-brand   { gap: 10px; }
+  .app-wordmark{ font-size: 17px; }
+
+  /* Below 420px the wordmark plus three nav links no longer fit: at 390px they
+     measured ~354px against ~350px of usable width, so "Check labs" wrapped and
+     the bar grew to two rows. Tighten the whole bar, not just the links. */
   @media (max-width: 420px) {
-    .nav-link { padding: 0 8px; font-size: 13px; }
+    .app-bar     { padding: 12px 14px; }
+    .app-brand   { gap: 8px; }
+    .app-wordmark{ font-size: 15.5px; }
+    .nav-link    { padding: 0 7px; font-size: 12.5px; white-space: nowrap; }
+  }
+
+  /* Below 360px it still overflowed — 351px of content in a 320px viewport,
+     31px over, on /, /benchmark and /timeline alike. 320px is the narrowest
+     phone width still in circulation, and the responsive suite only covered
+     375/390, so this went unnoticed. Covered now by
+     tests/browser/test_browser_responsive.py::*_narrow. */
+  @media (max-width: 360px) {
+    .app-bar     { padding: 10px 10px; }
+    .app-wordmark{ font-size: 14px; }
+    .nav-link    { padding: 0 4px; font-size: 11.5px; }
   }
 
   .input { @apply w-full; height: 44px; padding: 0 14px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-sm); font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; transition: border-color .16s ease, box-shadow .16s ease; }
