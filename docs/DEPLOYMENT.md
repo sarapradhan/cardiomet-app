@@ -67,6 +67,24 @@ same-origin, so this needs two things the single-container path doesn't:
    *not* required here since none of those hosts need HF's Docker access).
 3. Set `ALLOWED_ORIGINS` on that API host to the Space's URL.
 
+### Preview deployments and CORS
+
+`ALLOWED_ORIGINS` is an exact-match allowlist. Preview deployments on Vercel get
+a freshly generated hostname on every build, so they can never appear in it. A
+preview whose origin is not allowed fails CORS preflight with `400 Disallowed
+CORS origin`, and the UI surfaces that as a bare `Failed to fetch` on the
+primary action — the page looks fine, the app is dead.
+
+Set `ALLOWED_ORIGIN_REGEX` alongside it to cover them:
+
+```
+ALLOWED_ORIGINS=https://cardiometlens.vercel.app
+ALLOWED_ORIGIN_REGEX=^https://[a-z0-9-]+-saras-projects-81420e9f\.vercel\.app$
+```
+
+Keep the regex anchored (`^`/`$`) and escape the dots, or it will match hosts
+you did not intend to allow.
+
 **To publish (manual, run anytime):**
 ```bash
 HF_SPACE=your-hf-username/your-space-name \
