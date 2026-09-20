@@ -1,5 +1,5 @@
 # ---- Stage 1: build the frontend static export ----
-FROM node:20-slim AS frontend
+FROM node:25-slim AS frontend
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm ci || npm install
