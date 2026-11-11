@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 from sahc_risklens.config import (
     DEFAULT_COHORT,
     NHANES_COHORT_LABEL,
+    NHANES_CYCLE_YEARS,
     PRODUCT_DISCLAIMER,
 )
 
@@ -89,6 +90,10 @@ class BenchmarkResponse(BaseModel):
     medication_notes: list[str]
     cohort: str = DEFAULT_COHORT  # selected cohort id (config.COHORT_*)
     cohort_label: CohortLabel = NHANES_COHORT_LABEL
+    # Population provenance, surfaced inline next to the benchmark chart (not
+    # only in README.md/DATA_DICTIONARY.md) — see config.COHORT_YEARS/COHORT_WEIGHTED.
+    cohort_years: str = NHANES_CYCLE_YEARS
+    cohort_weighted: bool = False
     matched: bool = False               # True if peer matching was applied to >=1 biomarker
     match_description: str | None = None  # peer group used, e.g. "Women, 49–64, on cholesterol medication"
     disclaimer: str = Field(default=PRODUCT_DISCLAIMER, min_length=20)

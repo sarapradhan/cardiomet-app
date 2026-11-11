@@ -33,6 +33,16 @@ def test_disclaimer_non_empty(healthy_patient):
     assert isinstance(d, str) and len(d) >= 20
 
 
+def test_cohort_provenance_fields_present(healthy_patient):
+    """Population provenance (data vintage + weighting) must be surfaced in
+    the response, not only in README.md/DATA_DICTIONARY.md — the frontend
+    DistributionChart renders these inline next to the benchmark chart."""
+    r = client.post("/api/v1/benchmark", json=healthy_patient)
+    body = r.json()
+    assert body["cohort_years"] == "2017-2018"
+    assert body["cohort_weighted"] is False
+
+
 def test_cohort_label_exact(healthy_patient):
     r = client.post("/api/v1/benchmark", json=healthy_patient)
     assert r.json()["cohort_label"] == "NHANES Non-Hispanic Asian"
@@ -108,6 +118,21 @@ def test_rejects_bad_sex(healthy_patient):
 def test_rejects_negative_ldl(healthy_patient):
     r = client.post("/api/v1/benchmark", json={**healthy_patient, "LDL_mgdl": -5})
     assert r.status_code == 422
+
+
+def test_rejects_swapped_sbp_dbp(healthy_patient):
+    """SBP 110 / DBP 130: each individually in-range, but systolic must exceed
+    diastolic for the same reading — a classic data-entry swap. See
+    api/models/patient.py BiomarkerInput._sbp_must_exceed_dbp."""
+    r = client.post("/api/v1/benchmark", json={**healthy_patient, "SBP_mmhg": 110, "DBP_mmhg": 130})
+    assert r.status_code == 422
+
+
+def test_accepts_equal_or_only_one_bp_value(healthy_patient):
+    """Providing only one of SBP/DBP (the other None) must not trigger the
+    cross-field check — it only fires when both are present."""
+    r = client.post("/api/v1/benchmark", json={**healthy_patient, "SBP_mmhg": 120, "DBP_mmhg": None})
+    assert r.status_code == 200
 
 
 def test_thresholds_all_biomarkers():

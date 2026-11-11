@@ -123,7 +123,7 @@ Written in standard form, grouped by persona, with acceptance criteria. These ma
 - The reference population is labeled exactly and honestly ("NHANES Non-Hispanic Asian"), with its sample size shown.
 
 **A3.** *As any user, I want each classification to name its source guideline, so that I can trust it and look it up.*
-- Every threshold card displays its guideline source (e.g. "ADA Standards of Medical Care 2024").
+- Every threshold card displays its guideline source (e.g. "ADA Standards of Care in Diabetes—2026").
 
 ### Epic B — South Asian–specific context
 

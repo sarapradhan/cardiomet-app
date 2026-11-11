@@ -105,7 +105,7 @@ export default function Home() {
               </div>
               <span className="status-chip">High</span>
             </div>
-            <p className="source-line">ACC/AHA 2018 Cholesterol Guideline</p>
+            <p className="source-line">2026 ACC/AHA/Multisociety Dyslipidemia Guideline</p>
             <div className="range-block">
               <div className="range-labels">
                 <span>Reference distribution</span><span>Population context</span>

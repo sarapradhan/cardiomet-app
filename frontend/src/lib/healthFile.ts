@@ -46,11 +46,32 @@ export function parseHealthFile(text: string): BiomarkerSeries {
     throw new Error('That file is not valid JSON.');
   }
   const d = doc as Partial<HealthFileDoc>;
-  if (!d || d.schema_version !== SCHEMA_VERSION) {
+  if (!d || typeof d !== 'object' || d.schema_version !== SCHEMA_VERSION) {
     throw new Error('Unsupported or missing health-file version.');
   }
   if (!d.series || !Array.isArray(d.series.draws) || d.series.draws.length === 0) {
     throw new Error('Health file contains no draws.');
+  }
+  // Each draw must have at minimum a draw_date and a values object — this was
+  // previously unchecked, so a draws array of arbitrary garbage (missing
+  // fields, wrong types, deeply nested junk) would pass straight through to
+  // React state and only ever get caught, if at all, by the server's 422 on
+  // submit (or not caught at all for anything only rendered locally, e.g. the
+  // imported-but-not-yet-submitted timeline view). Fail at import time
+  // instead, with the same friendly-error pattern as the checks above — this
+  // does not validate full clinical shape (BiomarkerInput's own Field ge/le
+  // constraints still apply server-side), only that each entry is structurally
+  // a draw at all.
+  const structurallyValid = d.series.draws.every(
+    (draw) =>
+      draw !== null &&
+      typeof draw === 'object' &&
+      typeof (draw as { draw_date?: unknown }).draw_date === 'string' &&
+      typeof (draw as { values?: unknown }).values === 'object' &&
+      (draw as { values?: unknown }).values !== null,
+  );
+  if (!structurallyValid) {
+    throw new Error('Health file contains a malformed draw entry.');
   }
   return d.series;
 }

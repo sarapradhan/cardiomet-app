@@ -38,11 +38,46 @@ COHORT_LABELS: dict[str, str] = {
     COHORT_NHANES: NHANES_COHORT_LABEL,
 }
 
+# Per-cohort methodology metadata, surfaced inline next to the benchmark chart
+# (api/models/results.py BenchmarkResponse.cohort_years/cohort_weighted ->
+# frontend DistributionChart) so population provenance is visible where the
+# numbers are shown, not only in README.md/DATA_DICTIONARY.md. Keyed the same
+# way as COHORT_LABELS; a newly registered cohort must add its own entries.
+COHORT_YEARS: dict[str, str] = {
+    COHORT_NHANES: NHANES_CYCLE_YEARS,
+}
+# False for NHANES: WTMEC2YR survey weights are loaded (see
+# data/nhanes_loader.py) but NOT applied in benchmark/percentile.py, which
+# computes plain np.percentile over the analytic sample. These are unweighted
+# analytic-sample statistics, not population-representative estimates after
+# correcting for NHANES's complex survey design. Flip to True only once
+# weighting is actually implemented — see README.md and
+# docs/DATA_DICTIONARY.md.
+COHORT_WEIGHTED: dict[str, bool] = {
+    COHORT_NHANES: False,
+}
+
 
 def cohort_label(cohort: str) -> str:
     """Display label for a cohort id. Unknown ids raise (fail loud, never mislabel)."""
     try:
         return COHORT_LABELS[cohort]
+    except KeyError as exc:
+        raise ValueError(f"Unknown cohort id: {cohort!r}") from exc
+
+
+def cohort_years(cohort: str) -> str:
+    """Data vintage (survey/collection years) for a cohort id."""
+    try:
+        return COHORT_YEARS[cohort]
+    except KeyError as exc:
+        raise ValueError(f"Unknown cohort id: {cohort!r}") from exc
+
+
+def cohort_weighted(cohort: str) -> bool:
+    """Whether a cohort's percentiles apply survey weighting. See COHORT_WEIGHTED."""
+    try:
+        return COHORT_WEIGHTED[cohort]
     except KeyError as exc:
         raise ValueError(f"Unknown cohort id: {cohort!r}") from exc
 

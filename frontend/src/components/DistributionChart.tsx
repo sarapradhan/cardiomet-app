@@ -13,15 +13,33 @@ function norm(v: number, lo: number, hi: number): number {
   return Math.max(0, Math.min(100, ((v - lo) / (hi - lo)) * 100));
 }
 
-export function DistributionChart({ benchmarkData, cohortLabel }: { benchmarkData: BenchmarkPoint[]; cohortLabel: string }) {
+interface Props {
+  benchmarkData: BenchmarkPoint[];
+  cohortLabel: string;
+  cohortYears?: string;
+  cohortWeighted?: boolean;
+}
+
+export function DistributionChart({ benchmarkData, cohortLabel, cohortYears, cohortWeighted }: Props) {
   return (
     <section className="card">
       <p className="eyebrow" style={{ marginBottom: 4 }}>Population benchmark</p>
       <h2 className="title" style={{ marginBottom: 6 }}>Where you sit in the distribution</h2>
-      <p className="body" style={{ marginBottom: 20 }}>
+      <p className="body" style={{ marginBottom: 4 }}>
         Reference: {cohortLabel}. The bar spans the 10th–90th percentile; the solid
         segment is the 25th–75th. Your value is the dot.
       </p>
+      {cohortYears && (
+        <p className="caption" style={{ marginBottom: 20, color: 'var(--ink-faint)' }}>
+          Collected {cohortYears}
+          {cohortWeighted === false
+            ? ' · unweighted analytic-sample statistics, not survey-weighted population estimates'
+            : cohortWeighted === true
+            ? ' · survey-weighted population estimates'
+            : ''}
+          .
+        </p>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {benchmarkData.map((b) => {
