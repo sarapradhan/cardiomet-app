@@ -39,24 +39,11 @@ const TOUR: TourStep[] = [
 
 const WORKFLOW = [
   ['01', 'Enter what you have.',
-    'Provide available values across lipids, glucose, blood pressure, body measures, and optional advanced markers. Missing inputs are never guessed.'],
+    'Provide available values across lipids, glucose, blood pressure, body measures, and optional advanced markers. Missing inputs are never guessed, and each value you do enter lands in a named guideline category rather than a raw number.'],
   ['02', 'Read the layers.',
-    'See guideline categories, population context, and South Asian discussion context when it applies — each kept distinct.'],
+    'See population context under its real cohort label. Peer matching stays off until a properly sourced cohort exists to match against, and South Asian context and advanced markers surface only when relevant, as discussion points, never a score.'],
   ['03', 'Carry the useful questions forward.',
-    'Use a plain-language appointment guide. For dated draws, explore descriptive trends in a user-owned health file.'],
-];
-
-const CAPABILITIES = [
-  ['01', 'Classify the essentials.',
-    'Place supplied lipids, glucose, blood pressure, body measures, and optional markers in a named guideline category.'],
-  ['02', 'Compare with care.',
-    'Show population context with its actual cohort label. Peer matching stays switched off until a cohort with established provenance is registered — no comparison beats an unsourced one.'],
-  ['03', 'Surface what is relevant.',
-    'Bring forward South Asian guideline context and advanced-marker categories when the input calls for them — never as a personal risk score.'],
-  ['04', 'Make time visible.',
-    'Review descriptive changes across dated draws in a portable health file the user keeps and controls.'],
-  ['05', 'Prepare for the visit.',
-    'Turn the result into a discussion guide and a copy-ready pre-visit brief for a clinician conversation.'],
+    'Turn the result into a discussion guide and a copy-ready pre-visit brief. For dated draws, track descriptive trends over time in a portable health file you keep.'],
 ];
 
 export default function Home() {
@@ -69,9 +56,9 @@ export default function Home() {
         <div className="hero-copy">
           <h1 id="hero-heading">Context before conclusions.</h1>
           <p className="hero-intro">
-            CardioMet Lens brings your lab values into clearer view &mdash; alongside
-            published guidelines and clearly labeled population context &mdash; so you
-            can arrive ready for a better clinician conversation.
+            CardioMet Lens puts your lab values in context: published guideline
+            categories and clearly labeled population data, organized so you can
+            walk into your next appointment ready to ask better questions.
           </p>
           <div className="hero-actions" data-tour="cta">
             <Link className="button button-primary" href="/benchmark">
@@ -113,7 +100,7 @@ export default function Home() {
               <div className="range-track" aria-hidden="true">
                 <span className="range-fill" /><i className="value-pin" />
               </div>
-              <p>Benchmarks are shown with a plainly named cohort &mdash; not a relabeled proxy.</p>
+              <p>Benchmarks are shown with a plainly named cohort, not a relabeled proxy.</p>
             </div>
             <div className="context-row">
               <span className="context-orb" aria-hidden="true">01</span>
@@ -127,7 +114,7 @@ export default function Home() {
               <b>Discussion guide <span aria-hidden="true">&#8599;</span></b>
             </div>
           </div>
-          <p className="art-caption">Illustrative workflow &mdash; not a patient report or a product screenshot.</p>
+          <p className="art-caption">Illustrative workflow, not a patient report or a product screenshot.</p>
         </div>
       </section>
 
@@ -150,9 +137,9 @@ export default function Home() {
         <div className="approach-layout">
           <div className="approach-statement">
             <p>
-              When results arrive, it can be hard to tell what deserves a question, what
-              belongs in a broader pattern, and what generic reference ranges leave out.
-              CardioMet Lens organizes that starting point without pretending to replace
+              When results come back, it&rsquo;s hard to know what deserves a question,
+              what fits a larger pattern, and what a generic reference range leaves out.
+              CardioMet Lens organizes that starting point. It doesn&rsquo;t replace
               clinical judgment.
             </p>
             <a className="text-link" href="#guardrails">
@@ -173,8 +160,8 @@ export default function Home() {
                 <b>See a benchmark without blurring what it represents.</b>
                 <p>
                   Cohort labels stay explicit. The population benchmark is NHANES
-                  Non-Hispanic Asian and is named as such &mdash; never relabeled as South
-                  Asian data it is not.
+                  Non-Hispanic Asian, named as such, and never relabeled as South Asian
+                  data it isn&rsquo;t.
                 </p>
               </div>
             </li>
@@ -197,7 +184,7 @@ export default function Home() {
               <p className="eyebrow eyebrow-light"><span /> A focused path, not an overload of data</p>
               <h2 id="workflow-heading">From lab panel to better prepared.</h2>
             </div>
-            <p>Designed as education before an appointment &mdash; not an alternative to one.</p>
+            <p>Designed as education before an appointment, not an alternative to one.</p>
           </div>
 
           <div className="workflow-grid">
@@ -208,30 +195,6 @@ export default function Home() {
                 <p>{body}</p>
               </article>
             ))}
-          </div>
-
-          <div className="workflow-note">
-            <span className="note-mark" aria-hidden="true">+</span>
-            <p>
-              <b>What stays out of scope:</b> diagnosis, individual risk prediction,
-              medication advice, and treatment recommendations.
-            </p>
-          </div>
-
-          <div className="capability-deck" aria-labelledby="capabilities-heading">
-            <div className="capability-deck-head">
-              <p className="eyebrow eyebrow-light"><span /> A more complete read, kept deliberately descriptive</p>
-              <h3 id="capabilities-heading">The layers behind a better conversation.</h3>
-            </div>
-            <div className="capability-rail">
-              {CAPABILITIES.map(([n, title, body]) => (
-                <article key={n}>
-                  <span>{n}</span>
-                  <h4>{title}</h4>
-                  <p>{body}</p>
-                </article>
-              ))}
-            </div>
           </div>
         </div>
       </section>
@@ -249,55 +212,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ========================== BENEFITS ========================== */}
-      <section className="benefits shell section" aria-labelledby="benefits-heading">
-        <div className="benefits-lead">
-          <p className="eyebrow"><span /> Useful by design</p>
-          <h2 id="benefits-heading">The difference is in the detail it refuses to hide.</h2>
-          <p>
-            CardioMet Lens is built around careful distinctions that make the information
-            more trustworthy &mdash; and more useful in a real conversation.
-          </p>
-        </div>
-        <div className="benefit-cards">
-          <article className="benefit-card benefit-featured">
-            <p className="card-kicker">Guideline-first</p>
-            <h3>Know what a category is anchored to.</h3>
-            <p>Results name the guideline source behind the classification rather than presenting an unexplained flag.</p>
-            <div className="source-pills">
-              <span>ACC/AHA</span><span>ADA</span><span>NCEP</span><span>WHO</span>
-            </div>
-          </article>
-          <article className="benefit-card">
-            <p className="card-kicker">Honest context</p>
-            <h3>Keep population labels precise.</h3>
-            <p>
-              Reference context is presented with its actual cohort label, and a comparison
-              is withheld rather than shown when there is not enough data to support it.
-            </p>
-          </article>
-          <article className="benefit-card">
-            <p className="card-kicker">Safety in the structure</p>
-            <h3>Boundaries don&rsquo;t disappear when the page gets busy.</h3>
-            <p>
-              Disclaimers lead; limitations remain visible; and patient-facing language is
-              fixed and reviewable rather than generated on the fly.
-            </p>
-          </article>
-          <article className="benefit-card">
-            <p className="card-kicker">User-owned history</p>
-            <h3>Follow a trajectory without building a patient database.</h3>
-            <p>Descriptive longitudinal context can travel in a portable health file the user controls.</p>
-          </article>
-        </div>
-      </section>
-
       {/* ========================== AUDIENCES ========================== */}
       <section className="audience-shell" id="audiences" aria-labelledby="audiences-heading">
         <div className="shell audiences">
           <div className="audience-intro">
             <p className="eyebrow"><span /> Better prepared, on both sides of the appointment</p>
-            <h2 id="audiences-heading">One tool. Two perspectives that belong in the same conversation.</h2>
+            <h2 id="audiences-heading">One tool, two perspectives in the same conversation.</h2>
             <p>
               CardioMet Lens is designed for the person bringing the lab report and the
               clinician helping make sense of the whole picture. It does not replace either role.
@@ -325,10 +245,6 @@ export default function Home() {
               </ul>
             </article>
           </div>
-          <p className="audience-note">
-            CardioMet Lens is an education and appointment-preparation tool &mdash; not a
-            clinician portal, patient record, or replacement for professional care.
-          </p>
         </div>
       </section>
 
@@ -339,10 +255,9 @@ export default function Home() {
             <p className="eyebrow"><span /> Designed for a responsible role</p>
             <h2 id="guardrails-heading">A complete picture. Deliberate limits.</h2>
             <p>
-              The product&rsquo;s most important feature is not a claim &mdash; it is its
-              restraint. CardioMet Lens makes the transition from information to clinical
-              judgment explicit, so a person can prepare without being nudged into
-              self-diagnosis.
+              What makes this trustworthy is what it refuses to do. CardioMet Lens
+              draws a hard line between information and clinical judgment, so you can
+              prepare without drifting into self-diagnosis.
             </p>
           </div>
           <dl className="guardrail-list">
@@ -374,9 +289,8 @@ export default function Home() {
         <p className="eyebrow"><span /> A more useful starting point</p>
         <h2 id="cta-heading">Bring the right questions to your next appointment.</h2>
         <p>
-          Enter the values you have and see how CardioMet Lens turns a lab panel into
-          context for a clinician conversation &mdash; without stepping into diagnosis or
-          treatment.
+          Enter the values you have, and CardioMet Lens turns your lab panel into a
+          clearer starting point for that conversation.
         </p>
         <div className="final-actions">
           <Link className="button button-primary" href="/benchmark">
