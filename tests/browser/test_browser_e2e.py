@@ -110,6 +110,51 @@ def test_timeline_journey_two_draws(page, base_url):
     assert "will reach" not in body and "predict" not in body
 
 
+def test_timeline_export_import_round_trip(page, base_url, tmp_path):
+    """Audit F-03 / Section 3 'Timeline: Export/import round-trip' (P0,
+    previously untested through the real UI — only the underlying
+    health-file parsing had coverage, in test_series.py and
+    test_browser_security.py's adversarial-input cases). Drives the actual
+    buttons: add a draw, export it, clear local state, re-import the
+    exported file, and confirm the same draw comes back unchanged.
+    """
+    page.goto(f"{base_url}/timeline/", wait_until="networkidle")
+
+    page.get_by_label("Draw date").fill("2025-11-01")
+    page.get_by_placeholder("e.g. 100").fill("145")
+    page.get_by_role("button", name="Add this draw").click()
+    page.wait_for_selector("text=Draws added (1)")
+
+    with page.expect_download() as download_info:
+        page.get_by_role("button", name="Export my file").click()
+    download = download_info.value
+    exported_path = tmp_path / "exported-health-file.json"
+    download.save_as(str(exported_path))
+    assert exported_path.stat().st_size > 0
+
+    page.once("dialog", lambda dialog: dialog.accept())
+    page.get_by_role("button", name="Clear local data").click()
+    expect(page.get_by_text("Have a saved file?")).to_be_visible()
+
+    page.locator('input[type="file"]').first.set_input_files(str(exported_path))
+    page.wait_for_selector("text=Draws added (1)")
+    expect(page.get_by_text("2025-11-01")).to_be_visible()
+
+
+def test_clear_local_data_asks_for_confirmation(page, base_url):
+    """Audit F-03: warn before a destructive action with no undo. Declining
+    the confirmation must leave the cached draws untouched."""
+    page.goto(f"{base_url}/timeline/", wait_until="networkidle")
+    page.get_by_label("Draw date").fill("2025-11-01")
+    page.get_by_placeholder("e.g. 100").fill("145")
+    page.get_by_role("button", name="Add this draw").click()
+    page.wait_for_selector("text=Draws added (1)")
+
+    page.once("dialog", lambda dialog: dialog.dismiss())
+    page.get_by_role("button", name="Clear local data").click()
+    expect(page.get_by_text("Draws added (1)")).to_be_visible()
+
+
 def test_keyboard_focus_visible_on_primary_action(page, base_url):
     page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
     page.keyboard.press("Tab")

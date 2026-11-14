@@ -308,6 +308,7 @@ body {
   .home .context-row small { display: block; color: #6B6E7C; font-size: 9px; }
   .home .guide-row { align-items: center; padding-top: 14px; color: #6B6E7C; font-size: 10px; }
   .home .guide-row b { color: var(--teal); }
+  .home .example-question { margin: 10px 0 0; padding-top: 10px; border-top: 1px dashed #E3E6EA; color: #4C4F5C; font-size: 11px; font-style: italic; line-height: 1.5; }
   .home .art-caption { position: absolute; z-index: 2; right: 0; bottom: 2px; max-width: 190px; margin: 0; color: #6B6E7C; font-size: 10px; line-height: 1.45; text-align: right; }
 
   /* ---------- Proof strip ---------- */

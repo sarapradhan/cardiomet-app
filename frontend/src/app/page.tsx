@@ -113,6 +113,10 @@ export default function Home() {
               <span>For your appointment</span>
               <b>Discussion guide <span aria-hidden="true">&#8599;</span></b>
             </div>
+            <p className="example-question">
+              &ldquo;My LDL is High against this guideline. What should I track
+              before my next visit?&rdquo;
+            </p>
           </div>
           <p className="art-caption">Illustrative workflow, not a patient report or a product screenshot.</p>
         </div>
