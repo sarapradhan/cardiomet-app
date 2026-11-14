@@ -72,11 +72,10 @@ export default function TimelinePage() {
   }
 
   function resetAll() {
-    // Audit finding F-03: clarify saved-vs-unsaved status and warn before a
-    // destructive action. "Clear" only removes this browser's local cache —
-    // if the user hasn't exported a file, that cache is the only copy, so
-    // confirm before wiping it rather than requiring an undo that doesn't
-    // exist.
+    // UX improvement: warn before a destructive action with no undo.
+    // "Clear" only removes this browser's local cache — if the user hasn't
+    // exported a file, that cache is the only copy, so confirm before
+    // wiping it rather than requiring an undo that doesn't exist.
     if (draws.length > 0 && !window.confirm(
       'This removes the health file cached in this browser. If you haven’t ' +
       'exported a copy, these draws will be gone. Continue?'
@@ -128,8 +127,8 @@ export default function TimelinePage() {
               </span>
             </div>
           ))}
-          {/* Audit F-03: "saved" is ambiguous — these draws are cached in
-              THIS browser only (localStorage), not backed up anywhere.
+          {/* UX improvement: "saved" is ambiguous — these draws are cached
+              in THIS browser only (localStorage), not backed up anywhere.
               Clearing browser data, a private window, or switching devices
               loses them unless exported first. */}
           <p style={{ margin: 0, color: 'var(--ink-soft)', fontSize: 12 }}>

@@ -111,12 +111,11 @@ def test_timeline_journey_two_draws(page, base_url):
 
 
 def test_timeline_export_import_round_trip(page, base_url, tmp_path):
-    """Audit F-03 / Section 3 'Timeline: Export/import round-trip' (P0,
-    previously untested through the real UI — only the underlying
-    health-file parsing had coverage, in test_series.py and
-    test_browser_security.py's adversarial-input cases). Drives the actual
-    buttons: add a draw, export it, clear local state, re-import the
-    exported file, and confirm the same draw comes back unchanged.
+    """The full user journey for the user-owned health file: add a draw,
+    export it, clear local state, re-import the exported file, and confirm
+    the same draw comes back unchanged. Previously untested through the real
+    UI — only the underlying health-file parsing had coverage, in
+    test_series.py and test_browser_security.py's adversarial-input cases.
     """
     page.goto(f"{base_url}/timeline/", wait_until="networkidle")
 
@@ -142,8 +141,8 @@ def test_timeline_export_import_round_trip(page, base_url, tmp_path):
 
 
 def test_clear_local_data_asks_for_confirmation(page, base_url):
-    """Audit F-03: warn before a destructive action with no undo. Declining
-    the confirmation must leave the cached draws untouched."""
+    """UX improvement: warn before a destructive action with no undo.
+    Declining the confirmation must leave the cached draws untouched."""
     page.goto(f"{base_url}/timeline/", wait_until="networkidle")
     page.get_by_label("Draw date").fill("2025-11-01")
     page.get_by_placeholder("e.g. 100").fill("145")
