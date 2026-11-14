@@ -54,7 +54,7 @@ This runs all backend test tiers (smoke → unit → integration → e2e), the T
 
 ## Clinical content changes
 
-Changes to thresholds, biomarker categories, or South Asian context notes are **clinical content** and carry extra weight. Cite the guideline and version (e.g. ACC/AHA 2018) in the PR, and expect these to be held for review before merge.
+Changes to thresholds, biomarker categories, or South Asian context notes are **clinical content** and carry extra weight. Cite the guideline and version (e.g. the 2026 ACC/AHA/Multisociety Dyslipidemia Guideline) in the PR, and expect these to be held for review before merge.
 
 ## Reporting issues
 

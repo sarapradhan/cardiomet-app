@@ -231,8 +231,15 @@ def test_fpg_not_classified_without_confirmed_fasting_status(page, base_url):
     page.wait_for_url("**/results/**")
     page.wait_for_load_state("networkidle")
     expect(page.get_by_text("Not classified")).to_be_visible()
-    body = page.inner_text("body").lower()
-    assert "diabetes" not in body
+    # Exact-text match, not a substring scan of the whole page: the FPG/HbA1c
+    # guideline_source citation ("ADA Standards of Care in Diabetes-2026")
+    # legitimately contains the word "diabetes" as part of the guideline's own
+    # name, so a bare substring check collides with it. A rendered category
+    # chip's text is always exactly "Diabetes"/"Prediabetes"/"Normal"/etc (see
+    # ThresholdCards.tsx), never embedded in a longer sentence, so exact=True
+    # distinguishes "a Diabetes category chip exists" from "the word diabetes
+    # appears anywhere, including in a citation".
+    assert page.get_by_text("Diabetes", exact=True).count() == 0
 
 
 def test_daylight_snapshot_and_benchmark_bars(page, base_url):

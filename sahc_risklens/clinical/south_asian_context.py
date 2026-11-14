@@ -4,7 +4,10 @@ sahc_risklens/clinical/south_asian_context.py
 South Asian risk-enhancing context panel.
 
 SOURCE OF TRUTH: docs/CLINICAL_LOGIC_APPENDIX.md
-  - "South Asian ASCVD Risk Context" section (2018 AHA/ACC Cholesterol Guideline)
+  - "South Asian ASCVD Risk Context" section (2026 ACC/AHA/Multisociety
+    Dyslipidemia Guideline, superseding the 2018 ACC/AHA Cholesterol Guideline
+    this qualitative risk-enhancing-factor framing originates from \u2014 see
+    "Guideline Currency Note" in the appendix)
   - "BMI \u2014 South Asian Context" section (WHO Expert Consultation 2004)
 
 Per docs/CLINICAL_LOGIC_APPENDIX.md: "Do not quantify individual risk \u2014 present
@@ -18,7 +21,15 @@ from __future__ import annotations
 
 from sahc_risklens.clinical.thresholds import classify_bmi_south_asian
 
-_ASCVD_SOURCE = "2018 AHA/ACC Cholesterol Guideline"
+# General qualitative framing (South Asian ancestry as a risk-enhancing
+# factor) — citation updated 2026-11, see module docstring. This is distinct
+# from the Lp(a) *numeric* risk-enhancer threshold below, which cites the same
+# source as thresholds._RISK_ENHANCER_SOURCE and is deliberately left on the
+# 2018 citation pending clinical review of that specific number (not this
+# general statement) — see thresholds.py and CLINICAL_LOGIC_APPENDIX.md
+# "PENDING CLINICAL REVIEW".
+_ASCVD_SOURCE = "2026 ACC/AHA/Multisociety Dyslipidemia Guideline"
+_LPA_RISK_ENHANCER_SOURCE = "2018 AHA/ACC Cholesterol Guideline (risk-enhancing factor) — PENDING CLINICAL REVIEW"
 _BMI_SOUTH_ASIAN_SOURCE = "WHO Expert Consultation on BMI in Asian Populations (2004)"
 
 
@@ -38,8 +49,8 @@ def get_south_asian_context(bmi_value: float | None = None,
         {
             "factor": "South Asian Ancestry \u2014 ASCVD Risk-Enhancing Factor",
             "description": (
-                "South Asian ancestry is recognized as a risk-enhancing factor in the "
-                "2018 AHA/ACC Cholesterol Guideline. South Asians may have elevated "
+                "South Asian ancestry is recognized as a risk-enhancing factor in "
+                "ACC/AHA dyslipidemia guidance. South Asians may have elevated "
                 "atherosclerotic cardiovascular disease (ASCVD) risk compared with "
                 "other populations, and this risk may be underestimated by standard "
                 "risk calculators. This is guideline-based clinical context for "
@@ -60,7 +71,7 @@ def get_south_asian_context(bmi_value: float | None = None,
                 f"South Asian populations. This is qualitative context for "
                 f"discussion with your physician — not an individual risk score."
             ),
-            "guideline_source": _ASCVD_SOURCE,
+            "guideline_source": _LPA_RISK_ENHANCER_SOURCE,
         })
 
     if bmi_value is not None:

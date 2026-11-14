@@ -14,8 +14,12 @@ population-independent read.
 
 - **Markers:** LDL, HDL (sex-specific), Triglycerides, Total Cholesterol, HbA1c,
   Fasting Glucose, Systolic/Diastolic BP, BMI.
-- **Sources:** ACC/AHA 2018 (lipids), NCEP ATP III (HDL/TC), ADA 2024 (glucose/
-  HbA1c), ACC/AHA 2017 (BP), WHO (BMI). Each category names its guideline.
+- **Sources:** 2026 ACC/AHA/Multisociety Dyslipidemia Guideline (lipids), NCEP
+  ATP III (HDL/TC), ADA Standards of Care in Diabetes—2026 (glucose/HbA1c),
+  ACC/AHA 2017 (BP), WHO (BMI). Each category names its guideline. See
+  docs/CLINICAL_LOGIC_APPENDIX.md "Guideline Currency Note" (2026-11) — the
+  lipid/glucose citations were bumped to the current guideline name; the
+  numeric bands were not changed and remain pending clinician review.
 - **Behavior:** missing values are shown as "Not provided," never imputed.
   Medication flags add a note but never change a category. BMI is dual — the
   standard WHO category here, the South Asian category in the context panel.
@@ -61,7 +65,8 @@ Markers that capture South Asian risk better than the standard panel, classified
 as guideline risk-enhancing factors.
 
 - **Classification-only:** no cohort measures them, so there is no percentile —
-  just a guideline category (2018 AHA/ACC risk-enhancer thresholds: ApoB ≥130
+  just a guideline category (2018 AHA/ACC risk-enhancer thresholds, PENDING
+  CLINICAL REVIEW against the 2026 guideline: ApoB ≥130
   mg/dL; Lp(a) ≥50 mg/dL / ≥125 nmol/L).
 - **Behavior:** present only when supplied (never flagged "missing"); ApoB carries
   a statin medication note; an elevated Lp(a) adds a South Asian context item.

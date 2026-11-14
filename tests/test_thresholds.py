@@ -253,12 +253,12 @@ def test_bmi_245_dual_classification():
 def test_guideline_sources_match_appendix():
     results = classify_all_biomarkers(_normal_data())
     sources = {r["biomarker"]: r["guideline_source"] for r in results}
-    assert sources["LDL"] == "ACC/AHA 2018 Cholesterol Guideline"
+    assert sources["LDL"] == "2026 ACC/AHA/Multisociety Dyslipidemia Guideline"
     assert sources["HDL"] == "NCEP ATP III"
-    assert sources["TG"] == "ACC/AHA 2018 Cholesterol Guideline"
+    assert sources["TG"] == "2026 ACC/AHA/Multisociety Dyslipidemia Guideline"
     assert sources["TC"] == "NCEP ATP III"
-    assert sources["HbA1c"] == "ADA Standards of Medical Care 2024"
-    assert sources["FPG"] == "ADA Standards of Medical Care 2024"
+    assert sources["HbA1c"] == "ADA Standards of Care in Diabetes—2026"
+    assert sources["FPG"] == "ADA Standards of Care in Diabetes—2026"
     assert sources["SBP"] == "ACC/AHA 2017 High Blood Pressure Guideline"
     assert sources["DBP"] == "ACC/AHA 2017 High Blood Pressure Guideline"
     assert sources["BMI"] == "WHO Global Database on Body Mass Index"
@@ -360,7 +360,7 @@ def test_south_asian_context_always_includes_ascvd_factor():
     items = get_south_asian_context()
     assert len(items) == 1
     assert "ASCVD" in items[0]["factor"] or "Ancestry" in items[0]["factor"]
-    assert items[0]["guideline_source"] == "2018 AHA/ACC Cholesterol Guideline"
+    assert items[0]["guideline_source"] == "2026 ACC/AHA/Multisociety Dyslipidemia Guideline"
 
 
 def test_south_asian_context_bmi_item_only_when_bmi_provided():
@@ -416,4 +416,4 @@ def test_physician_guide_cites_guideline_source():
     results = classify_all_biomarkers(data)
     guide = build_physician_guide(results)
     hba1c_item = next(g for g in guide if g["biomarker"] == "HbA1c")
-    assert "ADA Standards of Medical Care 2024" in hba1c_item["guideline_note"]
+    assert "ADA Standards of Care in Diabetes—2026" in hba1c_item["guideline_note"]
