@@ -5,7 +5,7 @@ frontend/src/lib/types.ts BiomarkerInput must mirror this.
 """
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class BiomarkerInput(BaseModel):
@@ -45,3 +45,25 @@ class BiomarkerInput(BaseModel):
         "BMI_kgm2": 22.1, "age_yr": 45, "sex": "M", "south_asian": True,
         "bp_med": False, "chol_med": False, "insulin": False, "dm_pills": False,
     }}}
+
+    @model_validator(mode="after")
+    def _sbp_must_exceed_dbp(self) -> "BiomarkerInput":
+        """
+        Cross-field consistency check: systolic pressure is physiologically
+        always higher than diastolic for the same reading. When both are
+        provided and SBP <= DBP, the pair is internally inconsistent (e.g. the
+        two values were swapped at entry) — reject rather than classify a
+        contradictory reading. This is an input-validation check only: it does
+        not infer or correct which value the user meant, it only refuses an
+        impossible pair. Single-field range limits (Field ge/le above) already
+        catch each value being implausible on its own; this catches the pair
+        being implausible together (e.g. 110/130, each individually in range).
+        """
+        if self.SBP_mmhg is not None and self.DBP_mmhg is not None:
+            if self.SBP_mmhg <= self.DBP_mmhg:
+                raise ValueError(
+                    f"SBP_mmhg ({self.SBP_mmhg}) must be greater than DBP_mmhg "
+                    f"({self.DBP_mmhg}) — systolic is always higher than "
+                    "diastolic for the same reading. Check for a data-entry swap."
+                )
+        return self

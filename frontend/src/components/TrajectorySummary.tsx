@@ -69,9 +69,11 @@ export function TrajectorySummary({ trajectories, interventions, disclaimer }: P
         </div>
       )}
 
-      {/* Disclaimer (from API) + trajectory-specific limitation, always shown */}
+      {/* Disclaimer (from API) + trajectory-specific limitation, always shown.
+          #BF360C, not #E65100 — see the matching comment in
+          app/results/page.tsx (same block; was 3.56:1, below AA 4.5:1). */}
       <div style={{ marginTop: 16, padding: '12px 16px', borderRadius: 8, fontSize: 12,
-        backgroundColor: '#FFF8E1', color: '#E65100', border: '1px solid #FFE082' }}>
+        backgroundColor: '#FFF8E1', color: '#BF360C', border: '1px solid #FFE082' }}>
         {disclaimer}
       </div>
       <p style={{ fontSize: 11, color: 'var(--ink-soft)', marginTop: 8 }}>

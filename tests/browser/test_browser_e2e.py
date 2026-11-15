@@ -110,6 +110,50 @@ def test_timeline_journey_two_draws(page, base_url):
     assert "will reach" not in body and "predict" not in body
 
 
+def test_timeline_export_import_round_trip(page, base_url, tmp_path):
+    """The full user journey for the user-owned health file: add a draw,
+    export it, clear local state, re-import the exported file, and confirm
+    the same draw comes back unchanged. Previously untested through the real
+    UI — only the underlying health-file parsing had coverage, in
+    test_series.py and test_browser_security.py's adversarial-input cases.
+    """
+    page.goto(f"{base_url}/timeline/", wait_until="networkidle")
+
+    page.get_by_label("Draw date").fill("2025-11-01")
+    page.get_by_placeholder("e.g. 100").fill("145")
+    page.get_by_role("button", name="Add this draw").click()
+    page.wait_for_selector("text=Draws added (1)")
+
+    with page.expect_download() as download_info:
+        page.get_by_role("button", name="Export my file").click()
+    download = download_info.value
+    exported_path = tmp_path / "exported-health-file.json"
+    download.save_as(str(exported_path))
+    assert exported_path.stat().st_size > 0
+
+    page.once("dialog", lambda dialog: dialog.accept())
+    page.get_by_role("button", name="Clear local data").click()
+    expect(page.get_by_text("Have a saved file?")).to_be_visible()
+
+    page.locator('input[type="file"]').first.set_input_files(str(exported_path))
+    page.wait_for_selector("text=Draws added (1)")
+    expect(page.get_by_text("2025-11-01")).to_be_visible()
+
+
+def test_clear_local_data_asks_for_confirmation(page, base_url):
+    """UX improvement: warn before a destructive action with no undo.
+    Declining the confirmation must leave the cached draws untouched."""
+    page.goto(f"{base_url}/timeline/", wait_until="networkidle")
+    page.get_by_label("Draw date").fill("2025-11-01")
+    page.get_by_placeholder("e.g. 100").fill("145")
+    page.get_by_role("button", name="Add this draw").click()
+    page.wait_for_selector("text=Draws added (1)")
+
+    page.once("dialog", lambda dialog: dialog.dismiss())
+    page.get_by_role("button", name="Clear local data").click()
+    expect(page.get_by_text("Draws added (1)")).to_be_visible()
+
+
 def test_keyboard_focus_visible_on_primary_action(page, base_url):
     page.goto(f"{base_url}/benchmark/", wait_until="networkidle")
     page.keyboard.press("Tab")
@@ -231,8 +275,15 @@ def test_fpg_not_classified_without_confirmed_fasting_status(page, base_url):
     page.wait_for_url("**/results/**")
     page.wait_for_load_state("networkidle")
     expect(page.get_by_text("Not classified")).to_be_visible()
-    body = page.inner_text("body").lower()
-    assert "diabetes" not in body
+    # Exact-text match, not a substring scan of the whole page: the FPG/HbA1c
+    # guideline_source citation ("ADA Standards of Care in Diabetes-2026")
+    # legitimately contains the word "diabetes" as part of the guideline's own
+    # name, so a bare substring check collides with it. A rendered category
+    # chip's text is always exactly "Diabetes"/"Prediabetes"/"Normal"/etc (see
+    # ThresholdCards.tsx), never embedded in a longer sentence, so exact=True
+    # distinguishes "a Diabetes category chip exists" from "the word diabetes
+    # appears anywhere, including in a citation".
+    assert page.get_by_text("Diabetes", exact=True).count() == 0
 
 
 def test_daylight_snapshot_and_benchmark_bars(page, base_url):

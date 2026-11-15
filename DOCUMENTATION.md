@@ -189,7 +189,7 @@ It performs no clinical computation of its own.
 
 ### 9.1 Test tiers
 
-307 backend tests organized as **smoke → unit → integration → e2e**, plus a 23-test Playwright browser tier. The tiering lets a fast smoke pass catch gross breakage before the slower integration and end-to-end suites run.
+321 backend tests organized as **smoke → unit → integration → e2e**, plus a 50-test Playwright browser tier (functional UI coverage, an automated WCAG 2.2 AA scan via axe-core, an import-path security/robustness suite — malformed/oversized health-file imports, a structurally-invalid draws array, an XSS-payload-in-label regression guard — and a lightweight Core Web Vitals proxy: FCP/transfer-size budgets and a console-error check, not a substitute for a real Lighthouse pass). The tiering lets a fast smoke pass catch gross breakage before the slower integration and end-to-end suites run.
 
 ### 9.2 The single release command
 

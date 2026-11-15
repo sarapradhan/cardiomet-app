@@ -26,7 +26,17 @@ Table = list[tuple[float, str, str]]
 # Threshold tables — docs/CLINICAL_LOGIC_APPENDIX.md
 # ---------------------------------------------------------------------------
 
-_LDL_SOURCE = "ACC/AHA 2018 Cholesterol Guideline"
+# Citation updated 2026-11 (see docs/CLINICAL_LOGIC_APPENDIX.md "Guideline
+# Currency Note"): the 2018 ACC/AHA Cholesterol Guideline has been superseded by
+# the 2026 ACC/AHA/AACVPR/ABC/ACPM/ADA/AGS/APhA/ASPC/NLA/PCNA Guideline on the
+# Management of Dyslipidemia (JACC, March 2026). Confirmed 2026 changes are
+# concentrated in treatment goals and a new risk-assessment tool (PREVENT-ASCVD)
+# — neither of which this product implements by design (no treatment advice, no
+# individual risk prediction). Whether the descriptive classification bands
+# below changed has NOT been confirmed against the new guideline's own tables;
+# they are carried over unchanged from the 2018 guideline pending clinician
+# review. Do not alter these numbers without that review.
+_LDL_SOURCE = "2026 ACC/AHA/Multisociety Dyslipidemia Guideline"
 _LDL_TABLE: Table = [
     (float("-inf"), "Optimal",         "< 100 mg/dL"),
     (100,           "Near Optimal",    "100-129 mg/dL"),
@@ -47,7 +57,8 @@ _HDL_FEMALE_TABLE: Table = [
     (60,            "Protective", ">= 60 mg/dL"),
 ]
 
-_TG_SOURCE = "ACC/AHA 2018 Cholesterol Guideline"
+# Same currency note as _LDL_SOURCE above — numeric bands unchanged pending review.
+_TG_SOURCE = "2026 ACC/AHA/Multisociety Dyslipidemia Guideline"
 _TG_TABLE: Table = [
     (float("-inf"), "Normal",          "< 150 mg/dL"),
     (150,           "Borderline High", "150-199 mg/dL"),
@@ -62,14 +73,24 @@ _TC_TABLE: Table = [
     (240,           "High",            ">= 240 mg/dL"),
 ]
 
-_HBA1C_SOURCE = "ADA Standards of Medical Care 2024"
+# Citation updated 2026-11: ADA renamed and re-published its annual standard as
+# "Standards of Care in Diabetes—2026" (Diabetes Care, Suppl. 1), superseding the
+# 2024 edition. "What's new" summaries of the 2026 edition describe changes to
+# CGM guidance, insulin-pump criteria, type 1 autoantibody screening, obesity
+# medication dosing, and older-adult care — none mention a change to the
+# diagnostic HbA1c/FPG cut-points below, which have been stable for over a
+# decade. That absence is not the same as confirmation from ADA's own Section 2
+# primary text, which was not independently checked — treat the numbers as
+# believed unchanged, not verified unchanged.
+_HBA1C_SOURCE = "ADA Standards of Care in Diabetes—2026"
 _HBA1C_TABLE: Table = [
     (float("-inf"), "Normal",      "< 5.7%"),
     (5.7,           "Prediabetes", "5.7-6.4%"),
     (6.5,           "Diabetes",    ">= 6.5%"),
 ]
 
-_FPG_SOURCE = "ADA Standards of Medical Care 2024"
+# Same currency note as _HBA1C_SOURCE above.
+_FPG_SOURCE = "ADA Standards of Care in Diabetes—2026"
 _FPG_TABLE: Table = [
     (float("-inf"), "Normal",      "< 100 mg/dL"),
     (100,           "Prediabetes", "100-125 mg/dL"),

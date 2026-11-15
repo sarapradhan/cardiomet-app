@@ -23,7 +23,7 @@ from sahc_risklens.clinical.thresholds import (
     classify_all_biomarkers,
     classify_risk_enhancing_markers,
 )
-from sahc_risklens.config import DEFAULT_COHORT, cohort_label
+from sahc_risklens.config import DEFAULT_COHORT, cohort_label, cohort_weighted, cohort_years
 
 router = APIRouter()
 
@@ -90,6 +90,8 @@ def benchmark_biomarkers(
         medication_notes=medication_notes,
         cohort=cohort,
         cohort_label=cohort_label(cohort),
+        cohort_years=cohort_years(cohort),
+        cohort_weighted=cohort_weighted(cohort),
         matched=any_matched is not None,
         match_description=any_matched["match_description"] if any_matched else None,
     )

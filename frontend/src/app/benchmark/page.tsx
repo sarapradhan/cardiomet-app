@@ -108,7 +108,11 @@ export default function BenchmarkPage() {
       }}>
         <span className="caption" style={{ fontWeight: 600 }}>Compared against:</span>
         <span className="caption" data-testid="cohort-name">{COHORT_LABELS.nhanes_asian}</span>
-        <span className="caption" style={{ opacity: 0.85 }}>
+        {/* No inline opacity: .caption's color (--ink-faint) is already tuned
+            to the smallest AA-passing margin at this font size (see globals.css
+            comment) against var(--surface-sunken) — dimming it further with
+            opacity dropped it below 4.5:1 (axe-core color-contrast, serious). */}
+        <span className="caption">
           &mdash; a public U.S. survey population, used as a proxy. NHANES has no
           South Asian&ndash;specific sample.
         </span>

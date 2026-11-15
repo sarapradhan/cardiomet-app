@@ -7,6 +7,8 @@ import { Timeline } from '@/components/Timeline';
 import { TrajectorySummary } from '@/components/TrajectorySummary';
 import { exportHealthFile, parseHealthFile, saveLocal, loadLocal, clearLocal } from '@/lib/healthFile';
 
+const MAX_HEALTH_FILE_BYTES = 5 * 1024 * 1024; // 5 MB — see onImport.
+
 export default function TimelinePage() {
   const [draws, setDraws] = useState<BiomarkerDraw[]>([]);
   const [drawDate, setDrawDate] = useState<string>(new Date().toISOString().slice(0, 10));
@@ -45,6 +47,18 @@ export default function TimelinePage() {
   function onImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Health files are a handful of draws of a few dozen numeric fields each
+    // — KBs, not MBs. Reject obviously-wrong files (wrong file picked, or a
+    // crafted oversized file) before reading/parsing them, rather than
+    // handing an arbitrarily large string to JSON.parse and React state.
+    if (file.size > MAX_HEALTH_FILE_BYTES) {
+      setError(
+        `That file is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). ` +
+        `A health file is expected to be well under ${MAX_HEALTH_FILE_BYTES / (1024 * 1024)} MB.`
+      );
+      e.target.value = '';
+      return;
+    }
     file.text().then((text) => {
       try {
         const series = parseHealthFile(text);
@@ -58,6 +72,16 @@ export default function TimelinePage() {
   }
 
   function resetAll() {
+    // UX improvement: warn before a destructive action with no undo.
+    // "Clear" only removes this browser's local cache — if the user hasn't
+    // exported a file, that cache is the only copy, so confirm before
+    // wiping it rather than requiring an undo that doesn't exist.
+    if (draws.length > 0 && !window.confirm(
+      'This removes the health file cached in this browser. If you haven’t ' +
+      'exported a copy, these draws will be gone. Continue?'
+    )) {
+      return;
+    }
     setDraws([]); setResult(null); clearLocal();
   }
 
@@ -103,6 +127,14 @@ export default function TimelinePage() {
               </span>
             </div>
           ))}
+          {/* UX improvement: "saved" is ambiguous — these draws are cached
+              in THIS browser only (localStorage), not backed up anywhere.
+              Clearing browser data, a private window, or switching devices
+              loses them unless exported first. */}
+          <p style={{ margin: 0, color: 'var(--ink-soft)', fontSize: 12 }}>
+            Cached in this browser only — not backed up anywhere. Export a file
+            to keep a copy or move it to another device.
+          </p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
             <button className="btn btn-primary" onClick={analyze} disabled={isLoading}>
               {isLoading ? 'Analyzing…' : 'See My Timeline'}

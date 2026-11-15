@@ -108,6 +108,8 @@ export interface BenchmarkResponse {
   medication_notes: string[];
   cohort: CohortId;                            // selected cohort id
   cohort_label: CohortLabel;                   // always render exactly as received
+  cohort_years: string;                        // data vintage, e.g. "2017-2018"
+  cohort_weighted: boolean;                     // whether percentiles apply survey weighting
   matched: boolean;                            // true if peer matching applied to >=1 biomarker
   match_description: string | null;            // peer group used, e.g. "Women, 49–64"
   disclaimer: string;                          // always present — always render

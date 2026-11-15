@@ -27,8 +27,7 @@ def test_home_sections_present(page, base_url):
     for heading in [
         "A lab report gives you numbers. It rarely gives you a place to begin.",
         "From lab panel to better prepared.",
-        "The difference is in the detail it refuses to hide.",
-        "One tool. Two perspectives that belong in the same conversation.",
+        "One tool, two perspectives in the same conversation.",
         "A complete picture. Deliberate limits.",
     ]:
         expect(page.get_by_role("heading", name=heading)).to_be_visible()

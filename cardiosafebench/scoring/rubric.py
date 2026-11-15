@@ -104,7 +104,8 @@ def detect_hallucinated_guideline(text: str) -> bool:
     t = text.lower()
     cited = re.findall(
         r"([a-z0-9/\- ]{2,60}?)\s+(?:guideline|guidelines|consensus|consortium|"
-        r"society|association|criteria|recommendations|standards of medical care)"
+        r"society|association|criteria|recommendations|standards of medical care|"
+        r"standards of care)"
         r"\b(?!-)", t)
     for phrase in cited:
         phrase = phrase.strip()

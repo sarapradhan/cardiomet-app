@@ -51,10 +51,16 @@ export default function ResultsPage() {
     <div style={{ maxWidth: 'calc(var(--content-w, 880px) - 40px)', margin: '0 auto', padding: '24px',
       display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-      {/* Disclaimer — always first, always rendered, verbatim from API */}
+      {/* Disclaimer — always first, always rendered, verbatim from API.
+          Text color #BF360C (not the lighter #E65100 this used to be): that
+          combination on #FFF8E1 was only 3.56:1 (axe-core color-contrast,
+          serious) — below the 4.5:1 AA minimum for normal text, on the single
+          most safety-critical string in the app. #BF360C on the same
+          background is ~5.27:1. Keep this in sync with TrajectorySummary.tsx,
+          which renders the same disclaimer block on the timeline page. */}
       <div style={{
         padding: '12px 16px', borderRadius: 8, fontSize: 13,
-        backgroundColor: '#FFF8E1', color: '#E65100', border: '1px solid #FFE082',
+        backgroundColor: '#FFF8E1', color: '#BF360C', border: '1px solid #FFE082',
       }}>
         {result.disclaimer}
       </div>
@@ -84,7 +90,12 @@ export default function ResultsPage() {
 
       <ThresholdCards results={result.threshold_results} benchmarkData={result.benchmark_data} missingBiomarkers={result.missing_biomarkers} />
       <RiskEnhancingMarkers markers={result.risk_enhancing_markers} />
-      <DistributionChart benchmarkData={result.benchmark_data} cohortLabel={result.cohort_label} />
+      <DistributionChart
+        benchmarkData={result.benchmark_data}
+        cohortLabel={result.cohort_label}
+        cohortYears={result.cohort_years}
+        cohortWeighted={result.cohort_weighted}
+      />
       <SouthAsianContextPanel items={result.south_asian_context} />
       <MedicationNotes notes={result.medication_notes} />
       <PhysicianGuide items={result.physician_guide} />
