@@ -6,6 +6,15 @@ import './globals.css';
 export const viewport = { width: 'device-width', initialScale: 1 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://cardiometlens.novalabs.tech'),
+  alternates: { canonical: './' },
+  openGraph: {
+    type: 'website',
+    url: './',
+    siteName: 'CardioMet Lens',
+    title: 'CardioMet Lens — Cardiometabolic lab context',
+    description: 'Understand your cardiometabolic labs against clinical guidelines and a population benchmark. Educational use only — not a diagnosis.',
+  },
   title: 'CardioMet Lens — Cardiometabolic lab context',
   description: 'Understand your cardiometabolic labs against clinical guidelines and a population benchmark. Educational use only — not a diagnosis.',
 };
